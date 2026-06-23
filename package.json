@@ -1,0 +1,16 @@
+{
+  "name": "kukus-gallery-invoice-system",
+  "version": "1.0.0",
+  "description": "Professional invoice management system for Kukus Gallery Pvt Ltd",
+  "scripts": {
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "client": "cd client && npm run dev",
+    "server": "cd server && npm run dev",
+    "build": "cd client && npm run build",
+    "start": "cd server && node server.js",
+    "seed": "cd server && node utils/seedAdmin.js"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.0"
+  }
+}
