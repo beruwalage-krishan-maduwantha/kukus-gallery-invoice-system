@@ -10,6 +10,7 @@ import LoadingSpinner from '../components/common/LoadingSpinner';
 export default function SettingsPage() {
   const { user } = useAuth();
   const isAdmin = user?.role === 'admin';
+  const isMainAdmin = user?.email === 'admin@kukusgallery.com';
   const [form, setForm] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -271,76 +272,94 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      {/* User Management Section - Admin Only */}
-      {isAdmin && <div className="card-custom mb-4">
-        <div className="d-flex justify-content-between align-items-center mb-3">
-          <h5 className="form-section-title" style={{ margin: 0, border: 0, padding: 0 }}>
-            <UsersIcon style={{ width: 20, height: 20, marginRight: 8, display: 'inline' }} />
-            User Management
-          </h5>
-          <Button className="btn-primary-custom btn-sm-custom" onClick={() => { setEditingUser(null); setUserForm({ name: '', email: '', password: '', role: 'staff' }); setShowUserForm(true); }}>
-            <PlusIcon style={{ width: 14, height: 14, marginRight: 4 }} /> Add User
-          </Button>
-        </div>
-
-        <div className="table-custom" style={{ boxShadow: 'none' }}>
-          <table>
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Role</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {users.map(u => (
-                <tr key={u._id}>
-                  <td style={{ fontWeight: 600, color: 'var(--primary-dark)' }}>{u.name}</td>
-                  <td>{u.email}</td>
-                  <td>
-                    <span className="status-badge" style={{
-                      background: u.role === 'admin' ? 'rgba(99,102,241,0.1)' : 'rgba(177,145,198,0.12)',
-                      color: u.role === 'admin' ? '#6366F1' : 'var(--accent)'
-                    }}>{u.role}</span>
-                  </td>
-                  <td>
-                    <span className="status-badge" style={{
-                      background: u.isActive ? 'rgba(34,197,94,0.1)' : 'rgba(239,68,68,0.1)',
-                      color: u.isActive ? 'var(--success)' : 'var(--danger)'
-                    }}>{u.isActive ? 'Active' : 'Inactive'}</span>
-                  </td>
-                  <td>
-                    <div className="d-flex gap-1">
-                      <button className="btn-outline-custom btn-sm-custom" onClick={() => {
-                        setEditingUser(u);
-                        setUserForm({ name: u.name, email: u.email, password: '', role: u.role });
-                        setShowUserForm(true);
-                      }}>Edit</button>
-                      <button className="btn-sm-custom" style={{ background: 'rgba(245,158,11,0.1)', color: 'var(--warning)', border: 'none', borderRadius: 6, padding: '0.35rem 0.6rem', fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer' }}
-                        onClick={() => { setShowResetPw(u); setNewPassword(''); }}>Reset PW</button>
-                      {u.role !== 'admin' && (
-                        <button className="btn-sm-custom" style={{
-                          background: u.isActive ? 'rgba(239,68,68,0.1)' : 'rgba(34,197,94,0.1)',
-                          color: u.isActive ? 'var(--danger)' : 'var(--success)',
-                          border: 'none', borderRadius: 6, padding: '0.35rem 0.6rem', fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer'
-                        }} onClick={async () => {
-                          try {
-                            await api.put(`/users/${u._id}`, { isActive: !u.isActive });
-                            toast.success(u.isActive ? 'User deactivated' : 'User activated');
-                            fetchUsers();
-                          } catch { toast.error('Failed'); }
-                        }}>{u.isActive ? 'Deactivate' : 'Activate'}</button>
-                      )}
-                    </div>
-                  </td>
+      {/* User Management - Main Admin sees all, other admins see only their own account */}
+      {isMainAdmin ? (
+        <div className="card-custom mb-4">
+          <div className="d-flex justify-content-between align-items-center mb-3">
+            <h5 className="form-section-title" style={{ margin: 0, border: 0, padding: 0 }}>
+              <UsersIcon style={{ width: 20, height: 20, marginRight: 8, display: 'inline' }} />
+              User Management
+            </h5>
+            <Button className="btn-primary-custom btn-sm-custom" onClick={() => { setEditingUser(null); setUserForm({ name: '', email: '', password: '', role: 'staff' }); setShowUserForm(true); }}>
+              <PlusIcon style={{ width: 14, height: 14, marginRight: 4 }} /> Add User
+            </Button>
+          </div>
+          <div className="table-custom" style={{ boxShadow: 'none' }}>
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Role</th>
+                  <th>Status</th>
+                  <th>Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {users.map(u => (
+                  <tr key={u._id}>
+                    <td style={{ fontWeight: 600, color: 'var(--primary-dark)' }}>{u.name}</td>
+                    <td>{u.email}</td>
+                    <td>
+                      <span className="status-badge" style={{
+                        background: u.role === 'admin' ? 'rgba(99,102,241,0.1)' : 'rgba(177,145,198,0.12)',
+                        color: u.role === 'admin' ? '#6366F1' : 'var(--accent)'
+                      }}>{u.role}</span>
+                    </td>
+                    <td>
+                      <span className="status-badge" style={{
+                        background: u.isActive ? 'rgba(34,197,94,0.1)' : 'rgba(239,68,68,0.1)',
+                        color: u.isActive ? 'var(--success)' : 'var(--danger)'
+                      }}>{u.isActive ? 'Active' : 'Inactive'}</span>
+                    </td>
+                    <td>
+                      <div className="d-flex gap-1">
+                        <button className="btn-outline-custom btn-sm-custom" onClick={() => {
+                          setEditingUser(u);
+                          setUserForm({ name: u.name, email: u.email, password: '', role: u.role });
+                          setShowUserForm(true);
+                        }}>Edit</button>
+                        <button className="btn-sm-custom" style={{ background: 'rgba(245,158,11,0.1)', color: 'var(--warning)', border: 'none', borderRadius: 6, padding: '0.35rem 0.6rem', fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer' }}
+                          onClick={() => { setShowResetPw(u); setNewPassword(''); }}>Reset PW</button>
+                        {u.email !== 'admin@kukusgallery.com' && (
+                          <button className="btn-sm-custom" style={{
+                            background: u.isActive ? 'rgba(239,68,68,0.1)' : 'rgba(34,197,94,0.1)',
+                            color: u.isActive ? 'var(--danger)' : 'var(--success)',
+                            border: 'none', borderRadius: 6, padding: '0.35rem 0.6rem', fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer'
+                          }} onClick={async () => {
+                            try {
+                              await api.put(`/users/${u._id}`, { isActive: !u.isActive });
+                              toast.success(u.isActive ? 'User deactivated' : 'User activated');
+                              fetchUsers();
+                            } catch { toast.error('Failed'); }
+                          }}>{u.isActive ? 'Deactivate' : 'Activate'}</button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>}
+      ) : isAdmin ? (
+        <div className="card-custom mb-4">
+          <h5 className="form-section-title" style={{ margin: 0, border: 0, padding: 0, marginBottom: '1rem' }}>
+            <UsersIcon style={{ width: 20, height: 20, marginRight: 8, display: 'inline' }} />
+            My Account
+          </h5>
+          <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
+            <div style={{ background: 'var(--tint)', padding: '1rem 1.5rem', borderRadius: 10, flex: 1, minWidth: 200 }}>
+              <div style={{ fontSize: '0.68rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--accent)', marginBottom: '0.3rem' }}>Logged in as</div>
+              <div style={{ fontWeight: 600, color: 'var(--primary-dark)', fontSize: '1rem' }}>{user?.name}</div>
+              <div style={{ fontSize: '0.82rem', color: '#888' }}>{user?.email}</div>
+            </div>
+            <Button className="btn-outline-custom btn-sm-custom" onClick={() => { setShowResetPw({ _id: user?.id, name: user?.name, email: user?.email }); setNewPassword(''); }}>
+              Change Password
+            </Button>
+          </div>
+        </div>
+      ) : null}
 
       {/* Add/Edit User Modal */}
       <Modal show={isAdmin && showUserForm} onHide={() => setShowUserForm(false)} centered>
