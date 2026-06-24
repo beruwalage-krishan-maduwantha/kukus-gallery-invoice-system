@@ -89,33 +89,37 @@ export default function InvoiceViewPage() {
       <div className="invoice-view-card">
         <div className="invoice-header">
           <div className="invoice-header-left">
+            <img src="/logo.png" alt="Logo" className="invoice-header-logo" />
             <div>
-              <div className="invoice-meta-title" style={{ textAlign: 'left' }}>INVOICE</div>
-              <div className="invoice-meta-row"><strong>{invoice.invoiceNumber}</strong></div>
-              <div className="invoice-meta-row">Date: <strong>{formatDate(invoice.invoiceDate)}</strong></div>
-              {invoice.deliveryDate && <div className="invoice-meta-row">Delivery: <strong>{formatDate(invoice.deliveryDate)}</strong></div>}
-              <div className="invoice-meta-row">Payment: {invoice.paymentType}</div>
+              <div className="invoice-company-name">{settings?.companyName}</div>
+              <div className="invoice-company-detail">
+                {settings?.address}<br />
+                Tel: {settings?.phone}<br />
+                {settings?.email}
+              </div>
             </div>
           </div>
           <div className="invoice-meta-box">
-            <img src="/logo.png" alt="Logo" style={{ width: 50, marginBottom: '0.5rem' }} />
-            <div style={{ fontFamily: 'var(--font-heading)', fontSize: '1rem', fontWeight: 600, color: 'var(--primary-dark)' }}>{settings?.companyName}</div>
-            <div style={{ fontSize: '0.72rem', color: '#666', lineHeight: 1.6 }}>
-              {settings?.address}<br />
-              Tel: {settings?.phone}<br />
-              {settings?.email}
-            </div>
+            <div className="invoice-meta-title">INVOICE</div>
           </div>
         </div>
 
-        <div className="bill-to-section">
-          <div className="bill-to-label">Bill To</div>
-          <div className="bill-to-name">{snap.name}</div>
-          <div className="bill-to-detail">
-            {snap.address && <div>{snap.address}</div>}
-            {snap.phone && <div>Phone: {snap.phone}</div>}
-            {snap.email && <div>Email: {snap.email}</div>}
-            {snap.company && <div>Company: {snap.company}</div>}
+        <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1.5rem', marginBottom: '2rem' }}>
+          <div>
+            <div className="bill-to-label">Bill To</div>
+            <div className="bill-to-name">{snap.name}</div>
+            <div className="bill-to-detail">
+              {snap.address && <div>{snap.address}</div>}
+              {snap.phone && <div>Phone: {snap.phone}</div>}
+              {snap.email && <div>Email: {snap.email}</div>}
+              {snap.company && <div>Company: {snap.company}</div>}
+            </div>
+          </div>
+          <div style={{ textAlign: 'right' }}>
+            <div className="invoice-meta-row"><strong>{invoice.invoiceNumber}</strong></div>
+            <div className="invoice-meta-row">Date: <strong>{formatDate(invoice.invoiceDate)}</strong></div>
+            {invoice.deliveryDate && <div className="invoice-meta-row">Delivery: <strong>{formatDate(invoice.deliveryDate)}</strong></div>}
+            <div className="invoice-meta-row">Payment: {invoice.paymentType}</div>
           </div>
         </div>
 
