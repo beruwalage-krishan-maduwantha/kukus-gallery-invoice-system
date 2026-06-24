@@ -24,5 +24,11 @@ export const STATUS_COLORS = {
   Sent: { bg: 'rgba(59,130,246,0.1)', color: '#3B82F6' },
   Paid: { bg: 'rgba(34,197,94,0.1)', color: '#22C55E' },
   Overdue: { bg: 'rgba(239,68,68,0.1)', color: '#EF4444' },
-  Cancelled: { bg: 'rgba(148,163,184,0.1)', color: '#94A3B8' }
+  Cancelled: { bg: 'rgba(148,163,184,0.1)', color: '#94A3B8' },
+  Accepted: { bg: 'rgba(34,197,94,0.1)', color: '#22C55E' },
+  Rejected: { bg: 'rgba(239,68,68,0.1)', color: '#EF4444' },
+  Expired: { bg: 'rgba(245,158,11,0.1)', color: '#F59E0B' },
+  Converted: { bg: 'rgba(99,102,241,0.1)', color: '#6366F1' }
 };
+
+export const QUOTATION_STATUS_OPTIONS = ['Draft', 'Sent', 'Accepted', 'Rejected', 'Expired', 'Converted'];

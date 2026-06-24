@@ -12,6 +12,9 @@ import CustomerListPage from './pages/CustomerListPage';
 import ProductListPage from './pages/ProductListPage';
 import SettingsPage from './pages/SettingsPage';
 import CreditNotesPage from './pages/CreditNotesPage';
+import QuotationListPage from './pages/QuotationListPage';
+import QuotationCreatePage from './pages/QuotationCreatePage';
+import QuotationViewPage from './pages/QuotationViewPage';
 import NotFoundPage from './pages/NotFoundPage';
 
 export default function App() {
@@ -35,6 +38,10 @@ export default function App() {
               <Route path="/invoices/new" element={<InvoiceCreatePage />} />
               <Route path="/invoices/:id" element={<InvoiceViewPage />} />
               <Route path="/invoices/:id/edit" element={<InvoiceCreatePage />} />
+              <Route path="/quotations" element={<QuotationListPage />} />
+              <Route path="/quotations/new" element={<QuotationCreatePage />} />
+              <Route path="/quotations/:id" element={<QuotationViewPage />} />
+              <Route path="/quotations/:id/edit" element={<QuotationCreatePage />} />
               <Route path="/credit-notes" element={<CreditNotesPage />} />
               <Route path="/customers" element={<CustomerListPage />} />
               <Route path="/products" element={<ProductListPage />} />

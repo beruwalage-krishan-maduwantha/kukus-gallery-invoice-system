@@ -3,6 +3,7 @@ import { useAuth } from '../../context/AuthContext';
 import {
   HomeIcon,
   DocumentTextIcon,
+  DocumentDuplicateIcon,
   UserGroupIcon,
   CubeIcon,
   Cog6ToothIcon,
@@ -12,6 +13,7 @@ import {
 
 const navItems = [
   { to: '/', icon: HomeIcon, label: 'Dashboard' },
+  { to: '/quotations', icon: DocumentDuplicateIcon, label: 'Quotations' },
   { to: '/invoices', icon: DocumentTextIcon, label: 'Invoices' },
   { to: '/credit-notes', icon: ReceiptRefundIcon, label: 'Credit Notes' },
   { to: '/customers', icon: UserGroupIcon, label: 'Customers' },

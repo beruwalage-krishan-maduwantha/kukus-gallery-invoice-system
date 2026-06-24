@@ -7,6 +7,8 @@ const pageTitles = {
   '/': 'Dashboard',
   '/invoices': 'Invoices',
   '/invoices/new': 'New Invoice',
+  '/quotations': 'Quotations',
+  '/quotations/new': 'New Quotation',
   '/credit-notes': 'Credit Notes',
   '/customers': 'Customers',
   '/products': 'Products',
@@ -20,6 +22,8 @@ export default function AppLayout() {
   let title = pageTitles[location.pathname] || '';
   if (location.pathname.match(/^\/invoices\/[^/]+\/edit$/)) title = 'Edit Invoice';
   else if (location.pathname.match(/^\/invoices\/[^/]+$/)) title = 'Invoice Details';
+  else if (location.pathname.match(/^\/quotations\/[^/]+\/edit$/)) title = 'Edit Quotation';
+  else if (location.pathname.match(/^\/quotations\/[^/]+$/)) title = 'Quotation Details';
 
   return (
     <div className="app-layout">

@@ -1,5 +1,6 @@
 const Invoice = require('../models/Invoice');
 const CreditNote = require('../models/CreditNote');
+const Quotation = require('../models/Quotation');
 
 exports.getStats = async (req, res) => {
   try {
@@ -50,12 +51,17 @@ exports.getStats = async (req, res) => {
       .limit(5)
       .select('invoiceNumber customerSnapshot grandTotal status invoiceDate createdAt');
 
+    const totalQuotations = await Quotation.countDocuments();
+    const pendingQuotations = await Quotation.countDocuments({ status: { $in: ['Draft', 'Sent'] } });
+
     res.json({
       totalInvoices,
       totalRevenue,
       outstanding,
       totalCredits,
       creditCount,
+      totalQuotations,
+      pendingQuotations,
       byStatus,
       monthlyRevenue,
       recentInvoices

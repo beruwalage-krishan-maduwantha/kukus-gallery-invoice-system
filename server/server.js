@@ -13,6 +13,7 @@ const invoiceRoutes = require('./routes/invoices');
 const dashboardRoutes = require('./routes/dashboard');
 const settingsRoutes = require('./routes/settings');
 const creditNoteRoutes = require('./routes/creditNotes');
+const quotationRoutes = require('./routes/quotations');
 
 const app = express();
 
@@ -37,6 +38,7 @@ app.use('/api/invoices', invoiceRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/credit-notes', creditNoteRoutes);
+app.use('/api/quotations', quotationRoutes);
 
 app.use(errorHandler);
 
