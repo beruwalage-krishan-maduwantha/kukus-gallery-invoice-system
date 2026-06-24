@@ -7,6 +7,7 @@ const pageTitles = {
   '/': 'Dashboard',
   '/invoices': 'Invoices',
   '/invoices/new': 'New Invoice',
+  '/credit-notes': 'Credit Notes',
   '/customers': 'Customers',
   '/products': 'Products',
   '/settings': 'Settings'

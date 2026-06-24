@@ -6,12 +6,14 @@ import {
   UserGroupIcon,
   CubeIcon,
   Cog6ToothIcon,
-  ArrowRightOnRectangleIcon
+  ArrowRightOnRectangleIcon,
+  ReceiptRefundIcon
 } from '@heroicons/react/24/outline';
 
 const navItems = [
   { to: '/', icon: HomeIcon, label: 'Dashboard' },
   { to: '/invoices', icon: DocumentTextIcon, label: 'Invoices' },
+  { to: '/credit-notes', icon: ReceiptRefundIcon, label: 'Credit Notes' },
   { to: '/customers', icon: UserGroupIcon, label: 'Customers' },
   { to: '/products', icon: CubeIcon, label: 'Products' },
   { to: '/settings', icon: Cog6ToothIcon, label: 'Settings' },

@@ -1,4 +1,5 @@
 const Invoice = require('../models/Invoice');
+const CreditNote = require('../models/CreditNote');
 
 exports.getStats = async (req, res) => {
   try {
@@ -16,7 +17,12 @@ exports.getStats = async (req, res) => {
     ]);
     const outstanding = outstandingResult[0]?.total || 0;
 
-    const overdueCount = await Invoice.countDocuments({ status: 'Overdue' });
+    const creditResult = await CreditNote.aggregate([
+      { $match: { status: 'Active' } },
+      { $group: { _id: null, total: { $sum: '$amount' }, count: { $sum: 1 } } }
+    ]);
+    const totalCredits = creditResult[0]?.total || 0;
+    const creditCount = creditResult[0]?.count || 0;
 
     const statusCounts = await Invoice.aggregate([
       { $group: { _id: '$status', count: { $sum: 1 } } }
@@ -48,7 +54,8 @@ exports.getStats = async (req, res) => {
       totalInvoices,
       totalRevenue,
       outstanding,
-      overdueCount,
+      totalCredits,
+      creditCount,
       byStatus,
       monthlyRevenue,
       recentInvoices

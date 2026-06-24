@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Row, Col } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-import { DocumentTextIcon, CurrencyDollarIcon, ClockIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
+import { DocumentTextIcon, CurrencyDollarIcon, ClockIcon, ReceiptRefundIcon } from '@heroicons/react/24/outline';
 import { getDashboardStats } from '../api/dashboard';
 import StatCard from '../components/common/StatCard';
 import RevenueChart from '../components/dashboard/RevenueChart';
@@ -36,7 +36,9 @@ export default function DashboardPage() {
           <StatCard icon={ClockIcon} label="Outstanding" value={formatCurrency(stats?.outstanding || 0)} color="var(--warning)" />
         </Col>
         <Col xs={6} lg={3}>
-          <StatCard icon={ExclamationTriangleIcon} label="Overdue" value={stats?.overdueCount || 0} color="var(--danger)" />
+          <Link to="/credit-notes" style={{ textDecoration: 'none' }}>
+            <StatCard icon={ReceiptRefundIcon} label="Credit Notes" value={`${stats?.creditCount || 0} (${formatCurrency(stats?.totalCredits || 0)})`} color="var(--info)" />
+          </Link>
         </Col>
       </Row>
 
