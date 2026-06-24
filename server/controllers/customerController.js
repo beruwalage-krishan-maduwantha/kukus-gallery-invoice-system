@@ -49,6 +49,11 @@ exports.createCustomer = async (req, res) => {
       return res.status(400).json({ errors: errors.array() });
     }
 
+    const existingPhone = await Customer.findOne({ phone: req.body.phone, isActive: true });
+    if (existingPhone) {
+      return res.status(409).json({ message: `Customer with phone ${req.body.phone} already exists (${existingPhone.name})` });
+    }
+
     const customer = await Customer.create({
       ...req.body,
       createdBy: req.user._id
