@@ -8,7 +8,8 @@ import {
   CubeIcon,
   Cog6ToothIcon,
   ArrowRightOnRectangleIcon,
-  ReceiptRefundIcon
+  ReceiptRefundIcon,
+  ChartBarIcon
 } from '@heroicons/react/24/outline';
 
 const navItems = [
@@ -16,6 +17,7 @@ const navItems = [
   { to: '/quotations', icon: DocumentDuplicateIcon, label: 'Quotations' },
   { to: '/invoices', icon: DocumentTextIcon, label: 'Invoices' },
   { to: '/credit-notes', icon: ReceiptRefundIcon, label: 'Credit Notes' },
+  { to: '/reports', icon: ChartBarIcon, label: 'Reports' },
   { to: '/customers', icon: UserGroupIcon, label: 'Customers' },
   { to: '/products', icon: CubeIcon, label: 'Products' },
   { to: '/settings', icon: Cog6ToothIcon, label: 'Settings' },
