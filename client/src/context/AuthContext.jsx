@@ -11,7 +11,14 @@ export function AuthProvider({ children }) {
     const token = localStorage.getItem('token');
     if (token) {
       getMeApi()
-        .then(res => setUser(res.data))
+        .then(res => {
+          if (res.data && res.data._id) {
+            setUser(res.data);
+          } else {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+          }
+        })
         .catch(() => {
           localStorage.removeItem('token');
           localStorage.removeItem('user');
@@ -34,6 +41,7 @@ export function AuthProvider({ children }) {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     setUser(null);
+    window.location.href = '/login';
   };
 
   return (
