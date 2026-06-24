@@ -169,7 +169,7 @@ export default function InvoiceCreatePage() {
         </div>
 
         <div className="card-custom mb-4">
-          <h5 className="form-section-title">Line Items</h5>
+          <h5 className="form-section-title">Items</h5>
           <div style={{ overflowX: 'auto' }}>
             <table className="items-table">
               <thead>
