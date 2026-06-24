@@ -43,7 +43,6 @@ const quotationSchema = new mongoose.Schema({
   pdfFilename: { type: String }
 }, { timestamps: true });
 
-quotationSchema.index({ quotationNumber: 1 });
 quotationSchema.index({ customer: 1 });
 quotationSchema.index({ status: 1 });
 quotationSchema.index({ quotationDate: -1 });
