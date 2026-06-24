@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { Button } from 'react-bootstrap';
+import { Button, Modal, Form, Row, Col } from 'react-bootstrap';
 import { ArrowLeftIcon, PencilIcon, ArrowDownTrayIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 import { getQuotation, updateQuotationStatus, deleteQuotation, convertQuotationToInvoice } from '../api/quotations';
@@ -9,7 +9,8 @@ import StatusBadge from '../components/common/StatusBadge';
 import ConfirmModal from '../components/common/ConfirmModal';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import { formatCurrency } from '../utils/formatCurrency';
-import { formatDate } from '../utils/formatDate';
+import { formatDate, formatDateInput } from '../utils/formatDate';
+import { PAYMENT_TYPES } from '../utils/constants';
 import { generateQuotationPdf } from '../components/pdf/generatePdf';
 
 export default function QuotationViewPage() {
@@ -19,7 +20,9 @@ export default function QuotationViewPage() {
   const [settings, setSettings] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showDelete, setShowDelete] = useState(false);
+  const [showConvert, setShowConvert] = useState(false);
   const [converting, setConverting] = useState(false);
+  const [convertData, setConvertData] = useState({ deliveryDate: '', paymentType: 'Cash' });
 
   useEffect(() => {
     Promise.all([getQuotation(id), getSettings()])
@@ -38,9 +41,13 @@ export default function QuotationViewPage() {
   };
 
   const handleConvert = async () => {
+    if (!convertData.deliveryDate) return toast.error('Please set a delivery date');
     setConverting(true);
     try {
-      const res = await convertQuotationToInvoice(id);
+      const res = await convertQuotationToInvoice(id, {
+        deliveryDate: convertData.deliveryDate,
+        paymentType: convertData.paymentType
+      });
       toast.success('Converted to Invoice!');
       navigate(`/invoices/${res.data.invoice._id}`);
     } catch (err) { toast.error(err.response?.data?.message || 'Failed'); }
@@ -87,8 +94,8 @@ export default function QuotationViewPage() {
             </>
           )}
           {quotation.status === 'Accepted' && (
-            <Button className="btn-sm-custom" style={{ background: 'rgba(99,102,241,0.15)', color: '#6366F1', border: 'none', borderRadius: 6, fontWeight: 600 }} onClick={handleConvert} disabled={converting}>
-              <ArrowPathIcon style={{ width: 14, height: 14, marginRight: 4 }} /> {converting ? 'Converting...' : 'Convert to Invoice'}
+            <Button className="btn-sm-custom" style={{ background: 'rgba(99,102,241,0.15)', color: '#6366F1', border: 'none', borderRadius: 6, fontWeight: 600 }} onClick={() => setShowConvert(true)}>
+              <ArrowPathIcon style={{ width: 14, height: 14, marginRight: 4 }} /> Convert to Invoice
             </Button>
           )}
           {quotation.status === 'Converted' && quotation.convertedInvoice && (
@@ -138,7 +145,6 @@ export default function QuotationViewPage() {
             <div className="invoice-meta-row"><strong>{quotation.quotationNumber}</strong></div>
             <div className="invoice-meta-row">Date: <strong>{formatDate(quotation.quotationDate)}</strong></div>
             <div className="invoice-meta-row">Valid Until: <strong>{formatDate(quotation.validUntil)}</strong></div>
-            {quotation.deliveryDate && <div className="invoice-meta-row">Delivery: <strong>{formatDate(quotation.deliveryDate)}</strong></div>}
           </div>
         </div>
 
@@ -226,6 +232,43 @@ Client-specific designs will not be used for other clients without prior written
           </div>
         </div>
       </div>
+
+      {/* Convert to Invoice Modal */}
+      <Modal show={showConvert} onHide={() => setShowConvert(false)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title className="modal-title-custom">Convert to Invoice</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p style={{ fontSize: '0.85rem', color: '#666', marginBottom: '1rem' }}>
+            Set the delivery date and payment type for the new invoice.
+          </p>
+          <Row className="g-3">
+            <Col md={6}>
+              <Form.Group>
+                <Form.Label className="form-label-custom">Delivery Date *</Form.Label>
+                <Form.Control className="form-input" type="date" value={convertData.deliveryDate} onChange={e => setConvertData({ ...convertData, deliveryDate: e.target.value })} required />
+              </Form.Group>
+            </Col>
+            <Col md={6}>
+              <Form.Group>
+                <Form.Label className="form-label-custom">Payment Type</Form.Label>
+                <Form.Select className="form-input" value={convertData.paymentType} onChange={e => setConvertData({ ...convertData, paymentType: e.target.value })}>
+                  {PAYMENT_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+                </Form.Select>
+              </Form.Group>
+            </Col>
+          </Row>
+          <div style={{ marginTop: '1rem', padding: '0.75rem', background: 'var(--tint)', borderRadius: 8, fontSize: '0.78rem', color: 'var(--accent)' }}>
+            This will create a new Draft invoice with all items from quotation <strong>{quotation.quotationNumber}</strong> ({formatCurrency(quotation.grandTotal)}).
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="outline-secondary" onClick={() => setShowConvert(false)}>Cancel</Button>
+          <Button className="btn-primary-custom" onClick={handleConvert} disabled={converting}>
+            {converting ? 'Converting...' : 'Convert to Invoice'}
+          </Button>
+        </Modal.Footer>
+      </Modal>
 
       <ConfirmModal show={showDelete} onHide={() => setShowDelete(false)} onConfirm={handleDelete} title="Delete Quotation" message={`Delete ${quotation.quotationNumber}?`} confirmText="Delete" />
     </div>

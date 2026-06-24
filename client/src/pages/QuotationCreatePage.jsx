@@ -30,7 +30,6 @@ export default function QuotationCreatePage() {
     const d = new Date(); d.setDate(d.getDate() + 7);
     return formatDateInput(d);
   });
-  const [deliveryDate, setDeliveryDate] = useState('');
   const [notes, setNotes] = useState('');
   const [terms, setTerms] = useState('');
   const [products, setProducts] = useState([]);
@@ -52,7 +51,6 @@ export default function QuotationCreatePage() {
         setDiscountValue(q.discountValue || 0);
         setQuotationDate(formatDateInput(q.quotationDate));
         setValidUntil(q.validUntil ? formatDateInput(q.validUntil) : '');
-        setDeliveryDate(q.deliveryDate ? formatDateInput(q.deliveryDate) : '');
         setNotes(q.notes || '');
         setTerms(q.terms || '');
       });
@@ -90,7 +88,6 @@ export default function QuotationCreatePage() {
         })),
         discountType, discountValue,
         quotationDate, validUntil: validUntil || undefined,
-        deliveryDate: deliveryDate || undefined,
         notes, terms, status
       };
 
@@ -149,12 +146,6 @@ export default function QuotationCreatePage() {
               <Form.Group>
                 <Form.Label className="form-label-custom">Valid Until</Form.Label>
                 <Form.Control className="form-input" type="date" value={validUntil} onChange={e => setValidUntil(e.target.value)} />
-              </Form.Group>
-            </Col>
-            <Col md={4}>
-              <Form.Group>
-                <Form.Label className="form-label-custom">Delivery Date</Form.Label>
-                <Form.Control className="form-input" type="date" value={deliveryDate} onChange={e => setDeliveryDate(e.target.value)} />
               </Form.Group>
             </Col>
           </Row>
@@ -216,7 +207,7 @@ export default function QuotationCreatePage() {
       </Col>
 
       <Col lg={4} className="d-none d-lg-block">
-        <InvoicePreview customer={customerData} items={items} subtotal={subtotal} discountAmount={discountAmount} grandTotal={grandTotal} invoiceDate={quotationDate} deliveryDate={deliveryDate} />
+        <InvoicePreview customer={customerData} items={items} subtotal={subtotal} discountAmount={discountAmount} grandTotal={grandTotal} invoiceDate={quotationDate} deliveryDate="" />
       </Col>
 
       <CustomerForm show={showCustomerForm} onHide={() => setShowCustomerForm(false)} onSave={handleNewCustomer} customer={null} />

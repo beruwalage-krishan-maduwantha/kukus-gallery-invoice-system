@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Button } from 'react-bootstrap';
+import { Button, Modal, Form, Row, Col } from 'react-bootstrap';
 import { PlusIcon, DocumentDuplicateIcon } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 import { getQuotations, deleteQuotation, updateQuotationStatus, convertQuotationToInvoice } from '../api/quotations';
@@ -12,7 +12,7 @@ import ConfirmModal from '../components/common/ConfirmModal';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import { formatCurrency } from '../utils/formatCurrency';
 import { formatDate } from '../utils/formatDate';
-import { QUOTATION_STATUS_OPTIONS } from '../utils/constants';
+import { QUOTATION_STATUS_OPTIONS, PAYMENT_TYPES } from '../utils/constants';
 
 export default function QuotationListPage() {
   const navigate = useNavigate();
@@ -24,7 +24,9 @@ export default function QuotationListPage() {
   const [statusFilter, setStatusFilter] = useState('');
   const [loading, setLoading] = useState(true);
   const [deleteTarget, setDeleteTarget] = useState(null);
-  const [converting, setConverting] = useState(null);
+  const [convertTarget, setConvertTarget] = useState(null);
+  const [converting, setConverting] = useState(false);
+  const [convertData, setConvertData] = useState({ deliveryDate: '', paymentType: 'Cash' });
 
   const fetchQuotations = useCallback(async () => {
     setLoading(true);
@@ -47,14 +49,19 @@ export default function QuotationListPage() {
     } catch (err) { toast.error(err.response?.data?.message || 'Failed'); }
   };
 
-  const handleConvert = async (id) => {
-    setConverting(id);
+  const handleConvert = async () => {
+    if (!convertData.deliveryDate) return toast.error('Please set a delivery date');
+    setConverting(true);
     try {
-      const res = await convertQuotationToInvoice(id);
+      const res = await convertQuotationToInvoice(convertTarget._id, {
+        deliveryDate: convertData.deliveryDate,
+        paymentType: convertData.paymentType
+      });
       toast.success('Quotation converted to Invoice!');
+      setConvertTarget(null);
       navigate(`/invoices/${res.data.invoice._id}`);
     } catch (err) { toast.error(err.response?.data?.message || 'Conversion failed'); }
-    finally { setConverting(null); }
+    finally { setConverting(false); }
   };
 
   const handleDelete = async () => {
@@ -133,8 +140,8 @@ export default function QuotationListPage() {
                         </>
                       )}
                       {q.status === 'Accepted' && (
-                        <button className="btn-sm-custom" style={btnStyle('rgba(99,102,241,0.15)', '#6366F1')} onClick={() => handleConvert(q._id)} disabled={converting === q._id}>
-                          {converting === q._id ? 'Converting...' : 'Convert to Invoice'}
+                        <button className="btn-sm-custom" style={btnStyle('rgba(99,102,241,0.15)', '#6366F1')} onClick={() => { setConvertTarget(q); setConvertData({ deliveryDate: '', paymentType: 'Cash' }); }}>
+                          Convert to Invoice
                         </button>
                       )}
                       {q.status === 'Converted' && q.convertedInvoice && (
@@ -152,6 +159,46 @@ export default function QuotationListPage() {
       )}
 
       <Pagination page={page} pages={pages} onPageChange={setPage} />
+
+      {/* Convert to Invoice Modal */}
+      <Modal show={!!convertTarget} onHide={() => setConvertTarget(null)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title className="modal-title-custom">Convert to Invoice</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p style={{ fontSize: '0.85rem', color: '#666', marginBottom: '1rem' }}>
+            Set the delivery date and payment type for the new invoice.
+          </p>
+          <Row className="g-3">
+            <Col md={6}>
+              <Form.Group>
+                <Form.Label className="form-label-custom">Delivery Date *</Form.Label>
+                <Form.Control className="form-input" type="date" value={convertData.deliveryDate} onChange={e => setConvertData({ ...convertData, deliveryDate: e.target.value })} />
+              </Form.Group>
+            </Col>
+            <Col md={6}>
+              <Form.Group>
+                <Form.Label className="form-label-custom">Payment Type</Form.Label>
+                <Form.Select className="form-input" value={convertData.paymentType} onChange={e => setConvertData({ ...convertData, paymentType: e.target.value })}>
+                  {PAYMENT_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+                </Form.Select>
+              </Form.Group>
+            </Col>
+          </Row>
+          {convertTarget && (
+            <div style={{ marginTop: '1rem', padding: '0.75rem', background: 'var(--tint)', borderRadius: 8, fontSize: '0.78rem', color: 'var(--accent)' }}>
+              Converting <strong>{convertTarget.quotationNumber}</strong> — {convertTarget.customerSnapshot?.name} — {formatCurrency(convertTarget.grandTotal)}
+            </div>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="outline-secondary" onClick={() => setConvertTarget(null)}>Cancel</Button>
+          <Button className="btn-primary-custom" onClick={handleConvert} disabled={converting}>
+            {converting ? 'Converting...' : 'Convert to Invoice'}
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
       <ConfirmModal show={!!deleteTarget} onHide={() => setDeleteTarget(null)} onConfirm={handleDelete} title="Delete Quotation" message={`Delete quotation ${deleteTarget?.quotationNumber}?`} confirmText="Delete" />
     </div>
   );
