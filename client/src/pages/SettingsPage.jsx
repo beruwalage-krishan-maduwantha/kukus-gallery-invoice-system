@@ -158,16 +158,16 @@ export default function SettingsPage() {
         <div className="card-custom mb-4">
           <h5 className="form-section-title">Invoice Defaults</h5>
           <Row className="g-3">
-            <Col md={6}>
+            <Col xs={12}>
               <Form.Group>
                 <Form.Label className="form-label-custom">Default Notes</Form.Label>
-                <Form.Control className="form-input" value={form.defaultNotes} onChange={e => update('defaultNotes', e.target.value)} />
+                <Form.Control className="form-input" as="textarea" rows={2} value={form.defaultNotes} onChange={e => update('defaultNotes', e.target.value)} />
               </Form.Group>
             </Col>
-            <Col md={6}>
+            <Col xs={12}>
               <Form.Group>
-                <Form.Label className="form-label-custom">Default Terms</Form.Label>
-                <Form.Control className="form-input" value={form.defaultTerms} onChange={e => update('defaultTerms', e.target.value)} />
+                <Form.Label className="form-label-custom">Default Terms & Conditions</Form.Label>
+                <Form.Control className="form-input" as="textarea" rows={12} value={form.defaultTerms} onChange={e => update('defaultTerms', e.target.value)} style={{ fontSize: '0.82rem', lineHeight: 1.7 }} />
               </Form.Group>
             </Col>
           </Row>
