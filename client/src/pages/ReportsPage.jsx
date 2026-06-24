@@ -39,13 +39,13 @@ export default function ReportsPage() {
         Overview
       </h4>
       <Row className="g-3 mb-4">
-        <Col xs={6} lg={3}>
+        <Col xs={6} lg={3} onClick={() => navigate('/quotations')} style={{ cursor: 'pointer' }}>
           <StatCard icon={DocumentDuplicateIcon} label="Total Quotations" value={data?.totalQuotations || 0} color="var(--primary)" />
         </Col>
         <Col xs={6} lg={3}>
           <StatCard icon={BanknotesIcon} label="Total Quotation Value" value={formatCurrency(data?.totalQuotationValue || 0)} color="var(--accent)" />
         </Col>
-        <Col xs={6} lg={3}>
+        <Col xs={6} lg={3} onClick={() => navigate('/invoices')} style={{ cursor: 'pointer' }}>
           <StatCard icon={DocumentTextIcon} label="Total Invoices" value={data?.totalInvoices || 0} color="var(--info)" />
         </Col>
         <Col xs={6} lg={3}>
