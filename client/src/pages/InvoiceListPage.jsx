@@ -105,17 +105,25 @@ export default function InvoiceListPage() {
                   <td><StatusBadge status={inv.status} /></td>
                   <td onClick={e => e.stopPropagation()}>
                     <div className="d-flex gap-1 flex-wrap">
+                      <button className="btn-outline-custom btn-sm-custom" onClick={() => navigate(`/invoices/${inv._id}`)}>View</button>
                       {inv.status === 'Draft' && (
                         <>
-                          <button className="btn-outline-custom btn-sm-custom" onClick={() => navigate(`/invoices/${inv._id}/edit`)}>Edit</button>
+                          <button className="btn-sm-custom" style={{ background: 'rgba(177,145,198,0.1)', color: 'var(--primary)', border: 'none', borderRadius: 6, padding: '0.35rem 0.6rem', fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer' }} onClick={() => navigate(`/invoices/${inv._id}/edit`)}>Edit</button>
                           <button className="btn-sm-custom" style={{ background: 'rgba(59,130,246,0.1)', color: 'var(--info)', border: 'none', borderRadius: 6, padding: '0.35rem 0.6rem', fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer' }} onClick={() => handleStatusChange(inv._id, 'Sent')}>Send</button>
+                          <button className="btn-sm-custom" style={{ background: 'rgba(239,68,68,0.1)', color: 'var(--danger)', border: 'none', borderRadius: 6, padding: '0.35rem 0.6rem', fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer' }} onClick={() => setDeleteTarget(inv)}>Del</button>
                         </>
                       )}
                       {inv.status === 'Sent' && (
-                        <button className="btn-sm-custom" style={{ background: 'rgba(34,197,94,0.1)', color: 'var(--success)', border: 'none', borderRadius: 6, padding: '0.35rem 0.6rem', fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer' }} onClick={() => handleStatusChange(inv._id, 'Paid')}>Paid</button>
+                        <>
+                          <button className="btn-sm-custom" style={{ background: 'rgba(34,197,94,0.1)', color: 'var(--success)', border: 'none', borderRadius: 6, padding: '0.35rem 0.6rem', fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer' }} onClick={() => handleStatusChange(inv._id, 'Paid')}>Paid</button>
+                          <button className="btn-sm-custom" style={{ background: 'rgba(239,68,68,0.1)', color: 'var(--danger)', border: 'none', borderRadius: 6, padding: '0.35rem 0.6rem', fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer' }} onClick={() => handleStatusChange(inv._id, 'Cancelled')}>Cancel</button>
+                        </>
                       )}
-                      {inv.status === 'Draft' && (
-                        <button className="btn-sm-custom" style={{ background: 'rgba(239,68,68,0.1)', color: 'var(--danger)', border: 'none', borderRadius: 6, padding: '0.35rem 0.6rem', fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer' }} onClick={() => setDeleteTarget(inv)}>Del</button>
+                      {inv.status === 'Overdue' && (
+                        <>
+                          <button className="btn-sm-custom" style={{ background: 'rgba(34,197,94,0.1)', color: 'var(--success)', border: 'none', borderRadius: 6, padding: '0.35rem 0.6rem', fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer' }} onClick={() => handleStatusChange(inv._id, 'Paid')}>Paid</button>
+                          <button className="btn-sm-custom" style={{ background: 'rgba(239,68,68,0.1)', color: 'var(--danger)', border: 'none', borderRadius: 6, padding: '0.35rem 0.6rem', fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer' }} onClick={() => handleStatusChange(inv._id, 'Cancelled')}>Cancel</button>
+                        </>
                       )}
                     </div>
                   </td>
