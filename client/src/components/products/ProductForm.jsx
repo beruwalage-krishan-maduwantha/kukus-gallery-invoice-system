@@ -2,24 +2,34 @@ import { useState, useEffect } from 'react';
 import { Modal, Form, Button, Row, Col } from 'react-bootstrap';
 import { ALL_CATEGORIES, UNITS, SERVICE_TYPES, CATEGORIES } from '../../utils/constants';
 
-const emptyForm = { name: '', description: '', category: '', serviceType: '', defaultPrice: '', unit: 'piece' };
+const emptyForm = { name: '', description: '', category: '', customCategory: '', serviceType: '', defaultPrice: '', unit: 'piece' };
 
 export default function ProductForm({ show, onHide, onSave, product }) {
   const [form, setForm] = useState(emptyForm);
 
   useEffect(() => {
-    setForm(product ? {
-      name: product.name || '', description: product.description || '',
-      category: product.category || '', serviceType: product.serviceType || '',
-      defaultPrice: product.defaultPrice || '', unit: product.unit || 'piece'
-    } : emptyForm);
+    if (product) {
+      const knownCategories = ALL_CATEGORIES;
+      const isCustom = product.category && !knownCategories.includes(product.category);
+      setForm({
+        name: product.name || '', description: product.description || '',
+        category: isCustom ? 'Other' : (product.category || ''),
+        customCategory: isCustom ? product.category : '',
+        serviceType: product.serviceType || '',
+        defaultPrice: product.defaultPrice || '', unit: product.unit || 'piece'
+      });
+    } else {
+      setForm(emptyForm);
+    }
   }, [product, show]);
 
   const availableCategories = form.serviceType ? (CATEGORIES[form.serviceType] || []).concat(['Other']) : ALL_CATEGORIES;
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSave({ ...form, defaultPrice: Number(form.defaultPrice) });
+    const category = form.category === 'Other' ? form.customCategory : form.category;
+    if (!category) return;
+    onSave({ ...form, category, defaultPrice: Number(form.defaultPrice) });
   };
 
   return (
@@ -39,7 +49,7 @@ export default function ProductForm({ show, onHide, onSave, product }) {
             <Col md={6}>
               <Form.Group>
                 <Form.Label className="form-label-custom">Service Type *</Form.Label>
-                <Form.Select className="form-input" value={form.serviceType} onChange={e => setForm({ ...form, serviceType: e.target.value, category: '' })} required>
+                <Form.Select className="form-input" value={form.serviceType} onChange={e => setForm({ ...form, serviceType: e.target.value, category: '', customCategory: '' })} required>
                   <option value="">Select...</option>
                   {SERVICE_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
                 </Form.Select>
@@ -48,12 +58,20 @@ export default function ProductForm({ show, onHide, onSave, product }) {
             <Col md={6}>
               <Form.Group>
                 <Form.Label className="form-label-custom">Category *</Form.Label>
-                <Form.Select className="form-input" value={form.category} onChange={e => setForm({ ...form, category: e.target.value })} required>
+                <Form.Select className="form-input" value={form.category} onChange={e => setForm({ ...form, category: e.target.value, customCategory: '' })} required>
                   <option value="">Select...</option>
                   {availableCategories.map(c => <option key={c} value={c}>{c}</option>)}
                 </Form.Select>
               </Form.Group>
             </Col>
+            {form.category === 'Other' && (
+              <Col xs={12}>
+                <Form.Group>
+                  <Form.Label className="form-label-custom">Custom Category Name *</Form.Label>
+                  <Form.Control className="form-input" value={form.customCategory} onChange={e => setForm({ ...form, customCategory: e.target.value })} placeholder="Type your category..." required />
+                </Form.Group>
+              </Col>
+            )}
             <Col md={6}>
               <Form.Group>
                 <Form.Label className="form-label-custom">Default Price (LKR) *</Form.Label>

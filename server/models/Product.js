@@ -5,12 +5,6 @@ const productSchema = new mongoose.Schema({
   description: { type: String, trim: true },
   category: {
     type: String,
-    enum: [
-      'Pattern Board Design', 'Size Grading', 'Sample Development',
-      'Bulk Production', 'Cutting/Sewing/Packing',
-      'T-Shirts', 'Overalls', 'Uniforms', 'DTF Printing', 'Embroidery',
-      'Other'
-    ],
     required: true
   },
   serviceType: {
