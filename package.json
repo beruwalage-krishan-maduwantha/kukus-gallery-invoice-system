@@ -8,7 +8,9 @@
     "server": "cd server && npm run dev",
     "build": "cd client && npm run build",
     "start": "cd server && node server.js",
-    "seed": "cd server && node utils/seedAdmin.js"
+    "seed": "cd server && node utils/seedAdmin.js",
+    "backup": "cd server && node utils/backup.js",
+    "archive": "cd server && node utils/archive.js"
   },
   "devDependencies": {
     "concurrently": "^8.2.0"
