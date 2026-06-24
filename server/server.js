@@ -16,6 +16,7 @@ const creditNoteRoutes = require('./routes/creditNotes');
 const quotationRoutes = require('./routes/quotations');
 const reportRoutes = require('./routes/reports');
 const backupRoutes = require('./routes/backup');
+const userRoutes = require('./routes/users');
 
 const app = express();
 
@@ -43,6 +44,7 @@ app.use('/api/credit-notes', creditNoteRoutes);
 app.use('/api/quotations', quotationRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/backup', backupRoutes);
+app.use('/api/users', userRoutes);
 
 app.use(errorHandler);
 

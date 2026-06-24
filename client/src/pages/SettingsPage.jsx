@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
-import { Form, Button, Row, Col } from 'react-bootstrap';
-import { ArrowDownTrayIcon, ArrowUpTrayIcon, CircleStackIcon } from '@heroicons/react/24/outline';
+import { Form, Button, Row, Col, Modal } from 'react-bootstrap';
+import { ArrowDownTrayIcon, ArrowUpTrayIcon, CircleStackIcon, UsersIcon, PlusIcon } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 import { getSettings, updateSettings } from '../api/settings';
 import api from '../api/axios';
@@ -14,14 +14,24 @@ export default function SettingsPage() {
   const [exporting, setExporting] = useState(false);
   const [importing, setImporting] = useState(false);
   const fileInputRef = useRef();
+  const [users, setUsers] = useState([]);
+  const [showUserForm, setShowUserForm] = useState(false);
+  const [editingUser, setEditingUser] = useState(null);
+  const [userForm, setUserForm] = useState({ name: '', email: '', password: '', role: 'staff' });
+  const [showResetPw, setShowResetPw] = useState(null);
+  const [newPassword, setNewPassword] = useState('');
+
+  const fetchUsers = () => api.get('/users').then(res => setUsers(res.data)).catch(() => {});
 
   useEffect(() => {
     Promise.all([
       getSettings(),
-      api.get('/backup/stats')
-    ]).then(([setRes, statsRes]) => {
+      api.get('/backup/stats'),
+      api.get('/users')
+    ]).then(([setRes, statsRes, usersRes]) => {
       setForm(setRes.data);
       setDbStats(statsRes.data);
+      setUsers(usersRes.data);
     }).catch(() => toast.error('Failed to load settings'))
       .finally(() => setLoading(false));
   }, []);
@@ -258,6 +268,159 @@ export default function SettingsPage() {
           <strong>Tip:</strong> Download a backup regularly to keep your data safe. Restore only adds missing records — it won't overwrite or duplicate existing data.
         </div>
       </div>
+
+      {/* User Management Section */}
+      <div className="card-custom mb-4">
+        <div className="d-flex justify-content-between align-items-center mb-3">
+          <h5 className="form-section-title" style={{ margin: 0, border: 0, padding: 0 }}>
+            <UsersIcon style={{ width: 20, height: 20, marginRight: 8, display: 'inline' }} />
+            User Management
+          </h5>
+          <Button className="btn-primary-custom btn-sm-custom" onClick={() => { setEditingUser(null); setUserForm({ name: '', email: '', password: '', role: 'staff' }); setShowUserForm(true); }}>
+            <PlusIcon style={{ width: 14, height: 14, marginRight: 4 }} /> Add User
+          </Button>
+        </div>
+
+        <div className="table-custom" style={{ boxShadow: 'none' }}>
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {users.map(u => (
+                <tr key={u._id}>
+                  <td style={{ fontWeight: 600, color: 'var(--primary-dark)' }}>{u.name}</td>
+                  <td>{u.email}</td>
+                  <td>
+                    <span className="status-badge" style={{
+                      background: u.role === 'admin' ? 'rgba(99,102,241,0.1)' : 'rgba(177,145,198,0.12)',
+                      color: u.role === 'admin' ? '#6366F1' : 'var(--accent)'
+                    }}>{u.role}</span>
+                  </td>
+                  <td>
+                    <span className="status-badge" style={{
+                      background: u.isActive ? 'rgba(34,197,94,0.1)' : 'rgba(239,68,68,0.1)',
+                      color: u.isActive ? 'var(--success)' : 'var(--danger)'
+                    }}>{u.isActive ? 'Active' : 'Inactive'}</span>
+                  </td>
+                  <td>
+                    <div className="d-flex gap-1">
+                      <button className="btn-outline-custom btn-sm-custom" onClick={() => {
+                        setEditingUser(u);
+                        setUserForm({ name: u.name, email: u.email, password: '', role: u.role });
+                        setShowUserForm(true);
+                      }}>Edit</button>
+                      <button className="btn-sm-custom" style={{ background: 'rgba(245,158,11,0.1)', color: 'var(--warning)', border: 'none', borderRadius: 6, padding: '0.35rem 0.6rem', fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer' }}
+                        onClick={() => { setShowResetPw(u); setNewPassword(''); }}>Reset PW</button>
+                      {u.role !== 'admin' && (
+                        <button className="btn-sm-custom" style={{
+                          background: u.isActive ? 'rgba(239,68,68,0.1)' : 'rgba(34,197,94,0.1)',
+                          color: u.isActive ? 'var(--danger)' : 'var(--success)',
+                          border: 'none', borderRadius: 6, padding: '0.35rem 0.6rem', fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer'
+                        }} onClick={async () => {
+                          try {
+                            await api.put(`/users/${u._id}`, { isActive: !u.isActive });
+                            toast.success(u.isActive ? 'User deactivated' : 'User activated');
+                            fetchUsers();
+                          } catch { toast.error('Failed'); }
+                        }}>{u.isActive ? 'Deactivate' : 'Activate'}</button>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Add/Edit User Modal */}
+      <Modal show={showUserForm} onHide={() => setShowUserForm(false)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title className="modal-title-custom">{editingUser ? 'Edit User' : 'Add New User'}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Row className="g-3">
+            <Col md={6}>
+              <Form.Group>
+                <Form.Label className="form-label-custom">Name *</Form.Label>
+                <Form.Control className="form-input" value={userForm.name} onChange={e => setUserForm({ ...userForm, name: e.target.value })} required />
+              </Form.Group>
+            </Col>
+            <Col md={6}>
+              <Form.Group>
+                <Form.Label className="form-label-custom">Role</Form.Label>
+                <Form.Select className="form-input" value={userForm.role} onChange={e => setUserForm({ ...userForm, role: e.target.value })}>
+                  <option value="staff">Staff</option>
+                  <option value="admin">Admin</option>
+                </Form.Select>
+              </Form.Group>
+            </Col>
+            <Col xs={12}>
+              <Form.Group>
+                <Form.Label className="form-label-custom">Email *</Form.Label>
+                <Form.Control className="form-input" type="email" value={userForm.email} onChange={e => setUserForm({ ...userForm, email: e.target.value })} required />
+              </Form.Group>
+            </Col>
+            {!editingUser && (
+              <Col xs={12}>
+                <Form.Group>
+                  <Form.Label className="form-label-custom">Password * (min 6 characters)</Form.Label>
+                  <Form.Control className="form-input" type="password" value={userForm.password} onChange={e => setUserForm({ ...userForm, password: e.target.value })} placeholder="Enter password" required />
+                </Form.Group>
+              </Col>
+            )}
+          </Row>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="outline-secondary" onClick={() => setShowUserForm(false)}>Cancel</Button>
+          <Button className="btn-primary-custom" onClick={async () => {
+            try {
+              if (editingUser) {
+                await api.put(`/users/${editingUser._id}`, { name: userForm.name, email: userForm.email, role: userForm.role });
+                toast.success('User updated');
+              } else {
+                if (!userForm.name || !userForm.email || !userForm.password) return toast.error('Fill all required fields');
+                await api.post('/users', userForm);
+                toast.success('User created');
+              }
+              setShowUserForm(false);
+              fetchUsers();
+            } catch (err) { toast.error(err.response?.data?.message || 'Failed'); }
+          }}>{editingUser ? 'Update' : 'Create User'}</Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Reset Password Modal */}
+      <Modal show={!!showResetPw} onHide={() => setShowResetPw(null)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title className="modal-title-custom">Reset Password</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p style={{ fontSize: '0.85rem', color: '#666' }}>Reset password for <strong>{showResetPw?.name}</strong> ({showResetPw?.email})</p>
+          <Form.Group>
+            <Form.Label className="form-label-custom">New Password * (min 6 characters)</Form.Label>
+            <Form.Control className="form-input" type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)} placeholder="Enter new password" />
+          </Form.Group>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="outline-secondary" onClick={() => setShowResetPw(null)}>Cancel</Button>
+          <Button className="btn-primary-custom" onClick={async () => {
+            if (!newPassword || newPassword.length < 6) return toast.error('Password must be at least 6 characters');
+            try {
+              await api.put(`/users/${showResetPw._id}/reset-password`, { newPassword });
+              toast.success('Password reset!');
+              setShowResetPw(null);
+            } catch (err) { toast.error(err.response?.data?.message || 'Failed'); }
+          }}>Reset Password</Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 }
