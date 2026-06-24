@@ -29,7 +29,7 @@ export default function LoginPage() {
     <div className="login-page">
       <div className="login-card">
         <img src="/logo.png" alt="Kukus Gallery" className="login-logo" />
-        <h2 className="login-title">Invoice Management System</h2>
+        <h2 className="login-title">System</h2>
         <p className="login-subtitle">Sign in to continue</p>
 
         {error && <Alert variant="danger" className="mb-3">{error}</Alert>}
