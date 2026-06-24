@@ -8,13 +8,13 @@ export const SERVICE_TYPES = ['Design Wear', 'Corporate Clothing'];
 
 export const CATEGORIES = {
   'Design Wear': ['Main Size Development', 'Size Grading', 'Sample Development', 'Bulk Production'],
-  'Corporate Clothing': ['T-Shirts', 'Overalls', 'Uniforms', 'DTF Printing', 'Embroidery']
+  'Corporate Clothing': ['T-Shirts', 'Uniforms', 'DTF Printing', 'Embroidery']
 };
 
 export const ALL_CATEGORIES = [
   'Main Size Development', 'Size Grading', 'Sample Development',
   'Bulk Production',
-  'T-Shirts', 'Overalls', 'Uniforms', 'DTF Printing', 'Embroidery', 'Other'
+  'T-Shirts', 'Uniforms', 'DTF Printing', 'Embroidery', 'Other'
 ];
 
 export const UNITS = ['piece', 'meter', 'yard', 'set', 'hour', 'lot'];
