@@ -15,6 +15,7 @@ const settingsRoutes = require('./routes/settings');
 const creditNoteRoutes = require('./routes/creditNotes');
 const quotationRoutes = require('./routes/quotations');
 const reportRoutes = require('./routes/reports');
+const backupRoutes = require('./routes/backup');
 
 const app = express();
 
@@ -41,6 +42,7 @@ app.use('/api/settings', settingsRoutes);
 app.use('/api/credit-notes', creditNoteRoutes);
 app.use('/api/quotations', quotationRoutes);
 app.use('/api/reports', reportRoutes);
+app.use('/api/backup', backupRoutes);
 
 app.use(errorHandler);
 
