@@ -4,9 +4,12 @@ import { ArrowDownTrayIcon, ArrowUpTrayIcon, CircleStackIcon, UsersIcon, PlusIco
 import toast from 'react-hot-toast';
 import { getSettings, updateSettings } from '../api/settings';
 import api from '../api/axios';
+import { useAuth } from '../context/AuthContext';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 
 export default function SettingsPage() {
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'admin';
   const [form, setForm] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -21,17 +24,16 @@ export default function SettingsPage() {
   const [showResetPw, setShowResetPw] = useState(null);
   const [newPassword, setNewPassword] = useState('');
 
-  const fetchUsers = () => api.get('/users').then(res => setUsers(res.data)).catch(() => {});
+  const fetchUsers = () => { if (isAdmin) api.get('/users').then(res => setUsers(res.data)).catch(() => {}); };
 
   useEffect(() => {
-    Promise.all([
-      getSettings(),
-      api.get('/backup/stats'),
-      api.get('/users')
-    ]).then(([setRes, statsRes, usersRes]) => {
+    const promises = [getSettings(), api.get('/backup/stats')];
+    if (isAdmin) promises.push(api.get('/users'));
+
+    Promise.all(promises).then(([setRes, statsRes, usersRes]) => {
       setForm(setRes.data);
       setDbStats(statsRes.data);
-      setUsers(usersRes.data);
+      if (usersRes) setUsers(usersRes.data);
     }).catch(() => toast.error('Failed to load settings'))
       .finally(() => setLoading(false));
   }, []);
@@ -269,8 +271,8 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      {/* User Management Section */}
-      <div className="card-custom mb-4">
+      {/* User Management Section - Admin Only */}
+      {isAdmin && <div className="card-custom mb-4">
         <div className="d-flex justify-content-between align-items-center mb-3">
           <h5 className="form-section-title" style={{ margin: 0, border: 0, padding: 0 }}>
             <UsersIcon style={{ width: 20, height: 20, marginRight: 8, display: 'inline' }} />
@@ -338,10 +340,10 @@ export default function SettingsPage() {
             </tbody>
           </table>
         </div>
-      </div>
+      </div>}
 
       {/* Add/Edit User Modal */}
-      <Modal show={showUserForm} onHide={() => setShowUserForm(false)} centered>
+      <Modal show={isAdmin && showUserForm} onHide={() => setShowUserForm(false)} centered>
         <Modal.Header closeButton>
           <Modal.Title className="modal-title-custom">{editingUser ? 'Edit User' : 'Add New User'}</Modal.Title>
         </Modal.Header>
@@ -398,7 +400,7 @@ export default function SettingsPage() {
       </Modal>
 
       {/* Reset Password Modal */}
-      <Modal show={!!showResetPw} onHide={() => setShowResetPw(null)} centered>
+      <Modal show={isAdmin && !!showResetPw} onHide={() => setShowResetPw(null)} centered>
         <Modal.Header closeButton>
           <Modal.Title className="modal-title-custom">Reset Password</Modal.Title>
         </Modal.Header>
