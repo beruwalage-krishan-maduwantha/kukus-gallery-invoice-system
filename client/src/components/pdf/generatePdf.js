@@ -65,8 +65,8 @@ export async function generateInvoicePdf(invoice, settings) {
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(7.5);
   doc.text(`Date: ${fmtDate(invoice.invoiceDate)}`, pageWidth - margin, 32, { align: 'right' });
-  if (invoice.dueDate) doc.text(`Due: ${fmtDate(invoice.dueDate)}`, pageWidth - margin, 36, { align: 'right' });
-  doc.text(`Terms: ${invoice.paymentTerms || 'Net 30'}`, pageWidth - margin, 40, { align: 'right' });
+  if (invoice.deliveryDate) doc.text(`Delivery: ${fmtDate(invoice.deliveryDate)}`, pageWidth - margin, 36, { align: 'right' });
+  doc.text(`Payment: ${invoice.paymentType || 'Cash'}`, pageWidth - margin, 40, { align: 'right' });
 
   // Bill To section
   let y = 58;

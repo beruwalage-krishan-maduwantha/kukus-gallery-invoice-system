@@ -103,8 +103,8 @@ export default function InvoiceViewPage() {
             <div className="invoice-meta-title">INVOICE</div>
             <div className="invoice-meta-row"><strong>{invoice.invoiceNumber}</strong></div>
             <div className="invoice-meta-row">Date: <strong>{formatDate(invoice.invoiceDate)}</strong></div>
-            {invoice.dueDate && <div className="invoice-meta-row">Due: <strong>{formatDate(invoice.dueDate)}</strong></div>}
-            <div className="invoice-meta-row">Terms: {invoice.paymentTerms}</div>
+            {invoice.deliveryDate && <div className="invoice-meta-row">Delivery: <strong>{formatDate(invoice.deliveryDate)}</strong></div>}
+            <div className="invoice-meta-row">Payment: {invoice.paymentType}</div>
           </div>
         </div>
 

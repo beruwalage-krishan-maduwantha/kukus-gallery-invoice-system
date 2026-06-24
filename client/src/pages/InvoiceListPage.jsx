@@ -88,7 +88,7 @@ export default function InvoiceListPage() {
                 <th>Invoice #</th>
                 <th>Customer</th>
                 <th>Date</th>
-                <th>Due Date</th>
+                <th>Delivery</th>
                 <th>Amount</th>
                 <th>Status</th>
                 <th>Actions</th>
@@ -100,7 +100,7 @@ export default function InvoiceListPage() {
                   <td style={{ fontWeight: 600, color: 'var(--primary-dark)' }}>{inv.invoiceNumber}</td>
                   <td>{inv.customerSnapshot?.name || inv.customer?.name}</td>
                   <td>{formatDate(inv.invoiceDate)}</td>
-                  <td>{formatDate(inv.dueDate)}</td>
+                  <td>{formatDate(inv.deliveryDate)}</td>
                   <td style={{ fontWeight: 600 }}>{formatCurrency(inv.grandTotal)}</td>
                   <td><StatusBadge status={inv.status} /></td>
                   <td onClick={e => e.stopPropagation()}>

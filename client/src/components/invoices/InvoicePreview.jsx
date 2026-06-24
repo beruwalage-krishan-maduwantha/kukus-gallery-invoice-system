@@ -1,7 +1,7 @@
 import { formatCurrency } from '../../utils/formatCurrency';
 import { formatDate } from '../../utils/formatDate';
 
-export default function InvoicePreview({ customer, items, subtotal, discountAmount, grandTotal, invoiceDate, dueDate }) {
+export default function InvoicePreview({ customer, items, subtotal, discountAmount, grandTotal, invoiceDate, deliveryDate }) {
   return (
     <div className="preview-panel">
       <h5 className="preview-title">Live Preview</h5>
@@ -22,7 +22,7 @@ export default function InvoicePreview({ customer, items, subtotal, discountAmou
 
       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.62rem', color: '#888', marginBottom: '0.5rem' }}>
         <span>Date: {formatDate(invoiceDate)}</span>
-        {dueDate && <span>Due: {formatDate(dueDate)}</span>}
+        {deliveryDate && <span>Delivery: {formatDate(deliveryDate)}</span>}
       </div>
 
       {items.filter(i => i.name).length > 0 && (

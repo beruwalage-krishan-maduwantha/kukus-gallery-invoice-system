@@ -64,7 +64,7 @@ exports.createInvoice = async (req, res) => {
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { customer: customerId, items, discountType, discountValue, paymentTerms, notes, terms, invoiceDate, dueDate, status } = req.body;
+    const { customer: customerId, items, discountType, discountValue, paymentType, notes, terms, invoiceDate, deliveryDate, status } = req.body;
 
     const customerDoc = await Customer.findById(customerId);
     if (!customerDoc) return res.status(404).json({ message: 'Customer not found' });
@@ -111,8 +111,8 @@ exports.createInvoice = async (req, res) => {
       grandTotal,
       status: status || 'Draft',
       invoiceDate: invoiceDate || new Date(),
-      dueDate,
-      paymentTerms: paymentTerms || settings?.defaultPaymentTerms || 'Net 30',
+      deliveryDate: deliveryDate || undefined,
+      paymentType: paymentType || 'Cash',
       notes: notes || settings?.defaultNotes || '',
       terms: terms || settings?.defaultTerms || '',
       createdBy: req.user._id,
@@ -142,7 +142,7 @@ exports.updateInvoice = async (req, res) => {
       return res.status(400).json({ message: 'Only draft invoices can be edited' });
     }
 
-    const { items, discountType, discountValue, paymentTerms, notes, terms, dueDate } = req.body;
+    const { items, discountType, discountValue, paymentType, notes, terms, deliveryDate } = req.body;
 
     if (items) {
       const processedItems = items.map(item => {
@@ -176,10 +176,10 @@ exports.updateInvoice = async (req, res) => {
       invoice.grandTotal = grandTotal;
     }
 
-    if (paymentTerms) invoice.paymentTerms = paymentTerms;
+    if (paymentType) invoice.paymentType = paymentType;
     if (notes !== undefined) invoice.notes = notes;
     if (terms !== undefined) invoice.terms = terms;
-    if (dueDate) invoice.dueDate = dueDate;
+    if (deliveryDate) invoice.deliveryDate = deliveryDate;
 
     await invoice.save();
 

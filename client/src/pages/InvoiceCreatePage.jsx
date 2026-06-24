@@ -11,7 +11,7 @@ import { createCustomer } from '../api/customers';
 import LineItemRow from '../components/invoices/LineItemRow';
 import InvoiceSummary from '../components/invoices/InvoiceSummary';
 import InvoicePreview from '../components/invoices/InvoicePreview';
-import { PAYMENT_TERMS } from '../utils/constants';
+import { PAYMENT_TYPES } from '../utils/constants';
 import { formatDateInput } from '../utils/formatDate';
 
 const emptyItem = { product: '', name: '', category: '', orderType: 'Sample', quantity: 1, unitPrice: 0, discount: 0, lineTotal: 0 };
@@ -26,9 +26,9 @@ export default function InvoiceCreatePage() {
   const [items, setItems] = useState([{ ...emptyItem }]);
   const [discountType, setDiscountType] = useState('percentage');
   const [discountValue, setDiscountValue] = useState(0);
-  const [paymentTerms, setPaymentTerms] = useState('Net 30');
+  const [paymentType, setPaymentType] = useState('Cash');
   const [invoiceDate, setInvoiceDate] = useState(formatDateInput(new Date()));
-  const [dueDate, setDueDate] = useState('');
+  const [deliveryDate, setDeliveryDate] = useState('');
   const [notes, setNotes] = useState('');
   const [terms, setTerms] = useState('');
   const [products, setProducts] = useState([]);
@@ -48,9 +48,9 @@ export default function InvoiceCreatePage() {
         setItems(inv.items.map(i => ({ ...i, product: i.product || '' })));
         setDiscountType(inv.discountType || 'percentage');
         setDiscountValue(inv.discountValue || 0);
-        setPaymentTerms(inv.paymentTerms || 'Net 30');
+        setPaymentType(inv.paymentType || 'Cash');
         setInvoiceDate(formatDateInput(inv.invoiceDate));
-        setDueDate(inv.dueDate ? formatDateInput(inv.dueDate) : '');
+        setDeliveryDate(inv.deliveryDate ? formatDateInput(inv.deliveryDate) : '');
         setNotes(inv.notes || '');
         setTerms(inv.terms || '');
       });
@@ -93,8 +93,8 @@ export default function InvoiceCreatePage() {
           discount: Number(i.discount) || 0
         })),
         discountType, discountValue,
-        paymentTerms, invoiceDate,
-        dueDate: dueDate || undefined,
+        paymentType, invoiceDate,
+        deliveryDate: deliveryDate || undefined,
         notes, terms, status
       };
 
@@ -153,15 +153,15 @@ export default function InvoiceCreatePage() {
             </Col>
             <Col md={4}>
               <Form.Group>
-                <Form.Label className="form-label-custom">Due Date</Form.Label>
-                <Form.Control className="form-input" type="date" value={dueDate} onChange={e => setDueDate(e.target.value)} />
+                <Form.Label className="form-label-custom">Delivery Date</Form.Label>
+                <Form.Control className="form-input" type="date" value={deliveryDate} onChange={e => setDeliveryDate(e.target.value)} />
               </Form.Group>
             </Col>
             <Col md={4}>
               <Form.Group>
-                <Form.Label className="form-label-custom">Payment Terms</Form.Label>
-                <Form.Select className="form-input" value={paymentTerms} onChange={e => setPaymentTerms(e.target.value)}>
-                  {PAYMENT_TERMS.map(t => <option key={t} value={t}>{t}</option>)}
+                <Form.Label className="form-label-custom">Payment Type</Form.Label>
+                <Form.Select className="form-input" value={paymentType} onChange={e => setPaymentType(e.target.value)}>
+                  {PAYMENT_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
                 </Form.Select>
               </Form.Group>
             </Col>
@@ -238,7 +238,7 @@ export default function InvoiceCreatePage() {
           discountAmount={discountAmount}
           grandTotal={grandTotal}
           invoiceDate={invoiceDate}
-          dueDate={dueDate}
+          deliveryDate={deliveryDate}
         />
       </Col>
 

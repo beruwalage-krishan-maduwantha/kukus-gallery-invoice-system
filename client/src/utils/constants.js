@@ -2,7 +2,7 @@ export const STATUS_OPTIONS = ['Draft', 'Sent', 'Paid', 'Overdue', 'Cancelled'];
 
 export const ORDER_TYPES = ['Sample', 'Bulk'];
 
-export const PAYMENT_TERMS = ['Due on Receipt', 'Net 15', 'Net 30', 'Net 45', 'Net 60'];
+export const PAYMENT_TYPES = ['Bank Transfer', 'Cash', 'Credits'];
 
 export const SERVICE_TYPES = ['Design Wear', 'Corporate Clothing'];
 

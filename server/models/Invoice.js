@@ -34,10 +34,9 @@ const invoiceSchema = new mongoose.Schema({
     default: 'Draft'
   },
   invoiceDate: { type: Date, default: Date.now },
-  dueDate: { type: Date },
+  deliveryDate: { type: Date },
   paidDate: { type: Date },
-  paymentTerms: { type: String, default: 'Net 30' },
-  paymentMethod: { type: String },
+  paymentType: { type: String, enum: ['Bank Transfer', 'Cash', 'Credits'], default: 'Cash' },
   notes: { type: String },
   terms: { type: String },
   createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
