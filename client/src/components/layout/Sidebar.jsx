@@ -13,18 +13,21 @@ import {
 } from '@heroicons/react/24/outline';
 
 const navItems = [
-  { to: '/', icon: HomeIcon, label: 'Dashboard' },
-  { to: '/quotations', icon: DocumentDuplicateIcon, label: 'Quotations' },
-  { to: '/invoices', icon: DocumentTextIcon, label: 'Invoices' },
-  { to: '/credit-notes', icon: ReceiptRefundIcon, label: 'Credit Notes' },
-  { to: '/reports', icon: ChartBarIcon, label: 'Reports' },
-  { to: '/customers', icon: UserGroupIcon, label: 'Customers' },
-  { to: '/products', icon: CubeIcon, label: 'Products' },
-  { to: '/settings', icon: Cog6ToothIcon, label: 'Settings' },
+  { to: '/', icon: HomeIcon, label: 'Dashboard', access: 'all' },
+  { to: '/quotations', icon: DocumentDuplicateIcon, label: 'Quotations', access: 'all' },
+  { to: '/invoices', icon: DocumentTextIcon, label: 'Invoices', access: 'all' },
+  { to: '/credit-notes', icon: ReceiptRefundIcon, label: 'Credit Notes', access: 'admin' },
+  { to: '/reports', icon: ChartBarIcon, label: 'Reports', access: 'admin' },
+  { to: '/customers', icon: UserGroupIcon, label: 'Customers', access: 'admin' },
+  { to: '/products', icon: CubeIcon, label: 'Products', access: 'admin' },
+  { to: '/settings', icon: Cog6ToothIcon, label: 'Settings', access: 'admin' },
 ];
 
 export default function Sidebar({ show, onClose }) {
   const { user, logout } = useAuth();
+  const isAdmin = user?.role === 'admin';
+
+  const visibleItems = navItems.filter(item => item.access === 'all' || (item.access === 'admin' && isAdmin));
 
   return (
     <>
@@ -32,11 +35,11 @@ export default function Sidebar({ show, onClose }) {
       <aside className={`sidebar ${show ? 'show' : ''}`}>
         <div className="sidebar-header">
           <img src="/logo.png" alt="Kukus Gallery" className="sidebar-logo" />
-          <span className="sidebar-brand">Invoice System</span>
+          <span className="sidebar-brand">System</span>
         </div>
 
         <nav className="sidebar-nav">
-          {navItems.map(({ to, icon: Icon, label }) => (
+          {visibleItems.map(({ to, icon: Icon, label }) => (
             <NavLink
               key={to}
               to={to}
