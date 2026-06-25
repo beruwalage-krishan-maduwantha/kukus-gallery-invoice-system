@@ -239,9 +239,13 @@ exports.addAdvancePayment = async (req, res) => {
     invoice.advancePayment = Math.round(advance * 100) / 100;
     invoice.balance = Math.round((invoice.grandTotal - invoice.advancePayment) * 100) / 100;
 
-    if (invoice.balance <= 0) {
+    if (invoice.paymentType === 'Credits') {
+      invoice.status = 'Overdue';
+    } else if (invoice.balance <= 0) {
       invoice.status = 'Paid';
       invoice.paidDate = new Date();
+    } else {
+      invoice.status = 'Sent';
     }
 
     await invoice.save();
