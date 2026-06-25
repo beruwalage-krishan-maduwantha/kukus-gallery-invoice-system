@@ -126,10 +126,7 @@ export default function InvoiceListPage() {
                       <button className="btn-outline-custom btn-sm-custom" onClick={() => navigate(`/invoices/${inv._id}`)}>View</button>
                       <button className="btn-sm-custom" style={btnStyle('rgba(177,145,198,0.1)', 'var(--primary)')} onClick={() => navigate(`/invoices/${inv._id}/edit`)}>Edit</button>
                       {inv.status !== 'Paid' && inv.status !== 'Cancelled' && (
-                        <button className="btn-sm-custom" style={btnStyle('rgba(34,197,94,0.1)', 'var(--success)')} onClick={() => { setAdvanceTarget(inv); setAdvanceAmount(''); }}>Advance</button>
-                      )}
-                      {(inv.status === 'Sent' || inv.status === 'Advance Paid') && (
-                        <button className="btn-sm-custom" style={btnStyle('rgba(34,197,94,0.15)', 'var(--success)')} onClick={() => handleStatusChange(inv._id, 'Paid')}>Paid</button>
+                        <button className="btn-sm-custom" style={btnStyle('rgba(34,197,94,0.1)', 'var(--success)')} onClick={() => { setAdvanceTarget(inv); setAdvanceAmount(''); }}>Pay</button>
                       )}
                       {inv.status === 'Draft' && (
                         <button className="btn-sm-custom" style={btnStyle('rgba(239,68,68,0.1)', 'var(--danger)')} onClick={() => setDeleteTarget(inv)}>Del</button>
@@ -145,21 +142,22 @@ export default function InvoiceListPage() {
 
       <Pagination page={page} pages={pages} onPageChange={setPage} />
 
-      {/* Advance Payment Modal */}
+      {/* Payment Modal */}
       <Modal show={!!advanceTarget} onHide={() => setAdvanceTarget(null)} centered>
         <Modal.Header closeButton>
-          <Modal.Title className="modal-title-custom">Add Advance Payment</Modal.Title>
+          <Modal.Title className="modal-title-custom">Record Payment</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           {advanceTarget && (
             <div style={{ marginBottom: '1rem', padding: '0.75rem', background: 'var(--tint)', borderRadius: 8, fontSize: '0.82rem' }}>
               <strong>{advanceTarget.invoiceNumber}</strong> — {advanceTarget.customerSnapshot?.name}<br />
-              <span style={{ color: 'var(--accent)' }}>Total: {formatCurrency(advanceTarget.grandTotal)} | Paid: {formatCurrency(advanceTarget.advancePayment || 0)} | Balance: {formatCurrency(advanceTarget.balance || advanceTarget.grandTotal)}</span>
+              <span style={{ color: 'var(--accent)' }}>Total: {formatCurrency(advanceTarget.grandTotal)} | Already Paid: {formatCurrency(advanceTarget.advancePayment || 0)} | Balance: <strong style={{ color: 'var(--danger)' }}>{formatCurrency(advanceTarget.balance ?? advanceTarget.grandTotal)}</strong></span>
             </div>
           )}
           <Form.Group>
-            <Form.Label className="form-label-custom">Advance Amount (LKR)</Form.Label>
+            <Form.Label className="form-label-custom">Payment Amount (LKR)</Form.Label>
             <Form.Control className="form-input" type="number" min="0.01" step="0.01" value={advanceAmount} onChange={e => setAdvanceAmount(e.target.value)} placeholder="0.00" />
+            {advanceTarget && <div style={{ fontSize: '0.72rem', color: 'var(--accent)', marginTop: '0.4rem' }}>Full balance: {formatCurrency(advanceTarget.balance ?? advanceTarget.grandTotal)} — enter this to mark as fully paid</div>}
           </Form.Group>
         </Modal.Body>
         <Modal.Footer>
