@@ -6,18 +6,19 @@ exports.getStats = async (req, res) => {
   try {
     const totalInvoices = await Invoice.countDocuments();
 
-    const revenueResult = await Invoice.aggregate([
-      { $group: { _id: null, totalAdvance: { $sum: '$advancePayment' } } }
-    ]);
     const paidResult = await Invoice.aggregate([
       { $match: { status: 'Paid' } },
       { $group: { _id: null, total: { $sum: '$grandTotal' } } }
     ]);
-    const totalRevenue = (paidResult[0]?.total || 0) + (revenueResult[0]?.totalAdvance || 0);
+    const advanceFromUnpaid = await Invoice.aggregate([
+      { $match: { status: { $in: ['Sent', 'Overdue', 'Draft'] }, advancePayment: { $gt: 0 } } },
+      { $group: { _id: null, total: { $sum: '$advancePayment' } } }
+    ]);
+    const totalRevenue = (paidResult[0]?.total || 0) + (advanceFromUnpaid[0]?.total || 0);
 
     const outstandingResult = await Invoice.aggregate([
       { $match: { status: { $in: ['Sent', 'Overdue'] } } },
-      { $group: { _id: null, total: { $sum: '$balance' } } }
+      { $group: { _id: null, total: { $sum: { $subtract: ['$grandTotal', { $ifNull: ['$advancePayment', 0] }] } } } }
     ]);
     const outstanding = outstandingResult[0]?.total || 0;
 
