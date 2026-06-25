@@ -839,9 +839,7 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-heading); }
 
 /* ==================== RESPONSIVE ==================== */
 @media (max-width: 991px) {
-  .sidebar {
-    transform: translateX(-100%);
-  }
+  .sidebar { transform: translateX(-100%); }
   .sidebar.show { transform: translateX(0); }
   .sidebar-overlay { display: block; }
   .main-content { margin-left: 0; }
@@ -851,10 +849,55 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-heading); }
 }
 
 @media (max-width: 767px) {
-  .stat-card { padding: 1rem; }
-  .stat-card-value { font-size: 1.3rem; }
-  .action-bar { flex-direction: column; align-items: stretch; }
+  .stat-card { padding: 0.75rem; gap: 0.6rem; }
+  .stat-card-icon { width: 36px; height: 36px; }
+  .stat-card-icon svg { width: 18px !important; height: 18px !important; }
+  .stat-card-label { font-size: 0.6rem; letter-spacing: 0.08em; }
+  .stat-card-value { font-size: 1rem; word-break: break-word; }
+
+  .action-bar { flex-direction: column; align-items: stretch; gap: 0.75rem; }
+  .action-bar-left { flex-direction: column; gap: 0.5rem; }
+  .search-input-wrapper { max-width: 100%; }
+
+  .table-custom { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .table-custom table { min-width: 600px; }
+
   .invoice-header { flex-direction: column; gap: 1rem; }
   .invoice-meta-box { text-align: left; }
-  .invoice-view-card { padding: 1.5rem; }
+  .invoice-view-card { padding: 1rem; }
+
+  .invoice-items-table { font-size: 0.75rem; }
+  .invoice-items-table thead th { padding: 0.5rem; font-size: 0.6rem; }
+  .invoice-items-table tbody td { padding: 0.4rem; }
+
+  .invoice-total-section { justify-content: flex-start; }
+  .invoice-total-box { width: 100%; }
+
+  .items-table { min-width: 550px; }
+
+  .service-tabs { flex-wrap: wrap; }
+
+  .login-card { margin: 1rem; padding: 1.5rem; }
+  .login-title { font-size: 1.4rem; }
+
+  .form-section-title { font-size: 1.1rem; }
+
+  .chart-card { padding: 1rem; }
+
+  .invoice-footer { font-size: 0.72rem; }
+
+  .topbar-title { font-size: 1.2rem; }
+
+  .pagination-wrapper { flex-wrap: wrap; }
+
+  .modal-body { padding: 1rem; }
+}
+
+@media (max-width: 480px) {
+  .page-content { padding: 0.75rem; }
+  .stat-card-value { font-size: 0.85rem; }
+  .stat-card-label { font-size: 0.55rem; }
+  .card-custom { padding: 1rem; }
+  .btn-primary-custom { font-size: 0.75rem; padding: 0.5rem 1rem; }
+  .btn-outline-custom { font-size: 0.75rem; padding: 0.4rem 0.8rem; }
 }
