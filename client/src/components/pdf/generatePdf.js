@@ -72,88 +72,43 @@ function drawInvoiceContent(doc, data, settings, logoBase64, title) {
   const margin = 8;
   const contentWidth = pageWidth - margin * 2;
 
-  // Header - white background with logo + company details (matching web view)
+  // === HEADER: Logo + Company (left) + INVOICE box (right) ===
   if (logoBase64) {
-    try { doc.addImage(logoBase64, 'JPEG', margin, 6, 28, 30); } catch {}
+    try { doc.addImage(logoBase64, 'JPEG', margin, 5, 22, 24); } catch {}
   }
 
+  const compX = margin + 26;
   doc.setTextColor(44, 22, 64);
   doc.setFontSize(9);
   doc.setFont('helvetica', 'bold');
-  doc.text(settings?.companyName || 'Kukus Gallery Pvt Ltd', margin + 32, 14);
+  doc.text(settings?.companyName || 'Kukus Gallery Pvt Ltd', compX, 12);
   doc.setFontSize(5.5);
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(100, 100, 100);
-  doc.text(settings?.address || '', margin + 32, 19);
-  doc.text(`Tel: ${settings?.landline || '011 287 0057'}`, margin + 32, 23);
-  doc.text(settings?.email || '', margin + 32, 27);
+  doc.text(settings?.address || '', compX, 17);
+  doc.text(`Tel: ${settings?.landline || '011 287 0057'}`, compX, 21);
+  doc.text(settings?.email || '', compX, 25);
 
-  // INVOICE/QUOTATION box - right side (lavender tint like web view)
+  // INVOICE/QUOTATION box (right, matching web view lavender box)
   doc.setFillColor(248, 244, 251);
   doc.setDrawColor(212, 189, 227);
-  doc.roundedRect(pageWidth - margin - 38, 8, 38, 14, 2, 2, 'FD');
+  doc.roundedRect(pageWidth - margin - 36, 8, 36, 16, 3, 3, 'FD');
   doc.setTextColor(177, 145, 198);
-  doc.setFontSize(11);
+  doc.setFontSize(10);
   doc.setFont('helvetica', 'bold');
-  doc.text(title, pageWidth - margin - 19, 17, { align: 'center' });
+  doc.text(title, pageWidth - margin - 18, 18, { align: 'center' });
 
-  // Divider line
-  let y = 40;
-  doc.setDrawColor(212, 189, 227);
-  doc.setLineWidth(0.3);
-  doc.line(margin, y - 2, pageWidth - margin, y - 2);
-  doc.setTextColor(44, 22, 64);
-  doc.setFontSize(14);
-  doc.setFont('helvetica', 'bold');
-  doc.text(title, margin, y);
-
-  doc.setFontSize(9);
-  doc.setTextColor(177, 145, 198);
-  doc.text(data.invoiceNumber || data.quotationNumber, margin + (title.length * 4.5), y);
-
-  // Invoice meta - right aligned table
-  doc.setFontSize(6.5);
-  doc.setFont('helvetica', 'normal');
-  const metaX = pageWidth - margin - 40;
-  doc.setTextColor(120, 120, 120);
-  doc.text('Date', metaX, y - 4);
-  doc.setTextColor(30, 30, 30);
-  doc.setFont('helvetica', 'bold');
-  doc.text(fmtDate(data.invoiceDate || data.quotationDate), pageWidth - margin, y - 4, { align: 'right' });
-
-  if (data.deliveryDate) {
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(120, 120, 120);
-    doc.text('Delivery', metaX, y);
-    doc.setTextColor(30, 30, 30);
-    doc.setFont('helvetica', 'bold');
-    doc.text(fmtDate(data.deliveryDate), pageWidth - margin, y, { align: 'right' });
-  }
-  if (data.validUntil) {
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(120, 120, 120);
-    doc.text('Valid Until', metaX, y);
-    doc.setTextColor(30, 30, 30);
-    doc.setFont('helvetica', 'bold');
-    doc.text(fmtDate(data.validUntil), pageWidth - margin, y, { align: 'right' });
-  }
-  if (data.paymentType) {
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(120, 120, 120);
-    doc.text('Payment', metaX, y + 4);
-    doc.setTextColor(30, 30, 30);
-    doc.text(data.paymentType, pageWidth - margin, y + 4, { align: 'right' });
-  }
-
-  // Divider
-  y += 8;
+  // === DIVIDER LINE ===
+  let y = 34;
   doc.setDrawColor(212, 189, 227);
   doc.setLineWidth(0.3);
   doc.line(margin, y, pageWidth - margin, y);
 
-  // Bill To
-  const snap = data.customerSnapshot || {};
+  // === BILL TO (left) + INVOICE META TABLE (right) ===
   y += 4;
+  const snap = data.customerSnapshot || {};
+
+  // Bill To - left side
   doc.setTextColor(154, 123, 175);
   doc.setFontSize(5.5);
   doc.setFont('helvetica', 'bold');
@@ -165,11 +120,36 @@ function drawInvoiceContent(doc, data, settings, logoBase64, title) {
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(6);
   doc.setTextColor(100, 100, 100);
-  y += 3.5;
-  if (snap.address) { doc.text(snap.address, margin, y); y += 3; }
-  if (snap.phone) { doc.text(`Phone: ${snap.phone}`, margin, y); y += 3; }
-  if (snap.email) { doc.text(`Email: ${snap.email}`, margin, y); y += 3; }
-  y += 2;
+  let billY = y + 3.5;
+  if (snap.address) { doc.text(snap.address, margin, billY); billY += 3; }
+  if (snap.phone) { doc.text(`Phone: ${snap.phone}`, margin, billY); billY += 3; }
+  if (snap.email) { doc.text(`Email: ${snap.email}`, margin, billY); billY += 3; }
+
+  // Invoice meta - right side table (matching web view alignment)
+  const metaLabelX = pageWidth - margin - 42;
+  const metaValX = pageWidth - margin;
+  let metaY = y - 3;
+
+  const metaRows = [
+    { label: 'Invoice No', value: data.invoiceNumber || data.quotationNumber, color: [177, 145, 198], bold: true },
+    { label: 'Date', value: fmtDate(data.invoiceDate || data.quotationDate) },
+  ];
+  if (data.deliveryDate) metaRows.push({ label: 'Delivery', value: fmtDate(data.deliveryDate) });
+  if (data.validUntil) metaRows.push({ label: 'Valid Until', value: fmtDate(data.validUntil) });
+  if (data.paymentType) metaRows.push({ label: 'Payment', value: data.paymentType });
+
+  metaRows.forEach(row => {
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(6);
+    doc.setTextColor(120, 120, 120);
+    doc.text(row.label, metaLabelX, metaY);
+    doc.setFont('helvetica', row.bold ? 'bold' : 'normal');
+    doc.setTextColor(...(row.color || [30, 30, 30]));
+    doc.text(row.value, metaValX, metaY, { align: 'right' });
+    metaY += 4;
+  });
+
+  y = Math.max(billY, metaY) + 2;
 
   // Items table - NO type column
   const tableBody = data.items.map((item, i) => [
