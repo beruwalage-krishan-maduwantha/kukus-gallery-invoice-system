@@ -18,7 +18,7 @@ const navItems = [
   { to: '/invoices', icon: DocumentTextIcon, label: 'Invoices', access: 'all' },
   { to: '/credit-notes', icon: ReceiptRefundIcon, label: 'Credit Notes', access: 'admin' },
   { to: '/reports', icon: ChartBarIcon, label: 'Reports', access: 'admin' },
-  { to: '/customers', icon: UserGroupIcon, label: 'Customers', access: 'admin' },
+  { to: '/customers', icon: UserGroupIcon, label: 'Customers', access: 'all' },
   { to: '/products', icon: CubeIcon, label: 'Products', access: 'admin' },
   { to: '/settings', icon: Cog6ToothIcon, label: 'Settings', access: 'all' },
 ];
