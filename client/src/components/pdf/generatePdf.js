@@ -203,7 +203,18 @@ function drawInvoiceContent(doc, data, settings, logoBase64, title) {
     y += 4;
   }
 
+  // Advance if exists
+  const advance = Number(data.advancePayment) || 0;
+  if (advance > 0) {
+    doc.setTextColor(34, 197, 94);
+    doc.setFont('helvetica', 'normal');
+    doc.text('Advance:', summaryX, y);
+    doc.text(`- ${formatLKR(advance)}`, pageWidth - margin, y, { align: 'right' });
+    y += 4;
+  }
+
   // Grand Total bar
+  const finalTotal = advance > 0 ? (data.grandTotal - advance) : data.grandTotal;
   y += 1;
   doc.setFillColor(177, 145, 198);
   doc.roundedRect(summaryX - 3, y - 3, contentWidth - summaryX + margin + 3, 8, 2, 2, 'F');
@@ -211,21 +222,9 @@ function drawInvoiceContent(doc, data, settings, logoBase64, title) {
   doc.setFontSize(7);
   doc.setFont('helvetica', 'bold');
   doc.text('GRAND TOTAL', summaryX, y + 2);
-  doc.text(formatLKR(data.grandTotal), pageWidth - margin, y + 2, { align: 'right' });
+  doc.text(formatLKR(finalTotal), pageWidth - margin, y + 2, { align: 'right' });
 
-  // Advance / Balance if exists
-  if (data.advancePayment > 0) {
-    y += 10;
-    doc.setFontSize(6.5);
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(34, 197, 94);
-    doc.text('Advance Paid:', summaryX, y);
-    doc.text(formatLKR(data.advancePayment), pageWidth - margin, y, { align: 'right' });
-    y += 4;
-    doc.setTextColor(239, 68, 68);
-    doc.setFont('helvetica', 'bold');
-    doc.text('Balance:', summaryX, y);
-    doc.text(formatLKR(data.balance || 0), pageWidth - margin, y, { align: 'right' });
+  if (false) { // removed old advance/balance block
   }
 
   // Bank details

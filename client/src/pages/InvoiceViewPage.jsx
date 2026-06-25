@@ -164,9 +164,15 @@ export default function InvoiceViewPage() {
                 <span>- {formatCurrency(invoice.discountAmount)}</span>
               </div>
             )}
+            {(invoice.advancePayment || 0) > 0 && (
+              <div className="invoice-total-row" style={{ color: 'var(--success)' }}>
+                <span>Advance Paid</span>
+                <span>- {formatCurrency(invoice.advancePayment)}</span>
+              </div>
+            )}
             <div className="invoice-total-row grand">
               <span>Grand Total</span>
-              <span>{formatCurrency(invoice.grandTotal)}</span>
+              <span>{formatCurrency((invoice.advancePayment > 0) ? (invoice.grandTotal - invoice.advancePayment) : invoice.grandTotal)}</span>
             </div>
           </div>
         </div>

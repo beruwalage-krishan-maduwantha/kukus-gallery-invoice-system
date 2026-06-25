@@ -168,12 +168,6 @@ export default function InvoiceCreatePage() {
                 </Form.Select>
               </Form.Group>
             </Col>
-            <Col md={4}>
-              <Form.Group>
-                <Form.Label className="form-label-custom">Advance Payment (LKR)</Form.Label>
-                <Form.Control className="form-input" type="number" min="0" step="0.01" value={advancePayment} onChange={e => setAdvancePayment(e.target.value)} placeholder="0.00" />
-              </Form.Group>
-            </Col>
           </Row>
         </div>
 
@@ -210,6 +204,8 @@ export default function InvoiceCreatePage() {
               discountValue={discountValue}
               onDiscountTypeChange={setDiscountType}
               onDiscountValueChange={setDiscountValue}
+              advancePayment={advancePayment}
+              onAdvanceChange={setAdvancePayment}
             />
           </div>
         </div>
