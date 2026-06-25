@@ -57,61 +57,84 @@ If any alterations are required, products must be handed over within 7 days of d
 9. Design Confidentiality
 Client-specific designs will not be used for other clients without prior written permission.`;
 
-export async function generateInvoicePdf(invoice, settings) {
-  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a5' });
+function drawFooter(doc, pageWidth, pageHeight, margin, settings) {
+  doc.setDrawColor(177, 145, 198);
+  doc.setLineWidth(0.2);
+  doc.line(margin, pageHeight - 6, pageWidth - margin, pageHeight - 6);
+  doc.setTextColor(154, 123, 175);
+  doc.setFontSize(4.5);
+  doc.text(`${settings?.companyName || 'Kukus Gallery Pvt Ltd'} | ${settings?.website || 'www.kukusgallery.com'}`, pageWidth / 2, pageHeight - 3, { align: 'center' });
+}
+
+function drawInvoiceContent(doc, data, settings, logoBase64, title) {
   const pageWidth = 148;
   const pageHeight = 210;
   const margin = 8;
   const contentWidth = pageWidth - margin * 2;
 
-  let logoBase64 = null;
-  try {
-    logoBase64 = await compressImage('/logo.png', 200, 0.6);
-  } catch {}
-
-  // === HEADER BAR (purple) ===
+  // Header bar
   doc.setFillColor(44, 22, 64);
-  doc.rect(0, 0, pageWidth, 32, 'F');
+  doc.rect(0, 0, pageWidth, 35, 'F');
 
-  // Logo left side
   if (logoBase64) {
-    try { doc.addImage(logoBase64, 'JPEG', margin, 3, 22, 26); } catch {}
+    try { doc.addImage(logoBase64, 'JPEG', margin, 2, 28, 30); } catch {}
   }
 
-  // Company details - RIGHT side of header
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(9);
   doc.setFont('helvetica', 'bold');
-  doc.text(settings?.companyName || 'Kukus Gallery Pvt Ltd', pageWidth - margin, 8, { align: 'right' });
-
+  doc.text(settings?.companyName || 'Kukus Gallery Pvt Ltd', pageWidth - margin, 10, { align: 'right' });
   doc.setFontSize(5.5);
   doc.setFont('helvetica', 'normal');
-  doc.text(settings?.address || '484/8/F Wettasinghe Gardens, Pitakotte, Sri Lanka', pageWidth - margin, 13, { align: 'right' });
-  doc.text(`Tel: ${settings?.phone || '076 861 4050 / 077 698 6155'}`, pageWidth - margin, 17, { align: 'right' });
-  doc.text(`Email: ${settings?.email || 'info@kukusgallery.com'}`, pageWidth - margin, 21, { align: 'right' });
-  if (settings?.website) doc.text(`Web: ${settings.website}`, pageWidth - margin, 25, { align: 'right' });
+  doc.text(settings?.address || '', pageWidth - margin, 15, { align: 'right' });
+  doc.text(`Tel: ${settings?.landline || '011 287 0057'}`, pageWidth - margin, 19, { align: 'right' });
+  doc.text(`Email: ${settings?.email || ''}`, pageWidth - margin, 23, { align: 'right' });
+  if (settings?.website) doc.text(`Web: ${settings.website}`, pageWidth - margin, 27, { align: 'right' });
 
-  // === INVOICE DETAILS (white area below header) ===
-  let y = 37;
-
-  // Invoice title + number
+  // Title
+  let y = 40;
   doc.setTextColor(44, 22, 64);
   doc.setFontSize(14);
   doc.setFont('helvetica', 'bold');
-  doc.text('INVOICE', margin, y);
+  doc.text(title, margin, y);
 
   doc.setFontSize(9);
-  doc.setFont('helvetica', 'bold');
   doc.setTextColor(177, 145, 198);
-  doc.text(invoice.invoiceNumber, margin + 36, y);
+  doc.text(data.invoiceNumber || data.quotationNumber, margin + (title.length * 4.5), y);
 
-  // Invoice meta - right aligned
+  // Invoice meta - right aligned table
   doc.setFontSize(6.5);
   doc.setFont('helvetica', 'normal');
-  doc.setTextColor(80, 80, 80);
-  doc.text(`Date: ${fmtDate(invoice.invoiceDate)}`, pageWidth - margin, y - 3, { align: 'right' });
-  if (invoice.deliveryDate) doc.text(`Delivery: ${fmtDate(invoice.deliveryDate)}`, pageWidth - margin, y + 1, { align: 'right' });
-  doc.text(`Payment: ${invoice.paymentType || 'Cash'}`, pageWidth - margin, y + 5, { align: 'right' });
+  const metaX = pageWidth - margin - 40;
+  doc.setTextColor(120, 120, 120);
+  doc.text('Date', metaX, y - 4);
+  doc.setTextColor(30, 30, 30);
+  doc.setFont('helvetica', 'bold');
+  doc.text(fmtDate(data.invoiceDate || data.quotationDate), pageWidth - margin, y - 4, { align: 'right' });
+
+  if (data.deliveryDate) {
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(120, 120, 120);
+    doc.text('Delivery', metaX, y);
+    doc.setTextColor(30, 30, 30);
+    doc.setFont('helvetica', 'bold');
+    doc.text(fmtDate(data.deliveryDate), pageWidth - margin, y, { align: 'right' });
+  }
+  if (data.validUntil) {
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(120, 120, 120);
+    doc.text('Valid Until', metaX, y);
+    doc.setTextColor(30, 30, 30);
+    doc.setFont('helvetica', 'bold');
+    doc.text(fmtDate(data.validUntil), pageWidth - margin, y, { align: 'right' });
+  }
+  if (data.paymentType) {
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(120, 120, 120);
+    doc.text('Payment', metaX, y + 4);
+    doc.setTextColor(30, 30, 30);
+    doc.text(data.paymentType, pageWidth - margin, y + 4, { align: 'right' });
+  }
 
   // Divider
   y += 8;
@@ -119,20 +142,17 @@ export async function generateInvoicePdf(invoice, settings) {
   doc.setLineWidth(0.3);
   doc.line(margin, y, pageWidth - margin, y);
 
-  // === BILL TO ===
+  // Bill To
+  const snap = data.customerSnapshot || {};
   y += 4;
   doc.setTextColor(154, 123, 175);
   doc.setFontSize(5.5);
   doc.setFont('helvetica', 'bold');
   doc.text('BILL TO', margin, y);
-
-  const snap = invoice.customerSnapshot || {};
   y += 3.5;
   doc.setTextColor(44, 22, 64);
   doc.setFontSize(8);
-  doc.setFont('helvetica', 'bold');
-  doc.text(snap.name || '', margin, y);
-
+  doc.text(`${snap.title ? snap.title + '. ' : ''}${snap.name || ''}`, margin, y);
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(6);
   doc.setTextColor(100, 100, 100);
@@ -140,68 +160,46 @@ export async function generateInvoicePdf(invoice, settings) {
   if (snap.address) { doc.text(snap.address, margin, y); y += 3; }
   if (snap.phone) { doc.text(`Phone: ${snap.phone}`, margin, y); y += 3; }
   if (snap.email) { doc.text(`Email: ${snap.email}`, margin, y); y += 3; }
-  if (snap.company) { doc.text(`Company: ${snap.company}`, margin, y); y += 3; }
-
   y += 2;
 
-  // === ITEMS TABLE ===
-  const tableBody = invoice.items.map((item, i) => [
-    i + 1,
-    item.name,
-    item.orderType,
-    item.quantity,
-    formatLKR(item.unitPrice),
-    item.discount > 0 ? `${item.discount}%` : '-',
-    formatLKR(item.lineTotal)
+  // Items table - NO type column
+  const tableBody = data.items.map((item, i) => [
+    i + 1, item.name, item.quantity,
+    formatLKR(item.unitPrice), item.discount > 0 ? `${item.discount}%` : '-', formatLKR(item.lineTotal)
   ]);
 
   autoTable(doc, {
     startY: y,
-    head: [['#', 'Product / Service', 'Type', 'Qty', 'Unit Price', 'Disc', 'Total']],
+    head: [['#', 'Product / Service', 'Qty', 'Unit Price', 'Disc', 'Total']],
     body: tableBody,
-    headStyles: {
-      fillColor: [44, 22, 64],
-      textColor: 255,
-      fontSize: 5.5,
-      fontStyle: 'bold',
-      cellPadding: 1.8
-    },
+    headStyles: { fillColor: [44, 22, 64], textColor: 255, fontSize: 5.5, fontStyle: 'bold', cellPadding: 1.8 },
     alternateRowStyles: { fillColor: [248, 244, 251] },
-    styles: {
-      fontSize: 6,
-      cellPadding: 1.5,
-      textColor: [30, 30, 30],
-      lineColor: [230, 230, 230],
-      lineWidth: 0.1
-    },
+    styles: { fontSize: 6, cellPadding: 1.5, textColor: [30, 30, 30], lineColor: [230, 230, 230], lineWidth: 0.1 },
     columnStyles: {
       0: { cellWidth: 6, halign: 'center' },
-      2: { cellWidth: 12, halign: 'center' },
-      3: { cellWidth: 9, halign: 'center' },
-      4: { cellWidth: 22, halign: 'right' },
-      5: { cellWidth: 9, halign: 'center' },
-      6: { cellWidth: 22, halign: 'right', fontStyle: 'bold' }
+      2: { cellWidth: 10, halign: 'center' },
+      3: { cellWidth: 24, halign: 'right' },
+      4: { cellWidth: 10, halign: 'center' },
+      5: { cellWidth: 24, halign: 'right', fontStyle: 'bold' }
     },
-    margin: { left: margin, right: margin },
-    theme: 'grid'
+    margin: { left: margin, right: margin }, theme: 'grid'
   });
 
   y = doc.lastAutoTable.finalY + 4;
 
-  // === TOTALS ===
+  // Totals
   const summaryX = pageWidth - margin - 55;
   doc.setFontSize(6.5);
-
   doc.setTextColor(100, 100, 100);
   doc.text('Subtotal:', summaryX, y);
   doc.setTextColor(30, 30, 30);
-  doc.text(formatLKR(invoice.subtotal), pageWidth - margin, y, { align: 'right' });
+  doc.text(formatLKR(data.subtotal), pageWidth - margin, y, { align: 'right' });
   y += 4;
 
-  if (invoice.discountAmount > 0) {
+  if (data.discountAmount > 0) {
     doc.setTextColor(239, 68, 68);
-    doc.text(`Discount ${invoice.discountType === 'percentage' ? `(${invoice.discountValue}%)` : ''}:`, summaryX, y);
-    doc.text(`- ${formatLKR(invoice.discountAmount)}`, pageWidth - margin, y, { align: 'right' });
+    doc.text(`Discount ${data.discountType === 'percentage' ? `(${data.discountValue}%)` : ''}:`, summaryX, y);
+    doc.text(`- ${formatLKR(data.discountAmount)}`, pageWidth - margin, y, { align: 'right' });
     y += 4;
   }
 
@@ -213,58 +211,69 @@ export async function generateInvoicePdf(invoice, settings) {
   doc.setFontSize(7);
   doc.setFont('helvetica', 'bold');
   doc.text('GRAND TOTAL', summaryX, y + 2);
-  doc.text(formatLKR(invoice.grandTotal), pageWidth - margin, y + 2, { align: 'right' });
+  doc.text(formatLKR(data.grandTotal), pageWidth - margin, y + 2, { align: 'right' });
 
+  // Advance / Balance if exists
+  if (data.advancePayment > 0) {
+    y += 10;
+    doc.setFontSize(6.5);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(34, 197, 94);
+    doc.text('Advance Paid:', summaryX, y);
+    doc.text(formatLKR(data.advancePayment), pageWidth - margin, y, { align: 'right' });
+    y += 4;
+    doc.setTextColor(239, 68, 68);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Balance:', summaryX, y);
+    doc.text(formatLKR(data.balance || 0), pageWidth - margin, y, { align: 'right' });
+  }
+
+  // Bank details
   y += 12;
-
-  // === NOTES ===
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(5);
-  if (invoice.notes) {
-    doc.setTextColor(154, 123, 175);
-    doc.setFont('helvetica', 'bold');
-    doc.text('NOTES', margin, y);
-    y += 3;
-    doc.setTextColor(100, 100, 100);
-    doc.setFont('helvetica', 'normal');
-    const noteLines = doc.splitTextToSize(invoice.notes, contentWidth);
-    doc.text(noteLines, margin, y);
-    y += noteLines.length * 2.5 + 2;
-  }
-
-  // === BANK DETAILS ===
   if (settings?.bankDetails?.bankName) {
-    doc.setTextColor(154, 123, 175);
-    doc.setFont('helvetica', 'bold');
+    doc.setFillColor(44, 22, 64);
+    doc.roundedRect(margin, y - 3, contentWidth, 18, 2, 2, 'F');
+    doc.setTextColor(212, 189, 227);
     doc.setFontSize(5);
-    doc.text('BANK DETAILS', margin, y);
-    y += 3;
-    doc.setTextColor(100, 100, 100);
+    doc.setFont('helvetica', 'bold');
+    doc.text('PAY TO:', margin + 4, y + 1);
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(5.5);
     doc.setFont('helvetica', 'normal');
-    doc.text(`${settings.bankDetails.bankName} | Account: ${settings.bankDetails.accountNumber || ''} | Name: ${settings.bankDetails.accountName || ''}`, margin, y);
-    y += 5;
+    doc.text(`Bank - ${settings.bankDetails.bankName}`, margin + 4, y + 5);
+    doc.text(`Account Name - ${settings.bankDetails.accountName || ''}`, margin + 4, y + 9);
+    doc.text(`Account Number - ${settings.bankDetails.accountNumber || ''}`, margin + 4, y + 13);
   }
 
-  // === TERMS & CONDITIONS (new page if needed) ===
-  if (y > pageHeight - 60) {
-    doc.addPage('a5', 'portrait');
-    y = margin;
-  }
+  // Footer
+  drawFooter(doc, pageWidth, pageHeight, margin, settings);
 
-  doc.setTextColor(154, 123, 175);
+  return doc;
+}
+
+function drawTermsPage(doc, settings) {
+  const pageWidth = 148;
+  const pageHeight = 210;
+  const margin = 8;
+  const contentWidth = pageWidth - margin * 2;
+
+  doc.addPage('a5', 'portrait');
+
+  let y = 15;
+  doc.setTextColor(44, 22, 64);
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(6);
-  doc.text('TERMS & CONDITIONS', margin, y);
-  y += 3;
+  doc.setFontSize(10);
+  doc.text('Terms & Conditions', pageWidth / 2, y, { align: 'center' });
 
+  y += 8;
   doc.setTextColor(80, 80, 80);
   doc.setFont('helvetica', 'normal');
-  doc.setFontSize(4.5);
+  doc.setFontSize(5);
   const termsLines = doc.splitTextToSize(TERMS_TEXT, contentWidth);
-
-  const lineHeight = 2.2;
+  const lineHeight = 2.4;
   for (let i = 0; i < termsLines.length; i++) {
     if (y + lineHeight > pageHeight - 8) {
+      drawFooter(doc, pageWidth, pageHeight, margin, settings);
       doc.addPage('a5', 'portrait');
       y = margin;
     }
@@ -272,177 +281,27 @@ export async function generateInvoicePdf(invoice, settings) {
     y += lineHeight;
   }
 
-  // === FOOTER on last page ===
-  const totalPages = doc.getNumberOfPages();
-  for (let p = 1; p <= totalPages; p++) {
-    doc.setPage(p);
-    doc.setDrawColor(177, 145, 198);
-    doc.setLineWidth(0.2);
-    doc.line(margin, pageHeight - 6, pageWidth - margin, pageHeight - 6);
-    doc.setTextColor(154, 123, 175);
-    doc.setFontSize(4.5);
-    doc.text(
-      `${settings?.companyName || 'Kukus Gallery Pvt Ltd'} | ${settings?.website || 'www.kukusgallery.com'}`,
-      pageWidth / 2, pageHeight - 3, { align: 'center' }
-    );
-  }
+  drawFooter(doc, pageWidth, pageHeight, margin, settings);
+}
+
+export async function generateInvoicePdf(invoice, settings) {
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a5' });
+  let logoBase64 = null;
+  try { logoBase64 = await compressImage('/logo.png', 200, 0.6); } catch {}
+
+  drawInvoiceContent(doc, invoice, settings, logoBase64, 'INVOICE');
+  drawTermsPage(doc, settings);
 
   doc.save(invoice.pdfFilename || `Invoice_${invoice.invoiceNumber}.pdf`);
 }
 
 export async function generateQuotationPdf(quotation, settings) {
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a5' });
-  const pageWidth = 148;
-  const pageHeight = 210;
-  const margin = 8;
-  const contentWidth = pageWidth - margin * 2;
-
   let logoBase64 = null;
   try { logoBase64 = await compressImage('/logo.png', 200, 0.6); } catch {}
 
-  doc.setFillColor(44, 22, 64);
-  doc.rect(0, 0, pageWidth, 32, 'F');
-
-  if (logoBase64) { try { doc.addImage(logoBase64, 'JPEG', margin, 3, 22, 26); } catch {} }
-
-  doc.setTextColor(255, 255, 255);
-  doc.setFontSize(9);
-  doc.setFont('helvetica', 'bold');
-  doc.text(settings?.companyName || 'Kukus Gallery Pvt Ltd', pageWidth - margin, 8, { align: 'right' });
-  doc.setFontSize(5.5);
-  doc.setFont('helvetica', 'normal');
-  doc.text(settings?.address || '', pageWidth - margin, 13, { align: 'right' });
-  doc.text(`Tel: ${settings?.phone || ''}`, pageWidth - margin, 17, { align: 'right' });
-  doc.text(`Email: ${settings?.email || ''}`, pageWidth - margin, 21, { align: 'right' });
-  if (settings?.website) doc.text(`Web: ${settings.website}`, pageWidth - margin, 25, { align: 'right' });
-
-  let y = 37;
-  doc.setTextColor(44, 22, 64);
-  doc.setFontSize(14);
-  doc.setFont('helvetica', 'bold');
-  doc.text('QUOTATION', margin, y);
-
-  doc.setFontSize(9);
-  doc.setTextColor(177, 145, 198);
-  doc.text(quotation.quotationNumber, margin + 46, y);
-
-  doc.setFontSize(6.5);
-  doc.setFont('helvetica', 'normal');
-  doc.setTextColor(80, 80, 80);
-  doc.text(`Date: ${fmtDate(quotation.quotationDate)}`, pageWidth - margin, y - 3, { align: 'right' });
-  doc.text(`Valid Until: ${fmtDate(quotation.validUntil)}`, pageWidth - margin, y + 1, { align: 'right' });
-  if (quotation.deliveryDate) doc.text(`Delivery: ${fmtDate(quotation.deliveryDate)}`, pageWidth - margin, y + 5, { align: 'right' });
-
-  y += 8;
-  doc.setDrawColor(212, 189, 227);
-  doc.setLineWidth(0.3);
-  doc.line(margin, y, pageWidth - margin, y);
-
-  const snap = quotation.customerSnapshot || {};
-  y += 4;
-  doc.setTextColor(154, 123, 175);
-  doc.setFontSize(5.5);
-  doc.setFont('helvetica', 'bold');
-  doc.text('BILL TO', margin, y);
-  y += 3.5;
-  doc.setTextColor(44, 22, 64);
-  doc.setFontSize(8);
-  doc.text(snap.name || '', margin, y);
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(6);
-  doc.setTextColor(100, 100, 100);
-  y += 3.5;
-  if (snap.address) { doc.text(snap.address, margin, y); y += 3; }
-  if (snap.phone) { doc.text(`Phone: ${snap.phone}`, margin, y); y += 3; }
-  if (snap.email) { doc.text(`Email: ${snap.email}`, margin, y); y += 3; }
-  y += 2;
-
-  const tableBody = quotation.items.map((item, i) => [
-    i + 1, item.name, item.orderType, item.quantity,
-    formatLKR(item.unitPrice), item.discount > 0 ? `${item.discount}%` : '-', formatLKR(item.lineTotal)
-  ]);
-
-  autoTable(doc, {
-    startY: y,
-    head: [['#', 'Product / Service', 'Type', 'Qty', 'Unit Price', 'Disc', 'Total']],
-    body: tableBody,
-    headStyles: { fillColor: [44, 22, 64], textColor: 255, fontSize: 5.5, fontStyle: 'bold', cellPadding: 1.8 },
-    alternateRowStyles: { fillColor: [248, 244, 251] },
-    styles: { fontSize: 6, cellPadding: 1.5, textColor: [30, 30, 30], lineColor: [230, 230, 230], lineWidth: 0.1 },
-    columnStyles: {
-      0: { cellWidth: 6, halign: 'center' }, 2: { cellWidth: 12, halign: 'center' },
-      3: { cellWidth: 9, halign: 'center' }, 4: { cellWidth: 22, halign: 'right' },
-      5: { cellWidth: 9, halign: 'center' }, 6: { cellWidth: 22, halign: 'right', fontStyle: 'bold' }
-    },
-    margin: { left: margin, right: margin }, theme: 'grid'
-  });
-
-  y = doc.lastAutoTable.finalY + 4;
-  const summaryX = pageWidth - margin - 55;
-  doc.setFontSize(6.5);
-  doc.setTextColor(100, 100, 100);
-  doc.text('Subtotal:', summaryX, y);
-  doc.setTextColor(30, 30, 30);
-  doc.text(formatLKR(quotation.subtotal), pageWidth - margin, y, { align: 'right' });
-  y += 4;
-  if (quotation.discountAmount > 0) {
-    doc.setTextColor(239, 68, 68);
-    doc.text(`Discount ${quotation.discountType === 'percentage' ? `(${quotation.discountValue}%)` : ''}:`, summaryX, y);
-    doc.text(`- ${formatLKR(quotation.discountAmount)}`, pageWidth - margin, y, { align: 'right' });
-    y += 4;
-  }
-  y += 1;
-  doc.setFillColor(177, 145, 198);
-  doc.roundedRect(summaryX - 3, y - 3, contentWidth - summaryX + margin + 3, 8, 2, 2, 'F');
-  doc.setTextColor(255, 255, 255);
-  doc.setFontSize(7);
-  doc.setFont('helvetica', 'bold');
-  doc.text('GRAND TOTAL', summaryX, y + 2);
-  doc.text(formatLKR(quotation.grandTotal), pageWidth - margin, y + 2, { align: 'right' });
-  y += 12;
-
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(5);
-  if (quotation.notes) {
-    doc.setTextColor(154, 123, 175);
-    doc.setFont('helvetica', 'bold');
-    doc.text('NOTES', margin, y);
-    y += 3;
-    doc.setTextColor(100, 100, 100);
-    doc.setFont('helvetica', 'normal');
-    const noteLines = doc.splitTextToSize(quotation.notes, contentWidth);
-    doc.text(noteLines, margin, y);
-    y += noteLines.length * 2.5 + 2;
-  }
-
-  if (y > pageHeight - 60) { doc.addPage('a5', 'portrait'); y = margin; }
-
-  doc.setTextColor(154, 123, 175);
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(6);
-  doc.text('TERMS & CONDITIONS', margin, y);
-  y += 3;
-  doc.setTextColor(80, 80, 80);
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(4.5);
-  const termsLines = doc.splitTextToSize(TERMS_TEXT, contentWidth);
-  const lineHeight = 2.2;
-  for (let i = 0; i < termsLines.length; i++) {
-    if (y + lineHeight > pageHeight - 8) { doc.addPage('a5', 'portrait'); y = margin; }
-    doc.text(termsLines[i], margin, y);
-    y += lineHeight;
-  }
-
-  const totalPages = doc.getNumberOfPages();
-  for (let p = 1; p <= totalPages; p++) {
-    doc.setPage(p);
-    doc.setDrawColor(177, 145, 198);
-    doc.setLineWidth(0.2);
-    doc.line(margin, pageHeight - 6, pageWidth - margin, pageHeight - 6);
-    doc.setTextColor(154, 123, 175);
-    doc.setFontSize(4.5);
-    doc.text(`${settings?.companyName || 'Kukus Gallery Pvt Ltd'} | ${settings?.website || 'www.kukusgallery.com'}`, pageWidth / 2, pageHeight - 3, { align: 'center' });
-  }
+  drawInvoiceContent(doc, quotation, settings, logoBase64, 'QUOTATION');
+  drawTermsPage(doc, settings);
 
   doc.save(quotation.pdfFilename || `Quotation_${quotation.quotationNumber}.pdf`);
 }

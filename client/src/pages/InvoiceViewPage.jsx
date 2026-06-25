@@ -88,13 +88,13 @@ export default function InvoiceViewPage() {
 
       <div className="invoice-view-card">
         <div className="invoice-header">
-          <div className="invoice-header-left">
-            <img src="/logo.png" alt="Logo" className="invoice-header-logo" />
+          <div className="invoice-header-left" style={{ gap: '1.2rem' }}>
+            <img src="/logo.png" alt="Logo" style={{ width: 80, height: 'auto' }} />
             <div>
               <div className="invoice-company-name">{settings?.companyName}</div>
               <div className="invoice-company-detail">
                 {settings?.address}<br />
-                Tel: {settings?.phone}<br />
+                Tel: {settings?.landline || '011 287 0057'}<br />
                 {settings?.email}
               </div>
             </div>
@@ -107,7 +107,7 @@ export default function InvoiceViewPage() {
         <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1.5rem', marginBottom: '2rem' }}>
           <div>
             <div className="bill-to-label">Bill To</div>
-            <div className="bill-to-name">{snap.name}</div>
+            <div className="bill-to-name">{snap.title ? `${snap.title}. ` : ''}{snap.name}</div>
             <div className="bill-to-detail">
               {snap.address && <div>{snap.address}</div>}
               {snap.phone && <div>Phone: {snap.phone}</div>}
@@ -115,11 +115,15 @@ export default function InvoiceViewPage() {
               {snap.company && <div>Company: {snap.company}</div>}
             </div>
           </div>
-          <div style={{ textAlign: 'right' }}>
-            <div className="invoice-meta-row"><strong>{invoice.invoiceNumber}</strong></div>
-            <div className="invoice-meta-row">Date: <strong>{formatDate(invoice.invoiceDate)}</strong></div>
-            {invoice.deliveryDate && <div className="invoice-meta-row">Delivery: <strong>{formatDate(invoice.deliveryDate)}</strong></div>}
-            <div className="invoice-meta-row">Payment: {invoice.paymentType}</div>
+          <div>
+            <table style={{ fontSize: '0.82rem', borderCollapse: 'collapse' }}>
+              <tbody>
+                <tr><td style={{ color: '#888', paddingRight: '1rem', paddingBottom: '0.3rem' }}>Invoice No</td><td style={{ fontWeight: 600, color: 'var(--primary)', paddingBottom: '0.3rem' }}>{invoice.invoiceNumber}</td></tr>
+                <tr><td style={{ color: '#888', paddingRight: '1rem', paddingBottom: '0.3rem' }}>Date</td><td style={{ fontWeight: 600, paddingBottom: '0.3rem' }}>{formatDate(invoice.invoiceDate)}</td></tr>
+                {invoice.deliveryDate && <tr><td style={{ color: '#888', paddingRight: '1rem', paddingBottom: '0.3rem' }}>Delivery</td><td style={{ fontWeight: 600, paddingBottom: '0.3rem' }}>{formatDate(invoice.deliveryDate)}</td></tr>}
+                <tr><td style={{ color: '#888', paddingRight: '1rem' }}>Payment</td><td style={{ fontWeight: 500 }}>{invoice.paymentType}</td></tr>
+              </tbody>
+            </table>
           </div>
         </div>
 
@@ -128,7 +132,6 @@ export default function InvoiceViewPage() {
             <tr>
               <th>#</th>
               <th>Product / Service</th>
-              <th>Type</th>
               <th style={{ textAlign: 'center' }}>Qty</th>
               <th style={{ textAlign: 'right' }}>Unit Price</th>
               <th style={{ textAlign: 'center' }}>Disc</th>
@@ -140,7 +143,6 @@ export default function InvoiceViewPage() {
               <tr key={i}>
                 <td>{i + 1}</td>
                 <td style={{ fontWeight: 500 }}>{item.name}</td>
-                <td><StatusBadge status={item.orderType} /></td>
                 <td style={{ textAlign: 'center' }}>{item.quantity}</td>
                 <td style={{ textAlign: 'right' }}>{formatCurrency(item.unitPrice)}</td>
                 <td style={{ textAlign: 'center' }}>{item.discount > 0 ? `${item.discount}%` : '-'}</td>
@@ -170,12 +172,6 @@ export default function InvoiceViewPage() {
         </div>
 
         <div className="invoice-footer">
-          {invoice.notes && (
-            <div className="mb-3">
-              <div className="invoice-footer-title">Notes</div>
-              <p style={{ margin: 0 }}>{invoice.notes}</p>
-            </div>
-          )}
           {settings?.bankDetails?.bankName && (
             <div className="mb-3">
               <div className="invoice-footer-title">Bank Details</div>
