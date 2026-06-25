@@ -173,16 +173,21 @@ exports.updateInvoice = async (req, res) => {
       invoice.grandTotal = grandTotal;
     }
 
+    if (paymentType) invoice.paymentType = paymentType;
+
     if (advancePayment !== undefined) {
       invoice.advancePayment = Number(advancePayment) || 0;
-      invoice.balance = Math.round((invoice.grandTotal - invoice.advancePayment) * 100) / 100;
-      if (invoice.balance <= 0 && invoice.paymentType !== 'Credits') {
-        invoice.status = 'Paid';
-        invoice.paidDate = new Date();
-      }
     }
+    invoice.balance = Math.round((invoice.grandTotal - (invoice.advancePayment || 0)) * 100) / 100;
 
-    if (paymentType) invoice.paymentType = paymentType;
+    if (invoice.paymentType === 'Credits') {
+      invoice.status = 'Overdue';
+    } else if (invoice.balance <= 0) {
+      invoice.status = 'Paid';
+      invoice.paidDate = new Date();
+    } else if (invoice.advancePayment > 0) {
+      invoice.status = 'Sent';
+    }
     if (notes !== undefined) invoice.notes = notes;
     if (terms !== undefined) invoice.terms = terms;
     if (deliveryDate) invoice.deliveryDate = deliveryDate;
