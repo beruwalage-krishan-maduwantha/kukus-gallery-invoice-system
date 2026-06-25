@@ -194,42 +194,56 @@ function drawInvoiceContent(doc, data, settings, logoBase64, title) {
     y += 4;
   }
 
-  // Advance if exists
-  const advance = Number(data.advancePayment) || 0;
-  if (advance > 0) {
-    doc.setTextColor(34, 197, 94);
-    doc.setFont('helvetica', 'normal');
-    doc.text('Advance:', summaryX, y);
-    doc.text(`- ${formatLKR(advance)}`, pageWidth - margin, y, { align: 'right' });
-    y += 4;
+  if (data.discountAmount > 0) {
+    y += 1;
   }
 
-  // Grand Total bar
-  const finalTotal = advance > 0 ? (data.grandTotal - advance) : data.grandTotal;
-  y += 1;
-  doc.setFillColor(177, 145, 198);
-  doc.roundedRect(summaryX - 3, y - 3, contentWidth - summaryX + margin + 3, 8, 2, 2, 'F');
-  doc.setTextColor(255, 255, 255);
-  doc.setFontSize(7);
-  doc.setFont('helvetica', 'bold');
-  doc.text('GRAND TOTAL', summaryX, y + 2);
-  doc.text(formatLKR(finalTotal), pageWidth - margin, y + 2, { align: 'right' });
+  // PAY TO box with Total/Advance/Balance - always at bottom of page 1
+  const advance = Number(data.advancePayment) || 0;
+  const finalTotal = data.grandTotal;
+  const balance = advance > 0 ? (finalTotal - advance) : finalTotal;
+  const bankY = pageHeight - 32;
+  const boxHeight = 22;
 
-  // Bank details - always at bottom of page 1
-  const bankY = pageHeight - 30;
   if (settings?.bankDetails?.bankName) {
-    doc.setFillColor(44, 22, 64);
-    doc.roundedRect(margin, bankY, contentWidth, 18, 2, 2, 'F');
-    doc.setTextColor(212, 189, 227);
-    doc.setFontSize(5);
-    doc.setFont('helvetica', 'bold');
-    doc.text('PAY TO:', margin + 4, bankY + 4);
+    doc.setFillColor(177, 145, 198);
+    doc.roundedRect(margin, bankY, contentWidth, boxHeight, 2, 2, 'F');
+
+    // Left side - Bank details
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(5.5);
+    doc.setFont('helvetica', 'bold');
+    doc.text('PAY TO:', margin + 4, bankY + 5);
     doc.setFont('helvetica', 'normal');
-    doc.text(`Bank - ${settings.bankDetails.bankName}`, margin + 4, bankY + 8);
-    doc.text(`Account Name - ${settings.bankDetails.accountName || ''}`, margin + 4, bankY + 12);
-    doc.text(`Account Number - ${settings.bankDetails.accountNumber || ''}`, margin + 4, bankY + 16);
+    doc.text(`Bank - ${settings.bankDetails.bankName}`, margin + 4, bankY + 9);
+    doc.text(`Account Name - ${settings.bankDetails.accountName || ''}`, margin + 4, bankY + 13);
+    doc.text(`Account Number - ${settings.bankDetails.accountNumber || ''}`, margin + 4, bankY + 17);
+
+    // Right side - Total / Advance / Balance
+    const rightX = pageWidth - margin - 45;
+    const valX = pageWidth - margin - 4;
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(6);
+    doc.text('Total', rightX, bankY + 6);
+    doc.setFontSize(9);
+    doc.text(formatLKR(finalTotal), valX, bankY + 6, { align: 'right' });
+
+    doc.setFontSize(6);
+    doc.setFont('helvetica', 'normal');
+    doc.text('Advance', rightX, bankY + 12);
+    doc.setFontSize(7);
+    doc.text(advance > 0 ? formatLKR(advance) : '', valX, bankY + 12, { align: 'right' });
+
+    doc.setDrawColor(255, 255, 255);
+    doc.setLineWidth(0.3);
+    doc.line(rightX, bankY + 14, valX, bankY + 14);
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(6);
+    doc.text('Balance', rightX, bankY + 19);
+    doc.setFontSize(9);
+    doc.text(formatLKR(balance), valX, bankY + 19, { align: 'right' });
   }
 
   // Footer
