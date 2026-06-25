@@ -283,24 +283,31 @@ function drawTermsPage(doc, settings) {
   drawFooter(doc, pageWidth, pageHeight, margin, settings);
 }
 
-export async function generateInvoicePdf(invoice, settings) {
+async function buildPdf(data, settings, title) {
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a5' });
   let logoBase64 = null;
   try { logoBase64 = await compressImage('/logo.png', 200, 0.6); } catch {}
-
-  drawInvoiceContent(doc, invoice, settings, logoBase64, 'INVOICE');
+  drawInvoiceContent(doc, data, settings, logoBase64, title);
   drawTermsPage(doc, settings);
+  return doc;
+}
 
+export async function generateInvoicePdf(invoice, settings) {
+  const doc = await buildPdf(invoice, settings, 'INVOICE');
   doc.save(invoice.pdfFilename || `Invoice_${invoice.invoiceNumber}.pdf`);
 }
 
 export async function generateQuotationPdf(quotation, settings) {
-  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a5' });
-  let logoBase64 = null;
-  try { logoBase64 = await compressImage('/logo.png', 200, 0.6); } catch {}
-
-  drawInvoiceContent(doc, quotation, settings, logoBase64, 'QUOTATION');
-  drawTermsPage(doc, settings);
-
+  const doc = await buildPdf(quotation, settings, 'QUOTATION');
   doc.save(quotation.pdfFilename || `Quotation_${quotation.quotationNumber}.pdf`);
+}
+
+export async function previewInvoicePdf(invoice, settings) {
+  const doc = await buildPdf(invoice, settings, 'INVOICE');
+  return doc.output('bloburl');
+}
+
+export async function previewQuotationPdf(quotation, settings) {
+  const doc = await buildPdf(quotation, settings, 'QUOTATION');
+  return doc.output('bloburl');
 }

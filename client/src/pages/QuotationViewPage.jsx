@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Button, Modal, Form, Row, Col } from 'react-bootstrap';
-import { ArrowLeftIcon, PencilIcon, ArrowDownTrayIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
+import { ArrowLeftIcon, PencilIcon, ArrowDownTrayIcon, ArrowPathIcon, EyeIcon } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 import { getQuotation, updateQuotationStatus, deleteQuotation, convertQuotationToInvoice } from '../api/quotations';
 import { getSettings } from '../api/settings';
@@ -11,7 +11,7 @@ import LoadingSpinner from '../components/common/LoadingSpinner';
 import { formatCurrency } from '../utils/formatCurrency';
 import { formatDate, formatDateInput } from '../utils/formatDate';
 import { PAYMENT_TYPES } from '../utils/constants';
-import { generateQuotationPdf } from '../components/pdf/generatePdf';
+import { generateQuotationPdf, previewQuotationPdf } from '../components/pdf/generatePdf';
 
 export default function QuotationViewPage() {
   const { id } = useParams();
@@ -23,6 +23,7 @@ export default function QuotationViewPage() {
   const [showConvert, setShowConvert] = useState(false);
   const [converting, setConverting] = useState(false);
   const [convertData, setConvertData] = useState({ deliveryDate: '', paymentType: 'Cash' });
+  const [pdfPreviewUrl, setPdfPreviewUrl] = useState(null);
 
   useEffect(() => {
     Promise.all([getQuotation(id), getSettings()])
@@ -66,6 +67,13 @@ export default function QuotationViewPage() {
     if (quotation && settings) generateQuotationPdf(quotation, settings);
   };
 
+  const handlePreviewPdf = async () => {
+    if (quotation && settings) {
+      const url = await previewQuotationPdf(quotation, settings);
+      setPdfPreviewUrl(url);
+    }
+  };
+
   if (loading) return <LoadingSpinner />;
   if (!quotation) return <p>Quotation not found</p>;
 
@@ -103,6 +111,9 @@ export default function QuotationViewPage() {
               <Button className="btn-sm-custom" style={{ background: 'rgba(99,102,241,0.1)', color: '#6366F1', border: 'none', borderRadius: 6, fontWeight: 600 }}>View Invoice ({quotation.convertedInvoice.invoiceNumber || 'Created'})</Button>
             </Link>
           )}
+          <Button className="btn-outline-custom btn-sm-custom" onClick={handlePreviewPdf}>
+            <EyeIcon style={{ width: 14, height: 14, marginRight: 4 }} /> Preview PDF
+          </Button>
           <Button className="btn-primary-custom btn-sm-custom" onClick={handleDownloadPdf}>
             <ArrowDownTrayIcon style={{ width: 14, height: 14, marginRight: 4 }} /> Download PDF
           </Button>
@@ -271,6 +282,21 @@ Client-specific designs will not be used for other clients without prior written
       </Modal>
 
       <ConfirmModal show={showDelete} onHide={() => setShowDelete(false)} onConfirm={handleDelete} title="Delete Quotation" message={`Delete ${quotation.quotationNumber}?`} confirmText="Delete" />
+
+      <Modal show={!!pdfPreviewUrl} onHide={() => setPdfPreviewUrl(null)} size="lg" centered>
+        <Modal.Header closeButton>
+          <Modal.Title className="modal-title-custom">PDF Preview — {quotation.quotationNumber}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body style={{ padding: 0, height: '75vh' }}>
+          {pdfPreviewUrl && <iframe src={pdfPreviewUrl} style={{ width: '100%', height: '100%', border: 'none' }} title="PDF Preview" />}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="outline-secondary" onClick={() => setPdfPreviewUrl(null)}>Close</Button>
+          <Button className="btn-primary-custom" onClick={handleDownloadPdf}>
+            <ArrowDownTrayIcon style={{ width: 14, height: 14, marginRight: 4 }} /> Download
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 }

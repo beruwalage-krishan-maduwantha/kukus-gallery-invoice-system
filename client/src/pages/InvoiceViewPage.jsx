@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { Button } from 'react-bootstrap';
-import { ArrowLeftIcon, PencilIcon, ArrowDownTrayIcon } from '@heroicons/react/24/outline';
+import { Button, Modal } from 'react-bootstrap';
+import { ArrowLeftIcon, PencilIcon, ArrowDownTrayIcon, EyeIcon } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 import { getInvoice, updateInvoiceStatus, deleteInvoice } from '../api/invoices';
 import { getSettings } from '../api/settings';
@@ -10,7 +10,7 @@ import ConfirmModal from '../components/common/ConfirmModal';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import { formatCurrency } from '../utils/formatCurrency';
 import { formatDate } from '../utils/formatDate';
-import { generateInvoicePdf } from '../components/pdf/generatePdf';
+import { generateInvoicePdf, previewInvoicePdf } from '../components/pdf/generatePdf';
 
 export default function InvoiceViewPage() {
   const { id } = useParams();
@@ -19,6 +19,7 @@ export default function InvoiceViewPage() {
   const [settings, setSettings] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showDelete, setShowDelete] = useState(false);
+  const [pdfPreviewUrl, setPdfPreviewUrl] = useState(null);
 
   useEffect(() => {
     Promise.all([getInvoice(id), getSettings()])
@@ -48,8 +49,13 @@ export default function InvoiceViewPage() {
   };
 
   const handleDownloadPdf = () => {
+    if (invoice && settings) generateInvoicePdf(invoice, settings);
+  };
+
+  const handlePreviewPdf = async () => {
     if (invoice && settings) {
-      generateInvoicePdf(invoice, settings);
+      const url = await previewInvoicePdf(invoice, settings);
+      setPdfPreviewUrl(url);
     }
   };
 
@@ -77,6 +83,9 @@ export default function InvoiceViewPage() {
           {invoice.status === 'Sent' && (
             <Button className="btn-sm-custom" style={{ background: 'rgba(34,197,94,0.1)', color: 'var(--success)', border: 'none', borderRadius: 6, fontWeight: 600, cursor: 'pointer' }} onClick={() => handleStatusChange('Paid')}>Mark as Paid</Button>
           )}
+          <Button className="btn-outline-custom btn-sm-custom" onClick={handlePreviewPdf}>
+            <EyeIcon style={{ width: 14, height: 14, marginRight: 4 }} /> Preview PDF
+          </Button>
           <Button className="btn-primary-custom btn-sm-custom" onClick={handleDownloadPdf}>
             <ArrowDownTrayIcon style={{ width: 14, height: 14, marginRight: 4 }} /> Download PDF
           </Button>
@@ -222,6 +231,21 @@ Client-specific designs will not be used for other clients without prior written
       </div>
 
       <ConfirmModal show={showDelete} onHide={() => setShowDelete(false)} onConfirm={handleDelete} title="Delete Invoice" message={`Delete ${invoice.invoiceNumber}? This cannot be undone.`} confirmText="Delete" />
+
+      <Modal show={!!pdfPreviewUrl} onHide={() => setPdfPreviewUrl(null)} size="lg" centered dialogClassName="pdf-preview-modal">
+        <Modal.Header closeButton>
+          <Modal.Title className="modal-title-custom">PDF Preview — {invoice.invoiceNumber}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body style={{ padding: 0, height: '75vh' }}>
+          {pdfPreviewUrl && <iframe src={pdfPreviewUrl} style={{ width: '100%', height: '100%', border: 'none' }} title="PDF Preview" />}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="outline-secondary" onClick={() => setPdfPreviewUrl(null)}>Close</Button>
+          <Button className="btn-primary-custom" onClick={handleDownloadPdf}>
+            <ArrowDownTrayIcon style={{ width: 14, height: 14, marginRight: 4 }} /> Download
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 }
