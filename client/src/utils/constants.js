@@ -1,4 +1,4 @@
-export const STATUS_OPTIONS = ['Draft', 'Sent', 'Paid', 'Overdue', 'Cancelled'];
+export const STATUS_OPTIONS = ['Draft', 'Advance Paid', 'Paid', 'Overdue', 'Cancelled'];
 
 export const ORDER_TYPES = ['Sample', 'Bulk'];
 
@@ -22,6 +22,7 @@ export const UNITS = ['piece', 'meter', 'yard', 'set', 'hour', 'lot'];
 export const STATUS_COLORS = {
   Draft: { bg: 'rgba(154,123,175,0.12)', color: '#9A7BAF' },
   Sent: { bg: 'rgba(59,130,246,0.1)', color: '#3B82F6' },
+  'Advance Paid': { bg: 'rgba(99,102,241,0.1)', color: '#6366F1' },
   Paid: { bg: 'rgba(34,197,94,0.1)', color: '#22C55E' },
   Overdue: { bg: 'rgba(239,68,68,0.1)', color: '#EF4444' },
   Cancelled: { bg: 'rgba(148,163,184,0.1)', color: '#94A3B8' },

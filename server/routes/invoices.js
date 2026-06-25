@@ -21,7 +21,7 @@ router.post('/', [
 
 router.put('/:id', updateInvoice);
 router.patch('/:id/status', [
-  body('status').isIn(['Draft', 'Sent', 'Paid', 'Overdue', 'Cancelled']).withMessage('Invalid status')
+  body('status').isIn(['Draft', 'Sent', 'Advance Paid', 'Paid', 'Overdue', 'Cancelled']).withMessage('Invalid status')
 ], updateStatus);
 
 router.post('/:id/advance', addAdvancePayment);

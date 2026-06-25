@@ -83,8 +83,12 @@ exports.createInvoice = async (req, res) => {
     let status = 'Draft';
     if (paymentType === 'Credits') {
       status = 'Overdue';
-    } else if (paymentType === 'Bank Transfer' || paymentType === 'Cash') {
-      status = balance <= 0 ? 'Paid' : 'Sent';
+    } else if (balance <= 0) {
+      status = 'Paid';
+    } else if (advance > 0) {
+      status = 'Advance Paid';
+    } else {
+      status = 'Sent';
     }
 
     const sanitizedName = customerDoc.name.replace(/[^a-zA-Z0-9]/g, '_');
@@ -186,7 +190,7 @@ exports.updateInvoice = async (req, res) => {
       invoice.status = 'Paid';
       invoice.paidDate = new Date();
     } else if (invoice.advancePayment > 0) {
-      invoice.status = 'Sent';
+      invoice.status = 'Advance Paid';
     }
     if (notes !== undefined) invoice.notes = notes;
     if (terms !== undefined) invoice.terms = terms;
@@ -209,8 +213,9 @@ exports.updateStatus = async (req, res) => {
     if (!invoice) return res.status(404).json({ message: 'Invoice not found' });
 
     const validTransitions = {
-      'Draft': ['Sent', 'Paid', 'Cancelled'],
-      'Sent': ['Paid', 'Overdue', 'Cancelled'],
+      'Draft': ['Sent', 'Advance Paid', 'Paid', 'Cancelled'],
+      'Sent': ['Advance Paid', 'Paid', 'Overdue', 'Cancelled'],
+      'Advance Paid': ['Paid', 'Cancelled'],
       'Overdue': ['Paid', 'Cancelled'],
       'Paid': [],
       'Cancelled': []
@@ -245,7 +250,7 @@ exports.addAdvancePayment = async (req, res) => {
       invoice.status = 'Paid';
       invoice.paidDate = new Date();
     } else {
-      invoice.status = 'Sent';
+      invoice.status = 'Advance Paid';
     }
 
     await invoice.save();

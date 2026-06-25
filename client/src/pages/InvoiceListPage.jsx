@@ -128,7 +128,7 @@ export default function InvoiceListPage() {
                       {inv.status !== 'Paid' && inv.status !== 'Cancelled' && (
                         <button className="btn-sm-custom" style={btnStyle('rgba(34,197,94,0.1)', 'var(--success)')} onClick={() => { setAdvanceTarget(inv); setAdvanceAmount(''); }}>Advance</button>
                       )}
-                      {inv.status === 'Sent' && (
+                      {(inv.status === 'Sent' || inv.status === 'Advance Paid') && (
                         <button className="btn-sm-custom" style={btnStyle('rgba(34,197,94,0.15)', 'var(--success)')} onClick={() => handleStatusChange(inv._id, 'Paid')}>Paid</button>
                       )}
                       {inv.status === 'Draft' && (
