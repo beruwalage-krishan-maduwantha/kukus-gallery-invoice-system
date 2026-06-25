@@ -94,6 +94,52 @@ export default function SettingsPage() {
     }
   };
 
+  if (!isAdmin && !loading) {
+    return (
+      <div>
+        <div className="card-custom mb-4">
+          <h5 className="form-section-title" style={{ margin: 0, border: 0, padding: 0, marginBottom: '1rem' }}>
+            <UsersIcon style={{ width: 20, height: 20, marginRight: 8, display: 'inline' }} />
+            My Account
+          </h5>
+          <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
+            <div style={{ background: 'var(--tint)', padding: '1rem 1.5rem', borderRadius: 10, flex: 1, minWidth: 200 }}>
+              <div style={{ fontSize: '0.68rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--accent)', marginBottom: '0.3rem' }}>Logged in as</div>
+              <div style={{ fontWeight: 600, color: 'var(--primary-dark)', fontSize: '1rem' }}>{user?.name}</div>
+              <div style={{ fontSize: '0.82rem', color: '#888' }}>{user?.email}</div>
+            </div>
+            <Button className="btn-outline-custom btn-sm-custom" onClick={() => { setShowResetPw({ _id: user?.id, name: user?.name, email: user?.email }); setNewPassword(''); }}>
+              Change Password
+            </Button>
+          </div>
+        </div>
+
+        <Modal show={!!showResetPw} onHide={() => setShowResetPw(null)} centered>
+          <Modal.Header closeButton>
+            <Modal.Title className="modal-title-custom">Change Password</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <Form.Group>
+              <Form.Label className="form-label-custom">New Password * (min 6 characters)</Form.Label>
+              <Form.Control className="form-input" type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)} placeholder="Enter new password" />
+            </Form.Group>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="outline-secondary" onClick={() => setShowResetPw(null)}>Cancel</Button>
+            <Button className="btn-primary-custom" onClick={async () => {
+              if (!newPassword || newPassword.length < 6) return toast.error('Password must be at least 6 characters');
+              try {
+                await api.put('/auth/change-password', { newPassword });
+                toast.success('Password changed!');
+                setShowResetPw(null);
+              } catch (err) { toast.error(err.response?.data?.message || 'Failed'); }
+            }}>Change Password</Button>
+          </Modal.Footer>
+        </Modal>
+      </div>
+    );
+  }
+
   if (loading || !form) return <LoadingSpinner />;
 
   const update = (field, value) => setForm({ ...form, [field]: value });
