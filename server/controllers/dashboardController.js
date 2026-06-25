@@ -7,14 +7,17 @@ exports.getStats = async (req, res) => {
     const totalInvoices = await Invoice.countDocuments();
 
     const revenueResult = await Invoice.aggregate([
+      { $group: { _id: null, totalAdvance: { $sum: '$advancePayment' } } }
+    ]);
+    const paidResult = await Invoice.aggregate([
       { $match: { status: 'Paid' } },
       { $group: { _id: null, total: { $sum: '$grandTotal' } } }
     ]);
-    const totalRevenue = revenueResult[0]?.total || 0;
+    const totalRevenue = (paidResult[0]?.total || 0) + (revenueResult[0]?.totalAdvance || 0);
 
     const outstandingResult = await Invoice.aggregate([
       { $match: { status: { $in: ['Sent', 'Overdue'] } } },
-      { $group: { _id: null, total: { $sum: '$grandTotal' } } }
+      { $group: { _id: null, total: { $sum: '$balance' } } }
     ]);
     const outstanding = outstandingResult[0]?.total || 0;
 
@@ -24,6 +27,9 @@ exports.getStats = async (req, res) => {
     ]);
     const totalCredits = creditResult[0]?.total || 0;
     const creditCount = creditResult[0]?.count || 0;
+
+    const totalQuotations = await Quotation.countDocuments();
+    const pendingQuotations = await Quotation.countDocuments({ status: { $in: ['Draft', 'Sent'] } });
 
     const statusCounts = await Invoice.aggregate([
       { $group: { _id: '$status', count: { $sum: 1 } } }
@@ -49,22 +55,13 @@ exports.getStats = async (req, res) => {
       .populate('customer', 'name phone')
       .sort({ createdAt: -1 })
       .limit(5)
-      .select('invoiceNumber customerSnapshot grandTotal status invoiceDate createdAt');
-
-    const totalQuotations = await Quotation.countDocuments();
-    const pendingQuotations = await Quotation.countDocuments({ status: { $in: ['Draft', 'Sent'] } });
+      .select('invoiceNumber customerSnapshot grandTotal advancePayment balance status invoiceDate createdAt');
 
     res.json({
-      totalInvoices,
-      totalRevenue,
-      outstanding,
-      totalCredits,
-      creditCount,
-      totalQuotations,
-      pendingQuotations,
-      byStatus,
-      monthlyRevenue,
-      recentInvoices
+      totalInvoices, totalRevenue, outstanding,
+      totalCredits, creditCount,
+      totalQuotations, pendingQuotations,
+      byStatus, monthlyRevenue, recentInvoices
     });
   } catch (error) {
     console.error('Dashboard error:', error);

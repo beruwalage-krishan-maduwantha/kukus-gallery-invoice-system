@@ -16,6 +16,7 @@ const invoiceSchema = new mongoose.Schema({
   invoiceNumber: { type: String, required: true, unique: true },
   customer: { type: mongoose.Schema.Types.ObjectId, ref: 'Customer', required: true },
   customerSnapshot: {
+    title: { type: String, default: '' },
     name: String,
     email: String,
     phone: String,
@@ -28,6 +29,8 @@ const invoiceSchema = new mongoose.Schema({
   discountValue: { type: Number, default: 0 },
   discountAmount: { type: Number, default: 0 },
   grandTotal: { type: Number, required: true },
+  advancePayment: { type: Number, default: 0 },
+  balance: { type: Number, default: 0 },
   status: {
     type: String,
     enum: ['Draft', 'Sent', 'Paid', 'Overdue', 'Cancelled'],

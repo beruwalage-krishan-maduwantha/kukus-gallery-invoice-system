@@ -1,9 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Button } from 'react-bootstrap';
+import { Button, Modal, Form } from 'react-bootstrap';
 import { PlusIcon, DocumentTextIcon } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 import { getInvoices, deleteInvoice, updateInvoiceStatus } from '../api/invoices';
+import api from '../api/axios';
 import SearchInput from '../components/common/SearchInput';
 import StatusBadge from '../components/common/StatusBadge';
 import EmptyState from '../components/common/EmptyState';
@@ -24,6 +25,8 @@ export default function InvoiceListPage() {
   const [statusFilter, setStatusFilter] = useState('');
   const [loading, setLoading] = useState(true);
   const [deleteTarget, setDeleteTarget] = useState(null);
+  const [advanceTarget, setAdvanceTarget] = useState(null);
+  const [advanceAmount, setAdvanceAmount] = useState('');
 
   const fetchInvoices = useCallback(async () => {
     setLoading(true);
@@ -46,6 +49,17 @@ export default function InvoiceListPage() {
     } catch (err) { toast.error(err.response?.data?.message || 'Failed'); }
   };
 
+  const handleAdvancePay = async () => {
+    if (!advanceAmount || Number(advanceAmount) <= 0) return toast.error('Enter a valid amount');
+    try {
+      await api.post(`/invoices/${advanceTarget._id}/advance`, { amount: Number(advanceAmount) });
+      toast.success('Advance payment recorded');
+      setAdvanceTarget(null);
+      setAdvanceAmount('');
+      fetchInvoices();
+    } catch (err) { toast.error(err.response?.data?.message || 'Failed'); }
+  };
+
   const handleDelete = async () => {
     try {
       await deleteInvoice(deleteTarget._id);
@@ -54,6 +68,8 @@ export default function InvoiceListPage() {
       fetchInvoices();
     } catch (err) { toast.error(err.response?.data?.message || 'Delete failed'); }
   };
+
+  const btnStyle = (bg, color) => ({ background: bg, color, border: 'none', borderRadius: 6, padding: '0.35rem 0.6rem', fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer' });
 
   return (
     <div>
@@ -88,8 +104,9 @@ export default function InvoiceListPage() {
                 <th>Invoice #</th>
                 <th>Customer</th>
                 <th>Date</th>
-                <th>Delivery</th>
                 <th>Amount</th>
+                <th>Advance</th>
+                <th>Balance</th>
                 <th>Status</th>
                 <th>Actions</th>
               </tr>
@@ -98,32 +115,24 @@ export default function InvoiceListPage() {
               {invoices.map(inv => (
                 <tr key={inv._id} onClick={() => navigate(`/invoices/${inv._id}`)} style={{ cursor: 'pointer' }}>
                   <td style={{ fontWeight: 600, color: 'var(--primary-dark)' }}>{inv.invoiceNumber}</td>
-                  <td>{inv.customerSnapshot?.name || inv.customer?.name}</td>
+                  <td>{inv.customerSnapshot?.title ? `${inv.customerSnapshot.title}. ` : ''}{inv.customerSnapshot?.name || inv.customer?.name}</td>
                   <td>{formatDate(inv.invoiceDate)}</td>
-                  <td>{formatDate(inv.deliveryDate)}</td>
                   <td style={{ fontWeight: 600 }}>{formatCurrency(inv.grandTotal)}</td>
+                  <td style={{ color: inv.advancePayment > 0 ? 'var(--success)' : '#ccc' }}>{formatCurrency(inv.advancePayment || 0)}</td>
+                  <td style={{ fontWeight: 600, color: (inv.balance || 0) > 0 ? 'var(--danger)' : 'var(--success)' }}>{formatCurrency(inv.balance || 0)}</td>
                   <td><StatusBadge status={inv.status} /></td>
                   <td onClick={e => e.stopPropagation()}>
                     <div className="d-flex gap-1 flex-wrap">
                       <button className="btn-outline-custom btn-sm-custom" onClick={() => navigate(`/invoices/${inv._id}`)}>View</button>
-                      {inv.status === 'Draft' && (
-                        <>
-                          <button className="btn-sm-custom" style={{ background: 'rgba(177,145,198,0.1)', color: 'var(--primary)', border: 'none', borderRadius: 6, padding: '0.35rem 0.6rem', fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer' }} onClick={() => navigate(`/invoices/${inv._id}/edit`)}>Edit</button>
-                          <button className="btn-sm-custom" style={{ background: 'rgba(59,130,246,0.1)', color: 'var(--info)', border: 'none', borderRadius: 6, padding: '0.35rem 0.6rem', fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer' }} onClick={() => handleStatusChange(inv._id, 'Sent')}>Send</button>
-                          <button className="btn-sm-custom" style={{ background: 'rgba(239,68,68,0.1)', color: 'var(--danger)', border: 'none', borderRadius: 6, padding: '0.35rem 0.6rem', fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer' }} onClick={() => setDeleteTarget(inv)}>Del</button>
-                        </>
+                      <button className="btn-sm-custom" style={btnStyle('rgba(177,145,198,0.1)', 'var(--primary)')} onClick={() => navigate(`/invoices/${inv._id}/edit`)}>Edit</button>
+                      {inv.status !== 'Paid' && inv.status !== 'Cancelled' && (
+                        <button className="btn-sm-custom" style={btnStyle('rgba(34,197,94,0.1)', 'var(--success)')} onClick={() => { setAdvanceTarget(inv); setAdvanceAmount(''); }}>Advance</button>
                       )}
                       {inv.status === 'Sent' && (
-                        <>
-                          <button className="btn-sm-custom" style={{ background: 'rgba(34,197,94,0.1)', color: 'var(--success)', border: 'none', borderRadius: 6, padding: '0.35rem 0.6rem', fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer' }} onClick={() => handleStatusChange(inv._id, 'Paid')}>Paid</button>
-                          <button className="btn-sm-custom" style={{ background: 'rgba(239,68,68,0.1)', color: 'var(--danger)', border: 'none', borderRadius: 6, padding: '0.35rem 0.6rem', fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer' }} onClick={() => handleStatusChange(inv._id, 'Cancelled')}>Cancel</button>
-                        </>
+                        <button className="btn-sm-custom" style={btnStyle('rgba(34,197,94,0.15)', 'var(--success)')} onClick={() => handleStatusChange(inv._id, 'Paid')}>Paid</button>
                       )}
-                      {inv.status === 'Overdue' && (
-                        <>
-                          <button className="btn-sm-custom" style={{ background: 'rgba(34,197,94,0.1)', color: 'var(--success)', border: 'none', borderRadius: 6, padding: '0.35rem 0.6rem', fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer' }} onClick={() => handleStatusChange(inv._id, 'Paid')}>Paid</button>
-                          <button className="btn-sm-custom" style={{ background: 'rgba(239,68,68,0.1)', color: 'var(--danger)', border: 'none', borderRadius: 6, padding: '0.35rem 0.6rem', fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer' }} onClick={() => handleStatusChange(inv._id, 'Cancelled')}>Cancel</button>
-                        </>
+                      {inv.status === 'Draft' && (
+                        <button className="btn-sm-custom" style={btnStyle('rgba(239,68,68,0.1)', 'var(--danger)')} onClick={() => setDeleteTarget(inv)}>Del</button>
                       )}
                     </div>
                   </td>
@@ -135,6 +144,29 @@ export default function InvoiceListPage() {
       )}
 
       <Pagination page={page} pages={pages} onPageChange={setPage} />
+
+      {/* Advance Payment Modal */}
+      <Modal show={!!advanceTarget} onHide={() => setAdvanceTarget(null)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title className="modal-title-custom">Add Advance Payment</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {advanceTarget && (
+            <div style={{ marginBottom: '1rem', padding: '0.75rem', background: 'var(--tint)', borderRadius: 8, fontSize: '0.82rem' }}>
+              <strong>{advanceTarget.invoiceNumber}</strong> — {advanceTarget.customerSnapshot?.name}<br />
+              <span style={{ color: 'var(--accent)' }}>Total: {formatCurrency(advanceTarget.grandTotal)} | Paid: {formatCurrency(advanceTarget.advancePayment || 0)} | Balance: {formatCurrency(advanceTarget.balance || advanceTarget.grandTotal)}</span>
+            </div>
+          )}
+          <Form.Group>
+            <Form.Label className="form-label-custom">Advance Amount (LKR)</Form.Label>
+            <Form.Control className="form-input" type="number" min="0.01" step="0.01" value={advanceAmount} onChange={e => setAdvanceAmount(e.target.value)} placeholder="0.00" />
+          </Form.Group>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="outline-secondary" onClick={() => setAdvanceTarget(null)}>Cancel</Button>
+          <Button className="btn-primary-custom" onClick={handleAdvancePay}>Record Payment</Button>
+        </Modal.Footer>
+      </Modal>
 
       <ConfirmModal show={!!deleteTarget} onHide={() => setDeleteTarget(null)} onConfirm={handleDelete} title="Delete Invoice" message={`Delete invoice ${deleteTarget?.invoiceNumber}? This cannot be undone.`} confirmText="Delete" />
     </div>

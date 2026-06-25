@@ -29,6 +29,7 @@ export default function InvoiceCreatePage() {
   const [paymentType, setPaymentType] = useState('Cash');
   const [invoiceDate, setInvoiceDate] = useState(formatDateInput(new Date()));
   const [deliveryDate, setDeliveryDate] = useState('');
+  const [advancePayment, setAdvancePayment] = useState(0);
   const [notes, setNotes] = useState('');
   const [terms, setTerms] = useState('');
   const [products, setProducts] = useState([]);
@@ -49,6 +50,7 @@ export default function InvoiceCreatePage() {
         setDiscountType(inv.discountType || 'percentage');
         setDiscountValue(inv.discountValue || 0);
         setPaymentType(inv.paymentType || 'Cash');
+        setAdvancePayment(inv.advancePayment || 0);
         setInvoiceDate(formatDateInput(inv.invoiceDate));
         setDeliveryDate(inv.deliveryDate ? formatDateInput(inv.deliveryDate) : '');
         setNotes(inv.notes || '');
@@ -95,7 +97,8 @@ export default function InvoiceCreatePage() {
         discountType, discountValue,
         paymentType, invoiceDate,
         deliveryDate: deliveryDate || undefined,
-        notes, terms, status
+        advancePayment: Number(advancePayment) || 0,
+        notes, terms
       };
 
       if (isEdit) {
@@ -165,6 +168,12 @@ export default function InvoiceCreatePage() {
                 </Form.Select>
               </Form.Group>
             </Col>
+            <Col md={4}>
+              <Form.Group>
+                <Form.Label className="form-label-custom">Advance Payment (LKR)</Form.Label>
+                <Form.Control className="form-input" type="number" min="0" step="0.01" value={advancePayment} onChange={e => setAdvancePayment(e.target.value)} placeholder="0.00" />
+              </Form.Group>
+            </Col>
           </Row>
         </div>
 
@@ -224,8 +233,7 @@ export default function InvoiceCreatePage() {
         </div>
 
         <div className="d-flex gap-2 flex-wrap">
-          <Button className="btn-outline-custom" onClick={() => handleSubmit('Draft')} disabled={saving}>Save as Draft</Button>
-          <Button className="btn-primary-custom" onClick={() => handleSubmit('Sent')} disabled={saving}>Save & Send</Button>
+          <Button className="btn-primary-custom" onClick={() => handleSubmit()} disabled={saving}>{saving ? 'Saving...' : (isEdit ? 'Update Invoice' : 'Create Invoice')}</Button>
           <Button variant="outline-secondary" onClick={() => navigate('/invoices')}>Cancel</Button>
         </div>
       </Col>

@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import { Modal, Form, Button, Row, Col } from 'react-bootstrap';
 
-const emptyForm = { name: '', email: '', phone: '', address: '', company: '', notes: '' };
+const emptyForm = { title: '', name: '', email: '', phone: '', address: '', company: '', notes: '' };
 
 export default function CustomerForm({ show, onHide, onSave, customer }) {
   const [form, setForm] = useState(emptyForm);
 
   useEffect(() => {
-    setForm(customer ? { name: customer.name || '', email: customer.email || '', phone: customer.phone || '', address: customer.address || '', company: customer.company || '', notes: customer.notes || '' } : emptyForm);
+    setForm(customer ? { title: customer.title || '', name: customer.name || '', email: customer.email || '', phone: customer.phone || '', address: customer.address || '', company: customer.company || '', notes: customer.notes || '' } : emptyForm);
   }, [customer, show]);
 
   const handleSubmit = (e) => {
@@ -23,7 +23,19 @@ export default function CustomerForm({ show, onHide, onSave, customer }) {
       <Form onSubmit={handleSubmit}>
         <Modal.Body>
           <Row className="g-3">
-            <Col md={6}>
+            <Col md={2}>
+              <Form.Group>
+                <Form.Label className="form-label-custom">Title</Form.Label>
+                <Form.Select className="form-input" value={form.title} onChange={e => setForm({ ...form, title: e.target.value })}>
+                  <option value="">-</option>
+                  <option value="Mr">Mr</option>
+                  <option value="Mrs">Mrs</option>
+                  <option value="Ms">Ms</option>
+                  <option value="Miss">Miss</option>
+                </Form.Select>
+              </Form.Group>
+            </Col>
+            <Col md={4}>
               <Form.Group>
                 <Form.Label className="form-label-custom">Name *</Form.Label>
                 <Form.Control className="form-input" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} required />

@@ -1,6 +1,6 @@
 const express = require('express');
 const { body } = require('express-validator');
-const { getInvoices, getInvoice, createInvoice, updateInvoice, updateStatus, deleteInvoice } = require('../controllers/invoiceController');
+const { getInvoices, getInvoice, createInvoice, updateInvoice, updateStatus, addAdvancePayment, deleteInvoice } = require('../controllers/invoiceController');
 const { auth } = require('../middleware/auth');
 
 const router = express.Router();
@@ -24,6 +24,7 @@ router.patch('/:id/status', [
   body('status').isIn(['Draft', 'Sent', 'Paid', 'Overdue', 'Cancelled']).withMessage('Invalid status')
 ], updateStatus);
 
+router.post('/:id/advance', addAdvancePayment);
 router.delete('/:id', deleteInvoice);
 
 module.exports = router;
