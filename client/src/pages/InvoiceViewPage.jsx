@@ -89,7 +89,7 @@ export default function InvoiceViewPage() {
       <div className="invoice-view-card">
         <div className="invoice-header">
           <div className="invoice-header-left" style={{ gap: '1.2rem' }}>
-            <img src="/logo.png" alt="Logo" style={{ width: 80, height: 'auto' }} />
+            <img src="/logo.png" alt="Logo" style={{ width: 120, height: 'auto' }} />
             <div>
               <div className="invoice-company-name">{settings?.companyName}</div>
               <div className="invoice-company-detail">
