@@ -54,7 +54,7 @@ exports.createInvoice = async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
 
-    const { customer: customerId, items, discountType, discountValue, paymentType, notes, terms, invoiceDate, deliveryDate, advancePayment } = req.body;
+    const { customer: customerId, items, discountType, discountValue, paymentType, notes, terms, invoiceDate, deliveryDate, advancePayment, forceDraft } = req.body;
 
     const customerDoc = await Customer.findById(customerId);
     if (!customerDoc) return res.status(404).json({ message: 'Customer not found' });
@@ -81,7 +81,9 @@ exports.createInvoice = async (req, res) => {
     const balance = Math.round((grandTotal - advance) * 100) / 100;
 
     let status = 'Draft';
-    if (paymentType === 'Credits') {
+    if (forceDraft) {
+      status = 'Draft';
+    } else if (paymentType === 'Credits') {
       status = 'Overdue';
     } else if (balance <= 0) {
       status = 'Paid';

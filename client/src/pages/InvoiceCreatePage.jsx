@@ -77,7 +77,7 @@ export default function InvoiceCreatePage() {
   const addItem = () => setItems([...items, { ...emptyItem }]);
   const removeItem = (index) => { if (items.length > 1) setItems(items.filter((_, i) => i !== index)); };
 
-  const handleSubmit = async (status = 'Draft') => {
+  const handleSubmit = async (forceDraft) => {
     if (!customerId) return toast.error('Please select a customer');
     if (!items.some(i => i.name && i.quantity > 0)) return toast.error('Add at least one item');
 
@@ -98,7 +98,8 @@ export default function InvoiceCreatePage() {
         paymentType, invoiceDate,
         deliveryDate: deliveryDate || undefined,
         advancePayment: Number(advancePayment) || 0,
-        notes, terms
+        notes, terms,
+        forceDraft: forceDraft === 'Draft'
       };
 
       if (isEdit) {
@@ -230,6 +231,7 @@ export default function InvoiceCreatePage() {
 
         <div className="d-flex gap-2 flex-wrap">
           <Button className="btn-primary-custom" onClick={() => handleSubmit()} disabled={saving}>{saving ? 'Saving...' : (isEdit ? 'Update Invoice' : 'Create Invoice')}</Button>
+          {!isEdit && <Button className="btn-outline-custom" onClick={() => handleSubmit('Draft')} disabled={saving}>Save as Draft</Button>}
           <Button variant="outline-secondary" onClick={() => navigate('/invoices')}>Cancel</Button>
         </div>
       </Col>

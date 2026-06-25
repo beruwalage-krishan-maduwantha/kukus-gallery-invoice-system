@@ -1,4 +1,4 @@
-export const STATUS_OPTIONS = ['Advance Paid', 'Paid', 'Overdue', 'Cancelled'];
+export const STATUS_OPTIONS = ['Draft', 'Advance Paid', 'Paid', 'Overdue', 'Cancelled'];
 
 export const ORDER_TYPES = ['Sample', 'Bulk'];
 
