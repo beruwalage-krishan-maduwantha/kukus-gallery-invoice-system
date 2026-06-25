@@ -215,24 +215,21 @@ function drawInvoiceContent(doc, data, settings, logoBase64, title) {
   doc.text('GRAND TOTAL', summaryX, y + 2);
   doc.text(formatLKR(finalTotal), pageWidth - margin, y + 2, { align: 'right' });
 
-  if (false) { // removed old advance/balance block
-  }
-
-  // Bank details
-  y += 12;
+  // Bank details - always at bottom of page 1
+  const bankY = pageHeight - 30;
   if (settings?.bankDetails?.bankName) {
     doc.setFillColor(44, 22, 64);
-    doc.roundedRect(margin, y - 3, contentWidth, 18, 2, 2, 'F');
+    doc.roundedRect(margin, bankY, contentWidth, 18, 2, 2, 'F');
     doc.setTextColor(212, 189, 227);
     doc.setFontSize(5);
     doc.setFont('helvetica', 'bold');
-    doc.text('PAY TO:', margin + 4, y + 1);
+    doc.text('PAY TO:', margin + 4, bankY + 4);
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(5.5);
     doc.setFont('helvetica', 'normal');
-    doc.text(`Bank - ${settings.bankDetails.bankName}`, margin + 4, y + 5);
-    doc.text(`Account Name - ${settings.bankDetails.accountName || ''}`, margin + 4, y + 9);
-    doc.text(`Account Number - ${settings.bankDetails.accountNumber || ''}`, margin + 4, y + 13);
+    doc.text(`Bank - ${settings.bankDetails.bankName}`, margin + 4, bankY + 8);
+    doc.text(`Account Name - ${settings.bankDetails.accountName || ''}`, margin + 4, bankY + 12);
+    doc.text(`Account Number - ${settings.bankDetails.accountNumber || ''}`, margin + 4, bankY + 16);
   }
 
   // Footer
