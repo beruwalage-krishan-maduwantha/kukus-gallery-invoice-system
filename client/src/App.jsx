@@ -17,6 +17,14 @@ import QuotationCreatePage from './pages/QuotationCreatePage';
 import QuotationViewPage from './pages/QuotationViewPage';
 import ReportsPage from './pages/ReportsPage';
 import NotFoundPage from './pages/NotFoundPage';
+import { useAuth } from './context/AuthContext';
+import { Navigate } from 'react-router-dom';
+
+function DashboardGuard() {
+  const { user } = useAuth();
+  if (user?.role === 'staff') return <Navigate to="/quotations" replace />;
+  return <DashboardPage />;
+}
 
 export default function App() {
   return (
@@ -34,7 +42,7 @@ export default function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route element={<ProtectedRoute />}>
             <Route element={<AppLayout />}>
-              <Route path="/" element={<DashboardPage />} />
+              <Route path="/" element={<DashboardGuard />} />
               <Route path="/invoices" element={<InvoiceListPage />} />
               <Route path="/invoices/new" element={<InvoiceCreatePage />} />
               <Route path="/invoices/:id" element={<InvoiceViewPage />} />

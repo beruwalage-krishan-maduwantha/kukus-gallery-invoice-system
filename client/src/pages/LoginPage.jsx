@@ -8,18 +8,21 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { login, isAuthenticated } = useAuth();
+  const { login, isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
 
-  if (isAuthenticated) return <Navigate to="/" replace />;
+  if (isAuthenticated) {
+    const dest = user?.role === 'staff' ? '/quotations' : '/';
+    return <Navigate to={dest} replace />;
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
     try {
-      await login(email, password);
-      navigate('/');
+      const res = await login(email, password);
+      navigate(res.user.role === 'staff' ? '/quotations' : '/');
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed');
     } finally {

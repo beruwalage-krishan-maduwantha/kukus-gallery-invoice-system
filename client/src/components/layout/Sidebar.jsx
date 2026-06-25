@@ -13,7 +13,7 @@ import {
 } from '@heroicons/react/24/outline';
 
 const navItems = [
-  { to: '/', icon: HomeIcon, label: 'Dashboard', access: 'all' },
+  { to: '/', icon: HomeIcon, label: 'Dashboard', access: 'admin' },
   { to: '/quotations', icon: DocumentDuplicateIcon, label: 'Quotations', access: 'all' },
   { to: '/invoices', icon: DocumentTextIcon, label: 'Invoices', access: 'all' },
   { to: '/credit-notes', icon: ReceiptRefundIcon, label: 'Credit Notes', access: 'admin' },
