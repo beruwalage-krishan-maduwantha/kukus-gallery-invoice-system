@@ -72,27 +72,36 @@ function drawInvoiceContent(doc, data, settings, logoBase64, title) {
   const margin = 8;
   const contentWidth = pageWidth - margin * 2;
 
-  // Header bar
-  doc.setFillColor(44, 22, 64);
-  doc.rect(0, 0, pageWidth, 35, 'F');
-
+  // Header - white background with logo + company details (matching web view)
   if (logoBase64) {
-    try { doc.addImage(logoBase64, 'JPEG', margin, 2, 28, 30); } catch {}
+    try { doc.addImage(logoBase64, 'JPEG', margin, 6, 28, 30); } catch {}
   }
 
-  doc.setTextColor(255, 255, 255);
+  doc.setTextColor(44, 22, 64);
   doc.setFontSize(9);
   doc.setFont('helvetica', 'bold');
-  doc.text(settings?.companyName || 'Kukus Gallery Pvt Ltd', pageWidth - margin, 10, { align: 'right' });
+  doc.text(settings?.companyName || 'Kukus Gallery Pvt Ltd', margin + 32, 14);
   doc.setFontSize(5.5);
   doc.setFont('helvetica', 'normal');
-  doc.text(settings?.address || '', pageWidth - margin, 15, { align: 'right' });
-  doc.text(`Tel: ${settings?.landline || '011 287 0057'}`, pageWidth - margin, 19, { align: 'right' });
-  doc.text(`Email: ${settings?.email || ''}`, pageWidth - margin, 23, { align: 'right' });
-  if (settings?.website) doc.text(`Web: ${settings.website}`, pageWidth - margin, 27, { align: 'right' });
+  doc.setTextColor(100, 100, 100);
+  doc.text(settings?.address || '', margin + 32, 19);
+  doc.text(`Tel: ${settings?.landline || '011 287 0057'}`, margin + 32, 23);
+  doc.text(settings?.email || '', margin + 32, 27);
 
-  // Title
+  // INVOICE/QUOTATION box - right side (lavender tint like web view)
+  doc.setFillColor(248, 244, 251);
+  doc.setDrawColor(212, 189, 227);
+  doc.roundedRect(pageWidth - margin - 38, 8, 38, 14, 2, 2, 'FD');
+  doc.setTextColor(177, 145, 198);
+  doc.setFontSize(11);
+  doc.setFont('helvetica', 'bold');
+  doc.text(title, pageWidth - margin - 19, 17, { align: 'center' });
+
+  // Divider line
   let y = 40;
+  doc.setDrawColor(212, 189, 227);
+  doc.setLineWidth(0.3);
+  doc.line(margin, y - 2, pageWidth - margin, y - 2);
   doc.setTextColor(44, 22, 64);
   doc.setFontSize(14);
   doc.setFont('helvetica', 'bold');
