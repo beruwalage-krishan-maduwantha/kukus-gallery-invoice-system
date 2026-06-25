@@ -359,7 +359,24 @@ export default function SettingsPage() {
             </Button>
           </div>
         </div>
-      ) : null}
+      ) : (
+        <div className="card-custom mb-4">
+          <h5 className="form-section-title" style={{ margin: 0, border: 0, padding: 0, marginBottom: '1rem' }}>
+            <UsersIcon style={{ width: 20, height: 20, marginRight: 8, display: 'inline' }} />
+            My Account
+          </h5>
+          <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
+            <div style={{ background: 'var(--tint)', padding: '1rem 1.5rem', borderRadius: 10, flex: 1, minWidth: 200 }}>
+              <div style={{ fontSize: '0.68rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--accent)', marginBottom: '0.3rem' }}>Logged in as</div>
+              <div style={{ fontWeight: 600, color: 'var(--primary-dark)', fontSize: '1rem' }}>{user?.name}</div>
+              <div style={{ fontSize: '0.82rem', color: '#888' }}>{user?.email}</div>
+            </div>
+            <Button className="btn-outline-custom btn-sm-custom" onClick={() => { setShowResetPw({ _id: user?.id, name: user?.name, email: user?.email }); setNewPassword(''); }}>
+              Change Password
+            </Button>
+          </div>
+        </div>
+      )}
 
       {/* Add/Edit User Modal */}
       <Modal show={isAdmin && showUserForm} onHide={() => setShowUserForm(false)} centered>

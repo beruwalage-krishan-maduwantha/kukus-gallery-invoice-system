@@ -20,7 +20,7 @@ const navItems = [
   { to: '/reports', icon: ChartBarIcon, label: 'Reports', access: 'admin' },
   { to: '/customers', icon: UserGroupIcon, label: 'Customers', access: 'admin' },
   { to: '/products', icon: CubeIcon, label: 'Products', access: 'admin' },
-  { to: '/settings', icon: Cog6ToothIcon, label: 'Settings', access: 'admin' },
+  { to: '/settings', icon: Cog6ToothIcon, label: 'Settings', access: 'all' },
 ];
 
 export default function Sidebar({ show, onClose }) {
