@@ -76,10 +76,10 @@ function drawInvoiceContent(doc, data, settings, logoBase64, title) {
 
   // === HEADER: Logo + Company (left) + INVOICE box (right) ===
   if (logoBase64) {
-    try { doc.addImage(logoBase64, 'JPEG', margin, 5, 22, 24); } catch {}
+    try { doc.addImage(logoBase64, 'JPEG', margin, 6, 28, 20); } catch {}
   }
 
-  const compX = margin + 26;
+  const compX = margin + 31;
   doc.setTextColor(44, 22, 64);
   doc.setFontSize(9);
   doc.setFont('helvetica', 'bold');
