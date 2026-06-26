@@ -7,6 +7,17 @@ const router = express.Router();
 
 router.use(auth);
 
+router.get('/next-order-number/:type', async (req, res) => {
+  try {
+    const Counter = require('../models/Counter');
+    const type = req.params.type;
+    const prefix = type === 'sm' ? 'SM' : 'BLK';
+    const counter = await Counter.findOne({ _id: `order_${type}` });
+    const next = (counter?.seq || 0) + 1;
+    res.json({ orderNumber: `${prefix}${String(next).padStart(3, '0')}` });
+  } catch { res.status(500).json({ message: 'Server error' }); }
+});
+
 router.get('/', getInvoices);
 router.get('/:id', getInvoice);
 

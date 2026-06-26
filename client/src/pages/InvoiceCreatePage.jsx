@@ -179,6 +179,7 @@ export default function InvoiceCreatePage() {
               <thead>
                 <tr>
                   <th>Product / Service</th>
+                  <th>Order #</th>
                   <th>Qty</th>
                   <th>Unit Price</th>
                   <th>Disc %</th>
