@@ -44,7 +44,7 @@ export default function DashboardPage() {
 
       <Row className="g-3 mb-4">
         <Col lg={8}>
-          <RevenueChart data={stats?.monthlyRevenue || []} />
+          <RevenueChart data={stats?.weeklyRevenue || []} />
         </Col>
         <Col lg={4}>
           <StatusPieChart data={stats?.byStatus || {}} />

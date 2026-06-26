@@ -3,17 +3,15 @@ import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Toolti
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip);
 
-const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-
 export default function RevenueChart({ data = [] }) {
   const chartData = {
-    labels: data.map(d => MONTHS[(d._id.month || 1) - 1]),
+    labels: data.map(d => d.week),
     datasets: [{
       label: 'Revenue (LKR)',
       data: data.map(d => d.total),
       backgroundColor: '#B191C6',
       borderRadius: 6,
-      maxBarThickness: 40
+      maxBarThickness: 50
     }]
   };
 
@@ -35,7 +33,7 @@ export default function RevenueChart({ data = [] }) {
 
   return (
     <div className="chart-card">
-      <h4 className="chart-title">Monthly Revenue</h4>
+      <h4 className="chart-title">This Month Revenue</h4>
       <div style={{ height: 280 }}>
         <Bar data={chartData} options={options} />
       </div>

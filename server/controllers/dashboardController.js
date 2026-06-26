@@ -38,19 +38,22 @@ exports.getStats = async (req, res) => {
     const byStatus = {};
     statusCounts.forEach(s => { byStatus[s._id] = s.count; });
 
-    const twelveMonthsAgo = new Date();
-    twelveMonthsAgo.setMonth(twelveMonthsAgo.getMonth() - 12);
+    const now = new Date();
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    const weeklyRevenue = [];
+    for (let w = 0; w < 4; w++) {
+      const weekStart = new Date(monthStart);
+      weekStart.setDate(weekStart.getDate() + (w * 7));
+      const weekEnd = new Date(monthStart);
+      weekEnd.setDate(weekEnd.getDate() + ((w + 1) * 7));
+      if (w === 3) weekEnd.setMonth(weekEnd.getMonth() + 1, 0, 23, 59, 59);
 
-    const monthlyRevenue = await Invoice.aggregate([
-      { $match: { status: 'Paid', paidDate: { $gte: twelveMonthsAgo } } },
-      {
-        $group: {
-          _id: { year: { $year: '$paidDate' }, month: { $month: '$paidDate' } },
-          total: { $sum: '$grandTotal' }
-        }
-      },
-      { $sort: { '_id.year': 1, '_id.month': 1 } }
-    ]);
+      const result = await Invoice.aggregate([
+        { $match: { status: 'Paid', invoiceDate: { $gte: weekStart, $lt: weekEnd } } },
+        { $group: { _id: null, total: { $sum: '$grandTotal' } } }
+      ]);
+      weeklyRevenue.push({ week: `Week ${w + 1}`, total: result[0]?.total || 0 });
+    }
 
     const recentInvoices = await Invoice.find()
       .populate('customer', 'name phone')
@@ -62,7 +65,7 @@ exports.getStats = async (req, res) => {
       totalInvoices, totalRevenue, outstanding,
       totalCredits, creditCount,
       totalQuotations, pendingQuotations,
-      byStatus, monthlyRevenue, recentInvoices
+      byStatus, weeklyRevenue, recentInvoices
     });
   } catch (error) {
     console.error('Dashboard error:', error);
