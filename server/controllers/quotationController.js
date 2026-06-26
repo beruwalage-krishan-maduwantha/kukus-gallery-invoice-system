@@ -106,7 +106,7 @@ exports.createQuotation = async (req, res) => {
       deliveryDate: deliveryDate || undefined,
       notes: notes || '', terms: terms || '',
       createdBy: req.user._id,
-      pdfFilename: `QT_${sanitizedName}_${sanitizedPhone}.pdf`
+      pdfFilename: `${sanitizedName}_${quotationNumber}.pdf`
     });
 
     const populated = await Quotation.findById(quotation._id)
@@ -221,7 +221,7 @@ exports.convertToInvoice = async (req, res) => {
       notes: quotation.notes,
       terms: quotation.terms,
       createdBy: req.user._id,
-      pdfFilename: `${customerDoc.name.replace(/[^a-zA-Z0-9]/g, '_')}_${customerDoc.phone.replace(/[^0-9]/g, '')}.pdf`
+      pdfFilename: `${customerDoc.name.replace(/[^a-zA-Z0-9]/g, '_')}_${invoiceNumber}.pdf`
     });
 
     await Customer.findByIdAndUpdate(quotation.customer._id, {

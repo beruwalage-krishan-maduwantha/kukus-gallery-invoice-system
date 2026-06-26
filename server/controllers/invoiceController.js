@@ -120,7 +120,7 @@ exports.createInvoice = async (req, res) => {
       notes: notes || settings?.defaultNotes || '',
       terms: terms || settings?.defaultTerms || '',
       createdBy: req.user._id,
-      pdfFilename: `${sanitizedName}_${sanitizedPhone}.pdf`
+      pdfFilename: `${sanitizedName}_${invoiceNumber}.pdf`
     });
 
     await Customer.findByIdAndUpdate(customerId, {
