@@ -164,16 +164,18 @@ function drawInvoiceContent(doc, data, settings, logoBase64, title) {
     startY: y,
     head: [['Product / Service', 'Qty', 'Unit Price', 'Disc', 'Total']],
     body: tableBody,
-    headStyles: { fillColor: [177, 145, 198], textColor: 255, fontSize: 5.5, fontStyle: 'bold', cellPadding: 1.8 },
+    headStyles: { fillColor: [177, 145, 198], textColor: 255, fontSize: 5.5, fontStyle: 'bold', cellPadding: 2.5, halign: 'center' },
     alternateRowStyles: { fillColor: [248, 244, 251] },
-    styles: { fontSize: 6, cellPadding: 1.5, textColor: [30, 30, 30], lineColor: [230, 230, 230], lineWidth: 0.1 },
+    styles: { fontSize: 6, cellPadding: 2, textColor: [30, 30, 30], lineColor: [220, 220, 220], lineWidth: 0.1, valign: 'middle' },
     columnStyles: {
-      1: { cellWidth: 10, halign: 'center' },
-      2: { cellWidth: 24, halign: 'right' },
-      3: { cellWidth: 10, halign: 'center' },
-      4: { cellWidth: 24, halign: 'right', fontStyle: 'bold' }
+      0: { cellWidth: 'auto', halign: 'left' },
+      1: { cellWidth: 12, halign: 'center' },
+      2: { cellWidth: 22, halign: 'right' },
+      3: { cellWidth: 12, halign: 'center' },
+      4: { cellWidth: 26, halign: 'right', fontStyle: 'bold' }
     },
-    margin: { left: margin, right: margin }, theme: 'grid'
+    margin: { left: margin, right: margin }, theme: 'grid',
+    tableLineColor: [177, 145, 198], tableLineWidth: 0.2
   });
 
   y = doc.lastAutoTable.finalY + 4;
