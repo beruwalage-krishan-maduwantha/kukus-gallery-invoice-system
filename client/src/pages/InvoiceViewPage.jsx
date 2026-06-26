@@ -136,21 +136,19 @@ export default function InvoiceViewPage() {
           </div>
         </div>
 
-        <table className="invoice-items-table">
+        <table className="invoice-items-table" style={{ borderCollapse: 'collapse' }}>
           <thead>
-            <tr>
-              <th>#</th>
-              <th>Product / Service</th>
-              <th style={{ textAlign: 'center' }}>Qty</th>
-              <th style={{ textAlign: 'right' }}>Unit Price</th>
-              <th style={{ textAlign: 'center' }}>Disc</th>
-              <th style={{ textAlign: 'right' }}>Total</th>
+            <tr style={{ background: 'var(--primary)' }}>
+              <th style={{ color: '#fff', textAlign: 'center' }}>Product / Service</th>
+              <th style={{ color: '#fff', textAlign: 'center' }}>Qty</th>
+              <th style={{ color: '#fff', textAlign: 'right' }}>Unit Price</th>
+              <th style={{ color: '#fff', textAlign: 'center' }}>Disc</th>
+              <th style={{ color: '#fff', textAlign: 'right' }}>Total</th>
             </tr>
           </thead>
           <tbody>
             {invoice.items.map((item, i) => (
               <tr key={i}>
-                <td>{i + 1}</td>
                 <td style={{ fontWeight: 500 }}>{item.name}</td>
                 <td style={{ textAlign: 'center' }}>{item.quantity}</td>
                 <td style={{ textAlign: 'right' }}>{formatCurrency(item.unitPrice)}</td>
@@ -163,10 +161,6 @@ export default function InvoiceViewPage() {
 
         <div className="invoice-total-section">
           <div className="invoice-total-box">
-            <div className="invoice-total-row">
-              <span>Subtotal</span>
-              <span>{formatCurrency(invoice.subtotal)}</span>
-            </div>
             {invoice.discountAmount > 0 && (
               <div className="invoice-total-row" style={{ color: 'var(--danger)' }}>
                 <span>Discount {invoice.discountType === 'percentage' ? `(${invoice.discountValue}%)` : ''}</span>

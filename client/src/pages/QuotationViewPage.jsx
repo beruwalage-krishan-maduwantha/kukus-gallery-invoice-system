@@ -159,24 +159,20 @@ export default function QuotationViewPage() {
           </div>
         </div>
 
-        <table className="invoice-items-table">
+        <table className="invoice-items-table" style={{ borderCollapse: 'collapse' }}>
           <thead>
-            <tr>
-              <th>#</th>
-              <th>Product / Service</th>
-              <th>Type</th>
-              <th style={{ textAlign: 'center' }}>Qty</th>
-              <th style={{ textAlign: 'right' }}>Unit Price</th>
-              <th style={{ textAlign: 'center' }}>Disc</th>
-              <th style={{ textAlign: 'right' }}>Total</th>
+            <tr style={{ background: 'var(--primary)' }}>
+              <th style={{ color: '#fff', textAlign: 'center' }}>Product / Service</th>
+              <th style={{ color: '#fff', textAlign: 'center' }}>Qty</th>
+              <th style={{ color: '#fff', textAlign: 'right' }}>Unit Price</th>
+              <th style={{ color: '#fff', textAlign: 'center' }}>Disc</th>
+              <th style={{ color: '#fff', textAlign: 'right' }}>Total</th>
             </tr>
           </thead>
           <tbody>
             {quotation.items.map((item, i) => (
               <tr key={i}>
-                <td>{i + 1}</td>
                 <td style={{ fontWeight: 500 }}>{item.name}</td>
-                <td><StatusBadge status={item.orderType} /></td>
                 <td style={{ textAlign: 'center' }}>{item.quantity}</td>
                 <td style={{ textAlign: 'right' }}>{formatCurrency(item.unitPrice)}</td>
                 <td style={{ textAlign: 'center' }}>{item.discount > 0 ? `${item.discount}%` : '-'}</td>
