@@ -7,12 +7,12 @@ export const PAYMENT_TYPES = ['Bank Transfer', 'Cash', 'Credits'];
 export const SERVICE_TYPES = ['Design Wear', 'Corporate Clothing'];
 
 export const CATEGORIES = {
-  'Design Wear': ['Main Size Development', 'Size Grading', 'Sample Development', 'Bulk Production'],
+  'Design Wear': ['Main Size Development', 'Size Grading', 'Sample', 'Bulk Production'],
   'Corporate Clothing': ['T-Shirts', 'Uniforms', 'DTF Printing', 'Embroidery']
 };
 
 export const ALL_CATEGORIES = [
-  'Main Size Development', 'Size Grading', 'Sample Development',
+  'Main Size Development', 'Size Grading', 'Sample',
   'Bulk Production',
   'T-Shirts', 'Uniforms', 'DTF Printing', 'Embroidery', 'Other'
 ];
