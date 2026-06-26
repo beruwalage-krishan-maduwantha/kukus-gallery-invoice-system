@@ -7,13 +7,12 @@ const Counter = require('../models/Counter');
 const generateInvoiceNumber = require('../utils/generateInvoiceNumber');
 
 async function generateQuotationNumber(prefix = 'QT') {
-  const year = new Date().getFullYear();
   const counter = await Counter.findOneAndUpdate(
-    { _id: `quotation_${year}` },
+    { _id: 'quotation_global' },
     { $inc: { seq: 1 } },
     { new: true, upsert: true }
   );
-  return `${prefix}-${year}-${String(counter.seq).padStart(4, '0')}`;
+  return `${prefix}${String(counter.seq).padStart(3, '0')}`;
 }
 
 exports.getQuotations = async (req, res) => {
