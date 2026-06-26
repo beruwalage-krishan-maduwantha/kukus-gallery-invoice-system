@@ -100,11 +100,11 @@ function drawInvoiceContent(doc, data, settings, logoBase64, title) {
   // INVOICE/QUOTATION box (right, centered text)
   doc.setFillColor(248, 244, 251);
   doc.setDrawColor(212, 189, 227);
-  doc.roundedRect(pageWidth - margin - 36, 6, 36, 18, 3, 3, 'FD');
+  doc.roundedRect(pageWidth - margin - 40, 5, 40, 20, 3, 3, 'FD');
   doc.setTextColor(177, 145, 198);
-  doc.setFontSize(10);
+  doc.setFontSize(14);
   doc.setFont('helvetica', 'bold');
-  doc.text(title, pageWidth - margin - 18, 17, { align: 'center' });
+  doc.text(title, pageWidth - margin - 20, 18, { align: 'center' });
 
   // === DIVIDER LINE ===
   let y = 34;
