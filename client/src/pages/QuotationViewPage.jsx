@@ -126,12 +126,11 @@ export default function QuotationViewPage() {
       <div className="invoice-view-card">
         <div className="invoice-header">
           <div className="invoice-header-left">
-            <img src="/logo.png" alt="Logo" className="invoice-header-logo" />
             <div>
-              <div className="invoice-company-name">{settings?.companyName}</div>
+              <div className="invoice-company-name" style={{ fontSize: '1.8rem' }}>{settings?.companyName}</div>
               <div className="invoice-company-detail">
-                {settings?.address}<br />
-                Tel: {settings?.phone}<br />
+                {settings?.address?.replace(', Sri Lanka', '')}<br />
+                Tel: {settings?.landline || '011 287 0057'}<br />
                 {settings?.email}
               </div>
             </div>

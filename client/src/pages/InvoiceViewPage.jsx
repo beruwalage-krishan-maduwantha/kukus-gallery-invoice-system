@@ -97,12 +97,11 @@ export default function InvoiceViewPage() {
 
       <div className="invoice-view-card">
         <div className="invoice-header">
-          <div className="invoice-header-left" style={{ gap: '1.2rem' }}>
-            <img src="/logo.png" alt="Logo" style={{ width: 120, height: 'auto' }} />
+          <div className="invoice-header-left">
             <div>
-              <div className="invoice-company-name">{settings?.companyName}</div>
+              <div className="invoice-company-name" style={{ fontSize: '1.8rem' }}>{settings?.companyName}</div>
               <div className="invoice-company-detail">
-                {settings?.address}<br />
+                {settings?.address?.replace(', Sri Lanka', '')}<br />
                 Tel: {settings?.landline || '011 287 0057'}<br />
                 {settings?.email}
               </div>

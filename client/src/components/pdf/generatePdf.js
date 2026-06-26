@@ -74,31 +74,37 @@ function drawInvoiceContent(doc, data, settings, logoBase64, title) {
   const margin = 8;
   const contentWidth = pageWidth - margin * 2;
 
-  // === HEADER: Logo + Company (left) + INVOICE box (right) ===
+  // === WATERMARK: Logo centered, large, transparent ===
   if (logoBase64) {
-    try { doc.addImage(logoBase64, 'JPEG', margin, 6, 28, 20); } catch {}
+    try {
+      doc.saveGraphicsState();
+      doc.setGState(new doc.GState({ opacity: 0.06 }));
+      doc.addImage(logoBase64, 'JPEG', pageWidth / 2 - 40, pageHeight / 2 - 35, 80, 58);
+      doc.restoreGraphicsState();
+    } catch {}
   }
 
-  const compX = margin + 31;
+  // === HEADER: Company name (left, bigger) + INVOICE box (right) ===
   doc.setTextColor(44, 22, 64);
-  doc.setFontSize(9);
+  doc.setFontSize(12);
   doc.setFont('helvetica', 'bold');
-  doc.text(settings?.companyName || 'Kukus Gallery Pvt Ltd', compX, 12);
+  doc.text(settings?.companyName || 'Kukus Gallery Pvt Ltd', margin, 12);
   doc.setFontSize(5.5);
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(100, 100, 100);
-  doc.text(settings?.address || '', compX, 17);
-  doc.text(`Tel: ${settings?.landline || '011 287 0057'}`, compX, 21);
-  doc.text(settings?.email || '', compX, 25);
+  const addr = (settings?.address || '').replace(', Sri Lanka', '');
+  doc.text(addr, margin, 17);
+  doc.text(`Tel: ${settings?.landline || '011 287 0057'}`, margin, 21);
+  doc.text(settings?.email || '', margin, 25);
 
-  // INVOICE/QUOTATION box (right, matching web view lavender box)
+  // INVOICE/QUOTATION box (right, centered text)
   doc.setFillColor(248, 244, 251);
   doc.setDrawColor(212, 189, 227);
-  doc.roundedRect(pageWidth - margin - 36, 8, 36, 16, 3, 3, 'FD');
+  doc.roundedRect(pageWidth - margin - 36, 6, 36, 18, 3, 3, 'FD');
   doc.setTextColor(177, 145, 198);
   doc.setFontSize(10);
   doc.setFont('helvetica', 'bold');
-  doc.text(title, pageWidth - margin - 18, 18, { align: 'center' });
+  doc.text(title, pageWidth - margin - 18, 17, { align: 'center' });
 
   // === DIVIDER LINE ===
   let y = 34;
