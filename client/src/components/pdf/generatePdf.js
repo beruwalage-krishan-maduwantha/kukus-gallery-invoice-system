@@ -117,7 +117,8 @@ function drawInvoiceContent(doc, data, settings, logoBase64, title) {
   doc.text('BILL TO', margin, y);
   y += 3.5;
   doc.setTextColor(44, 22, 64);
-  doc.setFontSize(8);
+  doc.setFontSize(6.5);
+  doc.setFont('helvetica', 'bold');
   doc.text(`${snap.title ? snap.title + '. ' : ''}${snap.name || ''}`, margin, y);
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(6);
@@ -153,50 +154,29 @@ function drawInvoiceContent(doc, data, settings, logoBase64, title) {
 
   y = Math.max(billY, metaY) + 2;
 
-  // Items table - NO type column
-  const tableBody = data.items.map((item, i) => [
-    i + 1, item.name, item.quantity,
+  // Items table - no # column, lavender header
+  const tableBody = data.items.map((item) => [
+    item.name, item.quantity,
     formatLKR(item.unitPrice), item.discount > 0 ? `${item.discount}%` : '-', formatLKR(item.lineTotal)
   ]);
 
   autoTable(doc, {
     startY: y,
-    head: [['#', 'Product / Service', 'Qty', 'Unit Price', 'Disc', 'Total']],
+    head: [['Product / Service', 'Qty', 'Unit Price', 'Disc', 'Total']],
     body: tableBody,
-    headStyles: { fillColor: [44, 22, 64], textColor: 255, fontSize: 5.5, fontStyle: 'bold', cellPadding: 1.8 },
+    headStyles: { fillColor: [177, 145, 198], textColor: 255, fontSize: 5.5, fontStyle: 'bold', cellPadding: 1.8 },
     alternateRowStyles: { fillColor: [248, 244, 251] },
     styles: { fontSize: 6, cellPadding: 1.5, textColor: [30, 30, 30], lineColor: [230, 230, 230], lineWidth: 0.1 },
     columnStyles: {
-      0: { cellWidth: 6, halign: 'center' },
-      2: { cellWidth: 10, halign: 'center' },
-      3: { cellWidth: 24, halign: 'right' },
-      4: { cellWidth: 10, halign: 'center' },
-      5: { cellWidth: 24, halign: 'right', fontStyle: 'bold' }
+      1: { cellWidth: 10, halign: 'center' },
+      2: { cellWidth: 24, halign: 'right' },
+      3: { cellWidth: 10, halign: 'center' },
+      4: { cellWidth: 24, halign: 'right', fontStyle: 'bold' }
     },
     margin: { left: margin, right: margin }, theme: 'grid'
   });
 
   y = doc.lastAutoTable.finalY + 4;
-
-  // Totals
-  const summaryX = pageWidth - margin - 55;
-  doc.setFontSize(6.5);
-  doc.setTextColor(100, 100, 100);
-  doc.text('Subtotal:', summaryX, y);
-  doc.setTextColor(30, 30, 30);
-  doc.text(formatLKR(data.subtotal), pageWidth - margin, y, { align: 'right' });
-  y += 4;
-
-  if (data.discountAmount > 0) {
-    doc.setTextColor(239, 68, 68);
-    doc.text(`Discount ${data.discountType === 'percentage' ? `(${data.discountValue}%)` : ''}:`, summaryX, y);
-    doc.text(`- ${formatLKR(data.discountAmount)}`, pageWidth - margin, y, { align: 'right' });
-    y += 4;
-  }
-
-  if (data.discountAmount > 0) {
-    y += 1;
-  }
 
   // PAY TO box with Total/Advance/Balance - always at bottom of page 1
   const advance = Number(data.advancePayment) || 0;
@@ -269,9 +249,9 @@ function drawTermsPage(doc, settings) {
   y += 8;
   doc.setTextColor(80, 80, 80);
   doc.setFont('helvetica', 'normal');
-  doc.setFontSize(5);
+  doc.setFontSize(6);
   const termsLines = doc.splitTextToSize(TERMS_TEXT, contentWidth);
-  const lineHeight = 2.4;
+  const lineHeight = 2.8;
   for (let i = 0; i < termsLines.length; i++) {
     if (y + lineHeight > pageHeight - 8) {
       drawFooter(doc, pageWidth, pageHeight, margin, settings);
