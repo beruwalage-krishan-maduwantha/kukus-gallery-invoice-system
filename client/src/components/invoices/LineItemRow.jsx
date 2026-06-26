@@ -12,7 +12,7 @@ export default function LineItemRow({ item, index, products, onChange, onRemove 
         updated.name = p.name;
         updated.category = p.category;
         updated.unitPrice = p.defaultPrice;
-        const isSample = p.serviceType === 'Design Wear';
+        const isSample = p.category === 'Sample' || p.category === 'Sample Development';
         updated.orderType = isSample ? 'Sample' : 'Bulk';
         try {
           const res = await api.get(`/invoices/next-order-number/${isSample ? 'sm' : 'blk'}`);
