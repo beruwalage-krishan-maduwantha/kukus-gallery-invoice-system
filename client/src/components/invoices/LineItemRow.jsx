@@ -12,7 +12,8 @@ export default function LineItemRow({ item, index, products, onChange, onRemove 
         updated.name = p.name;
         updated.category = p.category;
         updated.unitPrice = p.defaultPrice;
-        const isSample = p.category === 'Sample' || p.category === 'Sample Development';
+        const smCategories = ['Sample', 'Sample Development', 'Embroidery', 'DTF Printing'];
+        const isSample = smCategories.includes(p.category);
         updated.orderType = isSample ? 'Sample' : 'Bulk';
         try {
           const res = await api.get(`/invoices/next-order-number/${isSample ? 'sm' : 'blk'}`);
