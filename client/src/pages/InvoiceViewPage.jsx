@@ -161,6 +161,10 @@ export default function InvoiceViewPage() {
 
         <div className="invoice-total-section">
           <div className="invoice-total-box">
+            <div className="invoice-total-row">
+              <span>Subtotal</span>
+              <span>{formatCurrency(invoice.subtotal)}</span>
+            </div>
             {invoice.discountAmount > 0 && (
               <div className="invoice-total-row" style={{ color: 'var(--danger)' }}>
                 <span>Discount {invoice.discountType === 'percentage' ? `(${invoice.discountValue}%)` : ''}</span>
