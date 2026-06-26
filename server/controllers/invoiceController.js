@@ -89,6 +89,8 @@ exports.createInvoice = async (req, res) => {
       status = 'Paid';
     } else if (advance > 0) {
       status = 'Advance Paid';
+    } else if (paymentType === 'Bank Transfer' || paymentType === 'Cash') {
+      status = 'Paid';
     } else {
       status = 'Sent';
     }
