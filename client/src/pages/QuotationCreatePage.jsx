@@ -13,7 +13,7 @@ import InvoiceSummary from '../components/invoices/InvoiceSummary';
 import InvoicePreview from '../components/invoices/InvoicePreview';
 import { formatDateInput } from '../utils/formatDate';
 
-const emptyItem = { product: '', name: '', category: '', orderType: 'Sample', quantity: 1, unitPrice: 0, discount: 0, lineTotal: 0 };
+const emptyItem = { product: '', name: '', category: '', orderType: '', quantity: 1, unitPrice: 0, discount: 0, lineTotal: 0 };
 
 export default function QuotationCreatePage() {
   const { id } = useParams();
@@ -158,7 +158,7 @@ export default function QuotationCreatePage() {
               <thead>
                 <tr>
                   <th>Product / Service</th>
-                  <th>Type</th>
+
                   <th>Qty</th>
                   <th>Unit Price</th>
                   <th>Disc %</th>

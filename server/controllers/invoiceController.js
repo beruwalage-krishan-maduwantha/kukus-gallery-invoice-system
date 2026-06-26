@@ -62,10 +62,22 @@ exports.createInvoice = async (req, res) => {
     const settings = await Settings.findOne();
     const invoiceNumber = await generateInvoiceNumber(settings?.invoicePrefix || 'KG');
 
-    const processedItems = items.map(item => {
+    const Counter = require('../models/Counter');
+    const processedItems = [];
+    for (const item of items) {
       const lineTotal = item.quantity * item.unitPrice * (1 - (item.discount || 0) / 100);
-      return { ...item, lineTotal: Math.round(lineTotal * 100) / 100 };
-    });
+      let orderNumber = item.orderNumber || '';
+      if (!orderNumber && item.orderType) {
+        const prefix = item.orderType === 'Sample' ? 'SM' : 'BLK';
+        const counter = await Counter.findOneAndUpdate(
+          { _id: `order_${prefix.toLowerCase()}` },
+          { $inc: { seq: 1 } },
+          { new: true, upsert: true }
+        );
+        orderNumber = `${prefix}${String(counter.seq).padStart(3, '0')}`;
+      }
+      processedItems.push({ ...item, orderNumber, lineTotal: Math.round(lineTotal * 100) / 100 });
+    }
 
     const subtotal = processedItems.reduce((sum, item) => sum + item.lineTotal, 0);
     let discountAmount = 0;

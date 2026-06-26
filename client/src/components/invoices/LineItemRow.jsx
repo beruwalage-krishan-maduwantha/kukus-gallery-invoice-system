@@ -1,6 +1,5 @@
 import { Form } from 'react-bootstrap';
 import { TrashIcon } from '@heroicons/react/24/outline';
-import { ORDER_TYPES } from '../../utils/constants';
 import { formatCurrency } from '../../utils/formatCurrency';
 
 export default function LineItemRow({ item, index, products, onChange, onRemove }) {
@@ -12,6 +11,7 @@ export default function LineItemRow({ item, index, products, onChange, onRemove 
         updated.name = p.name;
         updated.category = p.category;
         updated.unitPrice = p.defaultPrice;
+        updated.orderType = p.serviceType === 'Design Wear' ? 'Sample' : 'Bulk';
       }
     }
     const qty = Number(updated.quantity) || 0;
@@ -23,7 +23,7 @@ export default function LineItemRow({ item, index, products, onChange, onRemove 
 
   return (
     <tr>
-      <td style={{ width: '28%' }}>
+      <td style={{ width: '32%' }}>
         <Form.Select size="sm" value={item.product || ''} onChange={e => handleChange('product', e.target.value)}>
           <option value="">-- Select Product --</option>
           {products.map(p => <option key={p._id} value={p._id}>{p.name}</option>)}
@@ -31,11 +31,6 @@ export default function LineItemRow({ item, index, products, onChange, onRemove 
         {!item.product && (
           <Form.Control size="sm" className="mt-1" placeholder="Or type name..." value={item.name || ''} onChange={e => handleChange('name', e.target.value)} />
         )}
-      </td>
-      <td style={{ width: '14%' }}>
-        <Form.Select size="sm" value={item.orderType || 'Sample'} onChange={e => handleChange('orderType', e.target.value)}>
-          {ORDER_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
-        </Form.Select>
       </td>
       <td style={{ width: '12%' }}>
         <Form.Control size="sm" type="number" min="1" value={item.quantity || ''} onChange={e => handleChange('quantity', e.target.value)} />
