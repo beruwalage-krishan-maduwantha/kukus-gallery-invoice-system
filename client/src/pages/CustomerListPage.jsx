@@ -127,7 +127,7 @@ export default function CustomerListPage() {
                         : <ChevronDownIcon style={{ width: 16, height: 16, color: 'var(--accent)' }} />
                       }
                     </td>
-                    <td style={{ fontWeight: 600, color: 'var(--primary-dark)' }}>{c.name}</td>
+                    <td style={{ fontWeight: 600, color: 'var(--primary-dark)' }}>{c.title ? `${c.title}. ` : ''}{c.name}</td>
                     <td>{c.company || '-'}</td>
                     <td>{c.phone}</td>
                     <td>{c.email || '-'}</td>
