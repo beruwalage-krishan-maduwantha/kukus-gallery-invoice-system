@@ -1,27 +1,56 @@
+const fs = require('fs');
+const path = require('path');
 const Customer = require('../models/Customer');
 const Product = require('../models/Product');
 const Invoice = require('../models/Invoice');
 const Quotation = require('../models/Quotation');
 const CreditNote = require('../models/CreditNote');
 const Settings = require('../models/Settings');
+const Counter = require('../models/Counter');
+const Order = require('../models/Order');
 
 exports.exportBackup = async (req, res) => {
   try {
-    const customers = await Customer.find();
-    const products = await Product.find();
-    const invoices = await Invoice.find();
-    const quotations = await Quotation.find();
-    const creditNotes = await CreditNote.find();
-    const settings = await Settings.findOne();
+    const customers = await Customer.find().lean();
+    const products = await Product.find().lean();
+    const invoices = await Invoice.find().lean();
+    const quotations = await Quotation.find().lean();
+    const creditNotes = await CreditNote.find().lean();
+    const orders = await Order.find().lean();
+    const settings = await Settings.findOne().lean();
+    const counters = await Counter.find().lean();
 
+    const now = new Date();
     const backup = {
-      exportDate: new Date().toISOString(),
+      exportDate: now.toISOString(),
       version: '1.0',
-      data: { customers, products, invoices, quotations, creditNotes, settings }
+      counts: {
+        customers: customers.length,
+        products: products.length,
+        invoices: invoices.length,
+        quotations: quotations.length,
+        creditNotes: creditNotes.length,
+        orders: orders.length
+      },
+      data: { customers, products, invoices, quotations, creditNotes, orders, settings, counters }
     };
 
+    if (process.env.VERCEL !== '1') {
+      try {
+        const backupDir = path.join(__dirname, '..', '..', 'backups');
+        if (!fs.existsSync(backupDir)) fs.mkdirSync(backupDir, { recursive: true });
+        const dateStr = now.toISOString().slice(0, 10);
+        const timeStr = now.toISOString().slice(11, 19).replace(/:/g, '-');
+        const filename = `kukus_backup_${dateStr}_${timeStr}.json`;
+        fs.writeFileSync(path.join(backupDir, filename), JSON.stringify(backup, null, 2));
+        console.log(`Backup saved: backups/${filename}`);
+      } catch (err) {
+        console.error('Local backup save failed:', err.message);
+      }
+    }
+
     res.setHeader('Content-Type', 'application/json');
-    res.setHeader('Content-Disposition', `attachment; filename=kukus_backup_${new Date().toISOString().slice(0, 10)}.json`);
+    res.setHeader('Content-Disposition', `attachment; filename=kukus_backup_${now.toISOString().slice(0, 10)}.json`);
     res.json(backup);
   } catch (error) {
     console.error('Backup error:', error);
@@ -34,55 +63,30 @@ exports.importBackup = async (req, res) => {
     const { data } = req.body;
     if (!data) return res.status(400).json({ message: 'No backup data provided' });
 
-    const results = { customers: 0, products: 0, invoices: 0, quotations: 0, creditNotes: 0 };
+    const results = { customers: 0, products: 0, invoices: 0, quotations: 0, creditNotes: 0, orders: 0 };
 
-    if (data.customers?.length) {
-      for (const doc of data.customers) {
-        const exists = await Customer.findById(doc._id);
+    const restoreCollection = async (Model, docs, key) => {
+      if (!docs?.length) return;
+      for (const doc of docs) {
+        const exists = await Model.findById(doc._id);
         if (!exists) {
-          await Customer.create({ ...doc, _id: doc._id });
-          results.customers++;
+          await Model.create({ ...doc, _id: doc._id });
+          results[key]++;
         }
       }
-    }
+    };
 
-    if (data.products?.length) {
-      for (const doc of data.products) {
-        const exists = await Product.findById(doc._id);
-        if (!exists) {
-          await Product.create({ ...doc, _id: doc._id });
-          results.products++;
-        }
-      }
-    }
+    await restoreCollection(Customer, data.customers, 'customers');
+    await restoreCollection(Product, data.products, 'products');
+    await restoreCollection(Invoice, data.invoices, 'invoices');
+    await restoreCollection(Quotation, data.quotations, 'quotations');
+    await restoreCollection(CreditNote, data.creditNotes, 'creditNotes');
+    await restoreCollection(Order, data.orders, 'orders');
 
-    if (data.invoices?.length) {
-      for (const doc of data.invoices) {
-        const exists = await Invoice.findById(doc._id);
-        if (!exists) {
-          await Invoice.create({ ...doc, _id: doc._id });
-          results.invoices++;
-        }
-      }
-    }
-
-    if (data.quotations?.length) {
-      for (const doc of data.quotations) {
-        const exists = await Quotation.findById(doc._id);
-        if (!exists) {
-          await Quotation.create({ ...doc, _id: doc._id });
-          results.quotations++;
-        }
-      }
-    }
-
-    if (data.creditNotes?.length) {
-      for (const doc of data.creditNotes) {
-        const exists = await CreditNote.findById(doc._id);
-        if (!exists) {
-          await CreditNote.create({ ...doc, _id: doc._id });
-          results.creditNotes++;
-        }
+    if (data.counters?.length) {
+      for (const doc of data.counters) {
+        const exists = await Counter.findById(doc._id);
+        if (!exists) await Counter.create({ ...doc, _id: doc._id });
       }
     }
 
@@ -105,7 +109,8 @@ exports.getDbStats = async (req, res) => {
       products: await Product.countDocuments(),
       invoices: await Invoice.countDocuments(),
       quotations: await Quotation.countDocuments(),
-      creditNotes: await CreditNote.countDocuments()
+      creditNotes: await CreditNote.countDocuments(),
+      orders: await Order.countDocuments()
     };
     stats.totalDocuments = Object.values(stats).reduce((a, b) => a + b, 0);
 
