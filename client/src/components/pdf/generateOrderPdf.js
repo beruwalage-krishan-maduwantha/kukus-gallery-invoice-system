@@ -260,63 +260,6 @@ async function buildOrderPdf(order) {
     tableLineWidth: 0.3
   });
 
-  y = doc.lastAutoTable.finalY + 10;
-
-  // Fabric Details & Size Break Down
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(10);
-  doc.text('Fabric Details & Size Break Down', margin, y);
-
-  y += 4;
-
-  // Empty table for fabric details
-  autoTable(doc, {
-    startY: y,
-    head: [['Fabric Type', 'Color', 'S', 'M', 'L', 'XL', 'XXL', 'Total']],
-    body: [
-      ['', '', '', '', '', '', '', ''],
-      ['', '', '', '', '', '', '', ''],
-      ['', '', '', '', '', '', '', ''],
-      ['', '', '', '', '', '', '', ''],
-      ['', '', '', '', '', '', '', '']
-    ],
-    headStyles: {
-      fillColor: [60, 60, 60], textColor: 255,
-      fontSize: 6.5, fontStyle: 'bold', cellPadding: 2.5
-    },
-    styles: {
-      fontSize: 6.5, cellPadding: 3,
-      textColor: [30, 30, 30],
-      lineColor: [0, 0, 0], lineWidth: 0.3,
-      minCellHeight: 8
-    },
-    columnStyles: {
-      0: { cellWidth: 30 },
-      1: { cellWidth: 22 },
-      2: { cellWidth: 12, halign: 'center' },
-      3: { cellWidth: 12, halign: 'center' },
-      4: { cellWidth: 12, halign: 'center' },
-      5: { cellWidth: 12, halign: 'center' },
-      6: { cellWidth: 12, halign: 'center' },
-      7: { cellWidth: 12, halign: 'center' }
-    },
-    margin: { left: margin, right: margin },
-    theme: 'grid',
-    tableLineColor: [0, 0, 0],
-    tableLineWidth: 0.3
-  });
-
-  y = doc.lastAutoTable.finalY + 10;
-
-  // Special Instructions
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(9);
-  doc.text('Special Instructions / Notes', margin, y);
-  y += 3;
-  drawLine(doc, margin, y + 3, contentWidth);
-  drawLine(doc, margin, y + 10, contentWidth);
-  drawLine(doc, margin, y + 17, contentWidth);
-
   return doc;
 }
 
