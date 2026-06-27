@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Modal } from 'react-bootstrap';
 import toast from 'react-hot-toast';
 import { getOrders, updateOrderStatus, approveOrder } from '../api/orders';
-import { generateOrderPdf } from '../components/pdf/generateOrderPdf';
+import { generateOrderPdf, previewOrderPdf } from '../components/pdf/generateOrderPdf';
 import SearchInput from '../components/common/SearchInput';
 import StatusBadge from '../components/common/StatusBadge';
 import EmptyState from '../components/common/EmptyState';
@@ -10,7 +11,7 @@ import Pagination from '../components/common/Pagination';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import { formatDate } from '../utils/formatDate';
 import { ORDER_STATUS_OPTIONS } from '../utils/constants';
-import { ClipboardDocumentListIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
+import { ClipboardDocumentListIcon, CheckCircleIcon, EyeIcon, ArrowDownTrayIcon } from '@heroicons/react/24/outline';
 
 export default function OrdersPage() {
   const navigate = useNavigate();
@@ -21,6 +22,8 @@ export default function OrdersPage() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [loading, setLoading] = useState(true);
+  const [previewUrl, setPreviewUrl] = useState(null);
+  const [previewOrder, setPreviewOrder] = useState(null);
 
   const fetchOrders = useCallback(async () => {
     setLoading(true);
@@ -42,8 +45,9 @@ export default function OrdersPage() {
       await updateOrderStatus(orderId, newStatus);
       toast.success('Order status updated');
       if (newStatus === 'Processing') {
-        generateOrderPdf(order);
-        toast.success('Order PDF downloading...');
+        const url = await previewOrderPdf(order);
+        setPreviewUrl(url);
+        setPreviewOrder(order);
       }
       fetchOrders();
     } catch (err) { toast.error(err.response?.data?.message || 'Failed'); }
@@ -57,6 +61,34 @@ export default function OrdersPage() {
       fetchOrders();
     } catch (err) { toast.error(err.response?.data?.message || 'Failed'); }
   };
+
+  const handlePreview = async (e, order) => {
+    e.stopPropagation();
+    try {
+      const url = await previewOrderPdf(order);
+      setPreviewUrl(url);
+      setPreviewOrder(order);
+    } catch { toast.error('Failed to generate preview'); }
+  };
+
+  const handleDownload = async (e, order) => {
+    e.stopPropagation();
+    try {
+      await generateOrderPdf(order);
+    } catch { toast.error('Failed to generate PDF'); }
+  };
+
+  const closePreview = () => {
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
+    setPreviewUrl(null);
+    setPreviewOrder(null);
+  };
+
+  const btnStyle = (bg, color) => ({
+    background: bg, color, border: 'none', borderRadius: 6,
+    padding: '0.3rem 0.45rem', fontSize: '0.72rem', fontWeight: 600,
+    cursor: 'pointer', display: 'inline-flex', alignItems: 'center'
+  });
 
   return (
     <div>
@@ -90,6 +122,7 @@ export default function OrdersPage() {
                 <th>Delivery Date</th>
                 <th>Status</th>
                 <th>Approval</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -149,6 +182,16 @@ export default function OrdersPage() {
                       </button>
                     )}
                   </td>
+                  <td onClick={e => e.stopPropagation()}>
+                    <div className="d-flex gap-1">
+                      <button style={btnStyle('rgba(177,145,198,0.12)', 'var(--primary)')} onClick={e => handlePreview(e, order)} title="Preview PDF">
+                        <EyeIcon style={{ width: 15, height: 15 }} />
+                      </button>
+                      <button style={btnStyle('rgba(59,130,246,0.1)', 'var(--info)')} onClick={e => handleDownload(e, order)} title="Download PDF">
+                        <ArrowDownTrayIcon style={{ width: 15, height: 15 }} />
+                      </button>
+                    </div>
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -157,6 +200,28 @@ export default function OrdersPage() {
       )}
 
       <Pagination page={page} pages={pages} onPageChange={setPage} />
+
+      {/* PDF Preview Modal */}
+      <Modal show={!!previewUrl} onHide={closePreview} size="lg" centered>
+        <Modal.Header closeButton>
+          <Modal.Title className="modal-title-custom" style={{ fontSize: '1rem' }}>
+            Order PDF — {previewOrder?.orderNumber}
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body style={{ padding: 0 }}>
+          <iframe
+            src={previewUrl}
+            style={{ width: '100%', height: '75vh', border: 'none' }}
+            title="Order PDF Preview"
+          />
+        </Modal.Body>
+        <Modal.Footer>
+          <button className="btn-outline-custom" onClick={closePreview}>Close</button>
+          <button className="btn-primary-custom" onClick={() => { if (previewOrder) generateOrderPdf(previewOrder); }}>
+            <ArrowDownTrayIcon style={{ width: 16, height: 16, marginRight: 6 }} /> Download PDF
+          </button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 }

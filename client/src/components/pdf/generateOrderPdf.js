@@ -44,7 +44,7 @@ function drawCheckbox(doc, x, y, checked) {
   }
 }
 
-export async function generateOrderPdf(order) {
+async function buildOrderPdf(order) {
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a5' });
   const pageWidth = 148;
   const margin = 12;
@@ -324,6 +324,16 @@ export async function generateOrderPdf(order) {
   drawLine(doc, margin, y + 10, contentWidth);
   drawLine(doc, margin, y + 17, contentWidth);
 
+  return doc;
+}
+
+export async function generateOrderPdf(order) {
+  const doc = await buildOrderPdf(order);
   const fileName = `${order.orderNumber}_${(order.customerSnapshot?.name || 'Order').replace(/[^a-zA-Z0-9]/g, '_')}.pdf`;
   doc.save(fileName);
+}
+
+export async function previewOrderPdf(order) {
+  const doc = await buildOrderPdf(order);
+  return doc.output('bloburl');
 }
