@@ -94,14 +94,13 @@ exports.createInvoice = async (req, res) => {
     if (advance >= grandTotal && (paymentType === 'Bank Transfer' || paymentType === 'Cash')) {
       advance = 0;
     }
-    const balance = Math.round((grandTotal - advance) * 100) / 100;
 
     let status = 'Draft';
     if (forceDraft) {
       status = 'Draft';
     } else if (paymentType === 'Credits') {
       status = 'Overdue';
-    } else if (advance > 0 && balance <= 0) {
+    } else if (advance > 0 && advance >= grandTotal) {
       status = 'Paid';
     } else if (advance > 0) {
       status = 'Advance Paid';
@@ -110,6 +109,8 @@ exports.createInvoice = async (req, res) => {
     } else {
       status = 'Sent';
     }
+
+    const balance = status === 'Paid' ? 0 : Math.round((grandTotal - advance) * 100) / 100;
 
     const sanitizedName = customerDoc.name.replace(/[^a-zA-Z0-9]/g, '_');
     const sanitizedPhone = customerDoc.phone.replace(/[^0-9]/g, '');
@@ -227,15 +228,23 @@ exports.updateInvoice = async (req, res) => {
     if (advancePayment !== undefined) {
       invoice.advancePayment = Number(advancePayment) || 0;
     }
-    invoice.balance = Math.round((invoice.grandTotal - (invoice.advancePayment || 0)) * 100) / 100;
 
     if (invoice.paymentType === 'Credits') {
       invoice.status = 'Overdue';
-    } else if (invoice.balance <= 0) {
+      invoice.balance = Math.round((invoice.grandTotal - (invoice.advancePayment || 0)) * 100) / 100;
+    } else if ((invoice.advancePayment || 0) >= invoice.grandTotal) {
       invoice.status = 'Paid';
       invoice.paidDate = new Date();
+      invoice.balance = 0;
     } else if (invoice.advancePayment > 0) {
       invoice.status = 'Advance Paid';
+      invoice.balance = Math.round((invoice.grandTotal - invoice.advancePayment) * 100) / 100;
+    } else if (invoice.paymentType === 'Bank Transfer' || invoice.paymentType === 'Cash') {
+      invoice.status = 'Paid';
+      invoice.paidDate = new Date();
+      invoice.balance = 0;
+    } else {
+      invoice.balance = Math.round((invoice.grandTotal - (invoice.advancePayment || 0)) * 100) / 100;
     }
     if (notes !== undefined) invoice.notes = notes;
     if (terms !== undefined) invoice.terms = terms;
@@ -287,13 +296,14 @@ exports.addAdvancePayment = async (req, res) => {
 
     const advance = (invoice.advancePayment || 0) + Number(amount);
     invoice.advancePayment = Math.round(advance * 100) / 100;
-    invoice.balance = Math.round((invoice.grandTotal - invoice.advancePayment) * 100) / 100;
 
     if (invoice.paymentType === 'Credits') {
       invoice.status = 'Overdue';
-    } else if (invoice.balance <= 0) {
+      invoice.balance = Math.round((invoice.grandTotal - invoice.advancePayment) * 100) / 100;
+    } else if (invoice.advancePayment >= invoice.grandTotal) {
       invoice.status = 'Paid';
       invoice.paidDate = new Date();
+      invoice.balance = 0;
     } else {
       invoice.status = 'Advance Paid';
     }
