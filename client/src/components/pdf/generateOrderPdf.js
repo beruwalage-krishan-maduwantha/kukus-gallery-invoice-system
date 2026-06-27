@@ -159,14 +159,6 @@ async function buildOrderPdf(order) {
   y += 8;
   doc.setFont('helvetica', 'bold');
   doc.text('•', margin + 2, y);
-  doc.text('Product:', margin + 6, y);
-  doc.setFont('helvetica', 'normal');
-  doc.text(order.productName || '', margin + 25, y);
-  drawLine(doc, margin + 24, y + 1, lineFieldWidth - 10);
-
-  y += 8;
-  doc.setFont('helvetica', 'bold');
-  doc.text('•', margin + 2, y);
   doc.text('Quantity:', margin + 6, y);
   doc.setFont('helvetica', 'normal');
   doc.text(String(order.quantity || ''), margin + 25, y);
