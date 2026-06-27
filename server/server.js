@@ -17,6 +17,7 @@ const quotationRoutes = require('./routes/quotations');
 const reportRoutes = require('./routes/reports');
 const backupRoutes = require('./routes/backup');
 const userRoutes = require('./routes/users');
+const orderRoutes = require('./routes/orders');
 
 const app = express();
 
@@ -45,6 +46,7 @@ app.use('/api/quotations', quotationRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/backup', backupRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/orders', orderRoutes);
 
 app.use(errorHandler);
 

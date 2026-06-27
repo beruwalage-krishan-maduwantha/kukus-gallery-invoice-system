@@ -9,13 +9,15 @@ import {
   Cog6ToothIcon,
   ArrowRightOnRectangleIcon,
   ReceiptRefundIcon,
-  ChartBarIcon
+  ChartBarIcon,
+  ClipboardDocumentListIcon
 } from '@heroicons/react/24/outline';
 
 const navItems = [
   { to: '/', icon: HomeIcon, label: 'Dashboard', access: 'admin' },
   { to: '/quotations', icon: DocumentDuplicateIcon, label: 'Quotations', access: 'all' },
   { to: '/invoices', icon: DocumentTextIcon, label: 'Invoices', access: 'all' },
+  { to: '/orders', icon: ClipboardDocumentListIcon, label: 'Orders', access: 'all' },
   { to: '/credit-notes', icon: ReceiptRefundIcon, label: 'Credit Notes', access: 'admin' },
   { to: '/reports', icon: ChartBarIcon, label: 'Reports', access: 'admin' },
   { to: '/customers', icon: UserGroupIcon, label: 'Customers', access: 'all' },

@@ -3,6 +3,7 @@ const Invoice = require('../models/Invoice');
 const Customer = require('../models/Customer');
 const CreditNote = require('../models/CreditNote');
 const Settings = require('../models/Settings');
+const Order = require('../models/Order');
 const generateInvoiceNumber = require('../utils/generateInvoiceNumber');
 
 exports.getInvoices = async (req, res) => {
@@ -89,7 +90,10 @@ exports.createInvoice = async (req, res) => {
     discountAmount = Math.round(discountAmount * 100) / 100;
     const grandTotal = Math.round((subtotal - discountAmount) * 100) / 100;
 
-    const advance = Number(advancePayment) || 0;
+    let advance = Number(advancePayment) || 0;
+    if (advance >= grandTotal && (paymentType === 'Bank Transfer' || paymentType === 'Cash')) {
+      advance = 0;
+    }
     const balance = Math.round((grandTotal - advance) * 100) / 100;
 
     let status = 'Draft';
@@ -97,7 +101,7 @@ exports.createInvoice = async (req, res) => {
       status = 'Draft';
     } else if (paymentType === 'Credits') {
       status = 'Overdue';
-    } else if (balance <= 0) {
+    } else if (advance > 0 && balance <= 0) {
       status = 'Paid';
     } else if (advance > 0) {
       status = 'Advance Paid';
@@ -150,6 +154,31 @@ exports.createInvoice = async (req, res) => {
         status: 'Active',
         createdBy: req.user._id
       });
+    }
+
+    const ordersToCreate = processedItems
+      .filter(item => item.orderNumber)
+      .map(item => ({
+        orderNumber: item.orderNumber,
+        invoice: invoice._id,
+        invoiceNumber,
+        customer: customerId,
+        customerSnapshot: {
+          title: customerDoc.title || '',
+          name: customerDoc.name,
+          phone: customerDoc.phone
+        },
+        productName: item.name,
+        category: item.category,
+        orderType: item.orderType,
+        quantity: item.quantity,
+        unitPrice: item.unitPrice,
+        invoiceDate: invoiceDate || new Date(),
+        deliveryDate: deliveryDate || undefined,
+        status: 'Pending'
+      }));
+    if (ordersToCreate.length > 0) {
+      await Order.insertMany(ordersToCreate);
     }
 
     const populated = await Invoice.findById(invoice._id)

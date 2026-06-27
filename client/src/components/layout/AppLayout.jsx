@@ -9,6 +9,7 @@ const pageTitles = {
   '/invoices/new': 'New Invoice',
   '/quotations': 'Quotations',
   '/quotations/new': 'New Quotation',
+  '/orders': 'Orders',
   '/credit-notes': 'Credit Notes',
   '/reports': 'Reports',
   '/customers': 'Customers',
