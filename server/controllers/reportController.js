@@ -54,6 +54,13 @@ exports.getReport = async (req, res) => {
     // Conversion rate
     const conversionRate = totalQuotations > 0 ? Math.round((convertedCount / totalQuotations) * 100) : 0;
 
+    const advancePaidCount = await Invoice.countDocuments({ status: 'Advance Paid' });
+    const overdueCount = await Invoice.countDocuments({ status: 'Overdue' });
+
+    const allInvoices = await Invoice.find()
+      .select('invoiceNumber customerSnapshot grandTotal advancePayment balance status invoiceDate')
+      .sort('-invoiceDate');
+
     res.json({
       totalQuotations,
       totalQuotationValue,
@@ -64,8 +71,11 @@ exports.getReport = async (req, res) => {
       totalInvoiceValue,
       totalSell,
       paidCount,
+      advancePaidCount,
+      overdueCount,
       quotationByStatus: qStatusMap,
-      quotations: allQuotations
+      quotations: allQuotations,
+      invoices: allInvoices
     });
   } catch (error) {
     console.error('Report error:', error);
