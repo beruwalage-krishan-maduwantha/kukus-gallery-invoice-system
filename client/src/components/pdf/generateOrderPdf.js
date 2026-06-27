@@ -260,6 +260,12 @@ async function buildOrderPdf(order) {
     tableLineWidth: 0.3
   });
 
+  y = doc.lastAutoTable.finalY + 10;
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(10);
+  doc.text('Fabric Details & Size Break Down', margin, y);
+
   return doc;
 }
 
