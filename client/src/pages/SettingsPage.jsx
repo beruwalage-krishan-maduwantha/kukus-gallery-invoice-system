@@ -82,7 +82,7 @@ export default function SettingsPage() {
 
       const res = await api.post('/backup/import', { data: backup.data });
       const r = res.data.results;
-      toast.success(`Restored: ${r.customers} customers, ${r.products} products, ${r.invoices} invoices, ${r.quotations} quotations, ${r.creditNotes} credit notes`);
+      toast.success(`Restored: ${r.customers} customers, ${r.products} products, ${r.invoices} invoices, ${r.orders || 0} orders, ${r.quotations} quotations, ${r.creditNotes} credit notes`);
 
       const statsRes = await api.get('/backup/stats');
       setDbStats(statsRes.data);
@@ -268,6 +268,7 @@ export default function SettingsPage() {
               { label: 'Customers', count: dbStats.customers },
               { label: 'Products', count: dbStats.products },
               { label: 'Invoices', count: dbStats.invoices },
+              { label: 'Orders', count: dbStats.orders },
               { label: 'Quotations', count: dbStats.quotations },
               { label: 'Credit Notes', count: dbStats.creditNotes }
             ].map(item => (
@@ -289,7 +290,7 @@ export default function SettingsPage() {
               <ArrowDownTrayIcon style={{ width: 32, height: 32, color: 'var(--primary)', marginBottom: '0.75rem' }} />
               <h6 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.1rem', color: 'var(--primary-dark)' }}>Download Backup</h6>
               <p style={{ fontSize: '0.78rem', color: '#888', marginBottom: '1rem' }}>
-                Export all data (customers, products, invoices, quotations, credit notes) as a JSON file.
+                Export all data (customers, products, invoices, orders, quotations, credit notes) as a JSON file.
               </p>
               <Button className="btn-primary-custom" onClick={handleExport} disabled={exporting}>
                 <ArrowDownTrayIcon style={{ width: 16, height: 16, marginRight: 6 }} />
