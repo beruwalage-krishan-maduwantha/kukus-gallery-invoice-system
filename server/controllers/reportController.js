@@ -1,5 +1,6 @@
 const Invoice = require('../models/Invoice');
 const Quotation = require('../models/Quotation');
+const Order = require('../models/Order');
 
 exports.getReport = async (req, res) => {
   try {
@@ -61,6 +62,20 @@ exports.getReport = async (req, res) => {
       .select('invoiceNumber customerSnapshot grandTotal advancePayment balance status invoiceDate')
       .sort('-invoiceDate');
 
+    const totalOrders = await Order.countDocuments();
+    const ordersByStatus = await Order.aggregate([
+      { $group: { _id: '$status', count: { $sum: 1 } } }
+    ]);
+    const orderStatusMap = {};
+    ordersByStatus.forEach(s => { orderStatusMap[s._id] = s.count; });
+
+    const approvedOrders = await Order.countDocuments({ approved: true });
+
+    const allOrders = await Order.find()
+      .populate('approvedBy', 'name')
+      .select('orderNumber productName category orderType customerSnapshot invoiceNumber invoice invoiceDate deliveryDate status approved approvedAt approvedBy quantity unitPrice')
+      .sort('-createdAt');
+
     res.json({
       totalQuotations,
       totalQuotationValue,
@@ -75,7 +90,11 @@ exports.getReport = async (req, res) => {
       overdueCount,
       quotationByStatus: qStatusMap,
       quotations: allQuotations,
-      invoices: allInvoices
+      invoices: allInvoices,
+      totalOrders,
+      ordersByStatus: orderStatusMap,
+      approvedOrders,
+      orders: allOrders
     });
   } catch (error) {
     console.error('Report error:', error);

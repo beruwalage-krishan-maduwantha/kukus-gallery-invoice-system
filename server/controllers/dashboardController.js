@@ -1,6 +1,7 @@
 const Invoice = require('../models/Invoice');
 const CreditNote = require('../models/CreditNote');
 const Quotation = require('../models/Quotation');
+const Order = require('../models/Order');
 
 exports.getStats = async (req, res) => {
   try {
@@ -61,11 +62,25 @@ exports.getStats = async (req, res) => {
       .limit(5)
       .select('invoiceNumber customerSnapshot grandTotal advancePayment balance status invoiceDate createdAt');
 
+    const totalOrders = await Order.countDocuments();
+    const ordersByStatus = await Order.aggregate([
+      { $group: { _id: '$status', count: { $sum: 1 } } }
+    ]);
+    const orderStatusMap = {};
+    ordersByStatus.forEach(s => { orderStatusMap[s._id] = s.count; });
+    const pendingOrders = orderStatusMap['Pending'] || 0;
+
+    const recentOrders = await Order.find()
+      .sort({ createdAt: -1 })
+      .limit(5)
+      .select('orderNumber productName customerSnapshot invoiceNumber invoice status approved deliveryDate createdAt');
+
     res.json({
       totalInvoices, totalRevenue, outstanding,
       totalCredits, creditCount,
       totalQuotations, pendingQuotations,
-      byStatus, weeklyRevenue, recentInvoices
+      byStatus, weeklyRevenue, recentInvoices,
+      totalOrders, pendingOrders, orderStatusMap, recentOrders
     });
   } catch (error) {
     console.error('Dashboard error:', error);

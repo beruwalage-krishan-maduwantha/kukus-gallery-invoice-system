@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Row, Col } from 'react-bootstrap';
+import { CheckCircleIcon } from '@heroicons/react/24/outline';
 import { getReport } from '../api/reports';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import StatusBadge from '../components/common/StatusBadge';
@@ -24,9 +25,12 @@ export default function ReportsPage() {
 
   const qStatus = data?.quotationByStatus || {};
 
+  const oStatus = data?.ordersByStatus || {};
+
   const tabs = [
     { key: 'summary', label: 'Summary' },
     { key: 'invoices', label: 'Invoices' },
+    { key: 'orders', label: 'Orders' },
     { key: 'quotations', label: 'Quotations' },
     { key: 'sales', label: 'Sales Conversion' }
   ];
@@ -76,6 +80,11 @@ export default function ReportsPage() {
                   <td style={{ fontWeight: 600, color: 'var(--info)' }}>Conversion Rate</td>
                   <td style={{ textAlign: 'right' }}>{data?.totalQuotations || 0} quotations</td>
                   <td style={{ textAlign: 'right', fontWeight: 700, fontSize: '1.1rem', color: 'var(--info)' }}>{data?.conversionRate || 0}%</td>
+                </tr>
+                <tr>
+                  <td style={{ fontWeight: 600, color: '#6366F1' }}>Total Orders</td>
+                  <td style={{ textAlign: 'right' }}>{data?.totalOrders || 0}</td>
+                  <td style={{ textAlign: 'right', fontWeight: 600, color: '#6366F1' }}>{data?.approvedOrders || 0} approved</td>
                 </tr>
               </tbody>
             </table>
@@ -162,6 +171,94 @@ export default function ReportsPage() {
                     <td style={{ textAlign: 'right', color: 'var(--success)' }}>{formatCurrency(inv.advancePayment || 0)}</td>
                     <td style={{ textAlign: 'right', color: 'var(--danger)', fontWeight: 600 }}>{formatCurrency(inv.balance || 0)}</td>
                     <td><StatusBadge status={inv.status} /></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* ===== ORDERS TAB ===== */}
+      {activeTab === 'orders' && (
+        <div>
+          <Row className="g-3 mb-4">
+            {['Pending', 'Processing', 'Alternative', 'Delivery'].map(status => (
+              <Col xs={6} md={3} key={status}>
+                <div className="card-custom" style={{ textAlign: 'center', padding: '1rem' }}>
+                  <StatusBadge status={status} />
+                  <div style={{ fontFamily: 'var(--font-heading)', fontSize: '1.4rem', fontWeight: 700, color: 'var(--primary-dark)', marginTop: '0.3rem' }}>{oStatus[status] || 0}</div>
+                </div>
+              </Col>
+            ))}
+          </Row>
+
+          <Row className="g-3 mb-4">
+            <Col xs={6} md={4}>
+              <div className="card-custom" style={{ textAlign: 'center', padding: '1rem' }}>
+                <div style={{ fontSize: '0.65rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--accent)' }}>Total Orders</div>
+                <div style={{ fontFamily: 'var(--font-heading)', fontSize: '1.4rem', fontWeight: 700, color: 'var(--primary-dark)' }}>{data?.totalOrders || 0}</div>
+              </div>
+            </Col>
+            <Col xs={6} md={4}>
+              <div className="card-custom" style={{ textAlign: 'center', padding: '1rem' }}>
+                <div style={{ fontSize: '0.65rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--success)' }}>Approved</div>
+                <div style={{ fontFamily: 'var(--font-heading)', fontSize: '1.4rem', fontWeight: 700, color: 'var(--success)' }}>{data?.approvedOrders || 0}</div>
+              </div>
+            </Col>
+            <Col xs={6} md={4}>
+              <div className="card-custom" style={{ textAlign: 'center', padding: '1rem' }}>
+                <div style={{ fontSize: '0.65rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#F59E0B' }}>Not Approved</div>
+                <div style={{ fontFamily: 'var(--font-heading)', fontSize: '1.4rem', fontWeight: 700, color: '#F59E0B' }}>{(data?.totalOrders || 0) - (data?.approvedOrders || 0)}</div>
+              </div>
+            </Col>
+          </Row>
+
+          <div className="table-custom">
+            <table>
+              <thead>
+                <tr>
+                  <th>Order #</th>
+                  <th>Product</th>
+                  <th>Customer</th>
+                  <th>Invoice</th>
+                  <th>Invoice Date</th>
+                  <th>Delivery Date</th>
+                  <th>Qty</th>
+                  <th>Status</th>
+                  <th>Approval</th>
+                </tr>
+              </thead>
+              <tbody>
+                {(!data?.orders || data.orders.length === 0) ? (
+                  <tr><td colSpan={9} style={{ textAlign: 'center', padding: '2rem', color: '#999' }}>No orders</td></tr>
+                ) : data.orders.map(o => (
+                  <tr key={o._id}>
+                    <td>
+                      <span style={{ fontSize: '0.75rem', fontWeight: 700, color: o.orderType === 'Sample' ? 'var(--primary)' : 'var(--info)', background: o.orderType === 'Sample' ? 'rgba(177,145,198,0.12)' : 'rgba(59,130,246,0.1)', padding: '0.2rem 0.5rem', borderRadius: 4 }}>
+                        {o.orderNumber}
+                      </span>
+                    </td>
+                    <td style={{ fontWeight: 500 }}>{o.productName}</td>
+                    <td>{o.customerSnapshot?.title ? `${o.customerSnapshot.title}. ` : ''}{o.customerSnapshot?.name}</td>
+                    <td>
+                      <span style={{ fontWeight: 600, color: 'var(--primary-dark)', cursor: 'pointer', textDecoration: 'underline' }} onClick={() => navigate(`/invoices/${o.invoice}`)}>
+                        {o.invoiceNumber}
+                      </span>
+                    </td>
+                    <td>{formatDate(o.invoiceDate)}</td>
+                    <td>{o.deliveryDate ? formatDate(o.deliveryDate) : <span style={{ color: '#ccc' }}>—</span>}</td>
+                    <td style={{ textAlign: 'center', fontWeight: 600 }}>{o.quantity}</td>
+                    <td><StatusBadge status={o.status} /></td>
+                    <td>
+                      {o.approved ? (
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, fontSize: '0.72rem', fontWeight: 600, color: 'var(--success)', background: 'rgba(34,197,94,0.1)', padding: '0.2rem 0.5rem', borderRadius: 6 }}>
+                          <CheckCircleIcon style={{ width: 13, height: 13 }} /> Approved
+                        </span>
+                      ) : (
+                        <span style={{ fontSize: '0.72rem', color: '#F59E0B', fontWeight: 600 }}>Pending</span>
+                      )}
+                    </td>
                   </tr>
                 ))}
               </tbody>
