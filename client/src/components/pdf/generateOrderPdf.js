@@ -38,9 +38,10 @@ function drawCheckbox(doc, x, y, checked) {
   doc.setLineWidth(0.3);
   doc.rect(x, y - 2.5, 3, 3);
   if (checked) {
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(8);
-    doc.text('✓', x + 0.3, y + 0.2);
+    doc.setDrawColor(0);
+    doc.setLineWidth(0.5);
+    doc.line(x + 0.5, y - 0.8, x + 1.2, y + 0.2);
+    doc.line(x + 1.2, y + 0.2, x + 2.7, y - 2);
   }
 }
 
