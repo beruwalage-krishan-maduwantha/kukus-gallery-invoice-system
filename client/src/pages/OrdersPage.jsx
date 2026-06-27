@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { getOrders, updateOrderStatus, approveOrder } from '../api/orders';
+import { generateOrderPdf } from '../components/pdf/generateOrderPdf';
 import SearchInput from '../components/common/SearchInput';
 import StatusBadge from '../components/common/StatusBadge';
 import EmptyState from '../components/common/EmptyState';
@@ -34,11 +35,16 @@ export default function OrdersPage() {
 
   useEffect(() => { fetchOrders(); }, [fetchOrders]);
 
-  const handleStatusChange = async (e, orderId) => {
+  const handleStatusChange = async (e, orderId, order) => {
     e.stopPropagation();
+    const newStatus = e.target.value;
     try {
-      await updateOrderStatus(orderId, e.target.value);
+      await updateOrderStatus(orderId, newStatus);
       toast.success('Order status updated');
+      if (newStatus === 'Processing') {
+        generateOrderPdf(order);
+        toast.success('Order PDF downloading...');
+      }
       fetchOrders();
     } catch (err) { toast.error(err.response?.data?.message || 'Failed'); }
   };
@@ -115,7 +121,7 @@ export default function OrdersPage() {
                     <select
                       className="filter-select"
                       value={order.status}
-                      onChange={e => handleStatusChange(e, order._id)}
+                      onChange={e => handleStatusChange(e, order._id, order)}
                       style={{
                         fontSize: '0.75rem', padding: '0.3rem 0.5rem', minWidth: 110,
                         fontWeight: 600, borderRadius: 6
