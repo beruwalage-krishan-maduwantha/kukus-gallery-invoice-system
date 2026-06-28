@@ -183,7 +183,7 @@ export default function ReportsPage() {
       {activeTab === 'orders' && (
         <div>
           <Row className="g-3 mb-4">
-            {['Pending', 'Processing', 'Alternative', 'Delivery'].map(status => (
+            {['Pending', 'Processing', 'Alternative', 'Delivered'].map(status => (
               <Col xs={6} md={3} key={status}>
                 <div className="card-custom" style={{ textAlign: 'center', padding: '1rem' }}>
                   <StatusBadge status={status} />

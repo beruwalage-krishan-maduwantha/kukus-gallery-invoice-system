@@ -33,9 +33,9 @@ export const STATUS_COLORS = {
   Pending: { bg: 'rgba(245,158,11,0.1)', color: '#F59E0B' },
   Processing: { bg: 'rgba(59,130,246,0.1)', color: '#3B82F6' },
   Alternative: { bg: 'rgba(168,85,247,0.1)', color: '#A855F7' },
-  Delivery: { bg: 'rgba(34,197,94,0.1)', color: '#22C55E' }
+  Delivered: { bg: 'rgba(34,197,94,0.1)', color: '#22C55E' }
 };
 
 export const QUOTATION_STATUS_OPTIONS = ['Draft', 'Sent', 'Accepted', 'Rejected', 'Expired', 'Converted'];
 
-export const ORDER_STATUS_OPTIONS = ['Pending', 'Processing', 'Alternative', 'Delivery'];
+export const ORDER_STATUS_OPTIONS = ['Pending', 'Processing', 'Alternative', 'Delivered'];
