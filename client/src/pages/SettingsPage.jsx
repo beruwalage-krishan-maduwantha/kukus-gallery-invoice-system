@@ -269,6 +269,7 @@ export default function SettingsPage() {
               { label: 'Products', count: dbStats.products },
               { label: 'Invoices', count: dbStats.invoices },
               { label: 'Orders', count: dbStats.orders },
+              { label: 'Expenses', count: dbStats.expenses },
               { label: 'Quotations', count: dbStats.quotations },
               { label: 'Credit Notes', count: dbStats.creditNotes }
             ].map(item => (

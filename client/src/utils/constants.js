@@ -39,3 +39,11 @@ export const STATUS_COLORS = {
 export const QUOTATION_STATUS_OPTIONS = ['Draft', 'Sent', 'Accepted', 'Rejected', 'Expired', 'Converted'];
 
 export const ORDER_STATUS_OPTIONS = ['Pending', 'Processing', 'Alternative', 'Delivered'];
+
+export const EXPENSE_CATEGORIES = [
+  'Raw Materials', 'Fabric', 'Trims & Accessories', 'Printing', 'Embroidery',
+  'Labour', 'Salaries', 'Rent', 'Utilities', 'Transport',
+  'Packaging', 'Equipment', 'Maintenance', 'Marketing', 'Office Supplies', 'Other'
+];
+
+export const EXPENSE_PAYMENT_METHODS = ['Cash', 'Bank Transfer', 'Cheque'];

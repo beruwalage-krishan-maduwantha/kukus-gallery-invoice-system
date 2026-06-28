@@ -10,7 +10,8 @@ import {
   ArrowRightOnRectangleIcon,
   ReceiptRefundIcon,
   ChartBarIcon,
-  ClipboardDocumentListIcon
+  ClipboardDocumentListIcon,
+  BanknotesIcon
 } from '@heroicons/react/24/outline';
 
 const navItems = [
@@ -18,6 +19,7 @@ const navItems = [
   { to: '/quotations', icon: DocumentDuplicateIcon, label: 'Quotations', access: 'all' },
   { to: '/invoices', icon: DocumentTextIcon, label: 'Invoices', access: 'all' },
   { to: '/orders', icon: ClipboardDocumentListIcon, label: 'Orders', access: 'all' },
+  { to: '/expenses', icon: BanknotesIcon, label: 'Expenses', access: 'admin' },
   { to: '/credit-notes', icon: ReceiptRefundIcon, label: 'Credit Notes', access: 'admin' },
   { to: '/reports', icon: ChartBarIcon, label: 'Reports', access: 'admin' },
   { to: '/customers', icon: UserGroupIcon, label: 'Customers', access: 'all' },

@@ -2,6 +2,7 @@ const Invoice = require('../models/Invoice');
 const CreditNote = require('../models/CreditNote');
 const Quotation = require('../models/Quotation');
 const Order = require('../models/Order');
+const Expense = require('../models/Expense');
 
 exports.getStats = async (req, res) => {
   try {
@@ -75,12 +76,25 @@ exports.getStats = async (req, res) => {
       .limit(5)
       .select('orderNumber productName customerSnapshot invoiceNumber invoice status approved deliveryDate createdAt');
 
+    const expenseResult = await Expense.aggregate([
+      { $group: { _id: null, total: { $sum: '$amount' } } }
+    ]);
+    const totalExpenses = expenseResult[0]?.total || 0;
+    const profit = totalRevenue - totalExpenses;
+
+    const monthExpenses = await Expense.aggregate([
+      { $match: { date: { $gte: monthStart } } },
+      { $group: { _id: null, total: { $sum: '$amount' } } }
+    ]);
+    const thisMonthExpenses = monthExpenses[0]?.total || 0;
+
     res.json({
       totalInvoices, totalRevenue, outstanding,
       totalCredits, creditCount,
       totalQuotations, pendingQuotations,
       byStatus, weeklyRevenue, recentInvoices,
-      totalOrders, pendingOrders, orderStatusMap, recentOrders
+      totalOrders, pendingOrders, orderStatusMap, recentOrders,
+      totalExpenses, profit, thisMonthExpenses
     });
   } catch (error) {
     console.error('Dashboard error:', error);

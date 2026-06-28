@@ -31,6 +31,7 @@ export default function ReportsPage() {
     { key: 'summary', label: 'Summary' },
     { key: 'invoices', label: 'Invoices' },
     { key: 'orders', label: 'Orders' },
+    { key: 'expenses', label: 'Expenses' },
     { key: 'quotations', label: 'Quotations' },
     { key: 'sales', label: 'Sales Conversion' }
   ];
@@ -85,6 +86,16 @@ export default function ReportsPage() {
                   <td style={{ fontWeight: 600, color: '#6366F1' }}>Total Orders</td>
                   <td style={{ textAlign: 'right' }}>{data?.totalOrders || 0}</td>
                   <td style={{ textAlign: 'right', fontWeight: 600, color: '#6366F1' }}>{data?.approvedOrders || 0} approved</td>
+                </tr>
+                <tr>
+                  <td style={{ fontWeight: 600, color: 'var(--danger)' }}>Total Expenses</td>
+                  <td style={{ textAlign: 'right' }}>{data?.expenses?.length || 0}</td>
+                  <td style={{ textAlign: 'right', fontWeight: 600, color: 'var(--danger)' }}>{formatCurrency(data?.totalExpenses || 0)}</td>
+                </tr>
+                <tr style={{ background: (data?.profit || 0) >= 0 ? 'rgba(34,197,94,0.05)' : 'rgba(239,68,68,0.05)' }}>
+                  <td style={{ fontWeight: 700, fontSize: '1rem', color: (data?.profit || 0) >= 0 ? 'var(--success)' : 'var(--danger)' }}>Profit</td>
+                  <td style={{ textAlign: 'right' }}>Income - Expenses</td>
+                  <td style={{ textAlign: 'right', fontWeight: 700, fontSize: '1.1rem', color: (data?.profit || 0) >= 0 ? 'var(--success)' : 'var(--danger)' }}>{formatCurrency(data?.profit || 0)}</td>
                 </tr>
               </tbody>
             </table>
@@ -259,6 +270,88 @@ export default function ReportsPage() {
                         <span style={{ fontSize: '0.72rem', color: '#F59E0B', fontWeight: 600 }}>Pending</span>
                       )}
                     </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* ===== EXPENSES TAB ===== */}
+      {activeTab === 'expenses' && (
+        <div>
+          <Row className="g-3 mb-4">
+            <Col xs={6} md={4}>
+              <div className="card-custom" style={{ textAlign: 'center', padding: '1rem' }}>
+                <div style={{ fontSize: '0.65rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--danger)' }}>Total Expenses</div>
+                <div style={{ fontFamily: 'var(--font-heading)', fontSize: '1.4rem', fontWeight: 700, color: 'var(--danger)' }}>{formatCurrency(data?.totalExpenses || 0)}</div>
+              </div>
+            </Col>
+            <Col xs={6} md={4}>
+              <div className="card-custom" style={{ textAlign: 'center', padding: '1rem' }}>
+                <div style={{ fontSize: '0.65rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--success)' }}>Income (Paid)</div>
+                <div style={{ fontFamily: 'var(--font-heading)', fontSize: '1.4rem', fontWeight: 700, color: 'var(--success)' }}>{formatCurrency(data?.totalSell || 0)}</div>
+              </div>
+            </Col>
+            <Col xs={12} md={4}>
+              <div className="card-custom" style={{ textAlign: 'center', padding: '1rem', background: (data?.profit || 0) >= 0 ? 'rgba(34,197,94,0.05)' : 'rgba(239,68,68,0.05)' }}>
+                <div style={{ fontSize: '0.65rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: (data?.profit || 0) >= 0 ? 'var(--success)' : 'var(--danger)' }}>Profit</div>
+                <div style={{ fontFamily: 'var(--font-heading)', fontSize: '1.4rem', fontWeight: 700, color: (data?.profit || 0) >= 0 ? 'var(--success)' : 'var(--danger)' }}>{formatCurrency(data?.profit || 0)}</div>
+              </div>
+            </Col>
+          </Row>
+
+          {data?.expensesByCategory?.length > 0 && (
+            <>
+              <h5 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.1rem', fontWeight: 600, color: 'var(--primary-dark)', marginBottom: '0.75rem' }}>By Category</h5>
+              <div className="table-custom mb-4">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Category</th>
+                      <th style={{ textAlign: 'center' }}>Count</th>
+                      <th style={{ textAlign: 'right' }}>Amount</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {data.expensesByCategory.map(cat => (
+                      <tr key={cat._id}>
+                        <td>
+                          <span className="status-badge" style={{ background: 'rgba(245,158,11,0.1)', color: '#D97706' }}>{cat._id}</span>
+                        </td>
+                        <td style={{ textAlign: 'center', fontWeight: 600 }}>{cat.count}</td>
+                        <td style={{ textAlign: 'right', fontWeight: 600, color: 'var(--danger)' }}>{formatCurrency(cat.total)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
+          )}
+
+          <h5 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.1rem', fontWeight: 600, color: 'var(--primary-dark)', marginBottom: '0.75rem' }}>All Expenses</h5>
+          <div className="table-custom">
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Title</th>
+                  <th>Category</th>
+                  <th style={{ textAlign: 'right' }}>Amount</th>
+                  <th>Payment</th>
+                </tr>
+              </thead>
+              <tbody>
+                {(!data?.expenses || data.expenses.length === 0) ? (
+                  <tr><td colSpan={5} style={{ textAlign: 'center', padding: '2rem', color: '#999' }}>No expenses</td></tr>
+                ) : data.expenses.map(exp => (
+                  <tr key={exp._id}>
+                    <td>{formatDate(exp.date)}</td>
+                    <td style={{ fontWeight: 600, color: 'var(--primary-dark)' }}>{exp.title}</td>
+                    <td><span className="status-badge" style={{ background: 'rgba(245,158,11,0.1)', color: '#D97706' }}>{exp.category}</span></td>
+                    <td style={{ textAlign: 'right', fontWeight: 600, color: 'var(--danger)' }}>{formatCurrency(exp.amount)}</td>
+                    <td style={{ fontSize: '0.82rem', color: '#666' }}>{exp.paymentMethod}</td>
                   </tr>
                 ))}
               </tbody>

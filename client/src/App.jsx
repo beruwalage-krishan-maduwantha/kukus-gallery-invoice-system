@@ -15,6 +15,7 @@ const QuotationListPage = lazy(() => import('./pages/QuotationListPage'));
 const QuotationCreatePage = lazy(() => import('./pages/QuotationCreatePage'));
 const QuotationViewPage = lazy(() => import('./pages/QuotationViewPage'));
 const OrdersPage = lazy(() => import('./pages/OrdersPage'));
+const ExpensesPage = lazy(() => import('./pages/ExpensesPage'));
 const CreditNotesPage = lazy(() => import('./pages/CreditNotesPage'));
 const ReportsPage = lazy(() => import('./pages/ReportsPage'));
 const CustomerListPage = lazy(() => import('./pages/CustomerListPage'));
@@ -58,6 +59,7 @@ export default function App() {
               <Route path="/quotations/:id" element={<LazyPage Component={QuotationViewPage} />} />
               <Route path="/quotations/:id/edit" element={<LazyPage Component={QuotationCreatePage} />} />
               <Route path="/orders" element={<LazyPage Component={OrdersPage} />} />
+              <Route path="/expenses" element={<LazyPage Component={ExpensesPage} />} />
               <Route path="/credit-notes" element={<LazyPage Component={CreditNotesPage} />} />
               <Route path="/reports" element={<LazyPage Component={ReportsPage} />} />
               <Route path="/customers" element={<LazyPage Component={CustomerListPage} />} />

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Row, Col } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-import { DocumentTextIcon, CurrencyDollarIcon, ClockIcon, ReceiptRefundIcon, ClipboardDocumentListIcon } from '@heroicons/react/24/outline';
+import { DocumentTextIcon, CurrencyDollarIcon, ClockIcon, ReceiptRefundIcon, ClipboardDocumentListIcon, BanknotesIcon } from '@heroicons/react/24/outline';
 import { getDashboardStats } from '../api/dashboard';
 import StatCard from '../components/common/StatCard';
 import RevenueChart from '../components/dashboard/RevenueChart';
@@ -28,24 +28,37 @@ export default function DashboardPage() {
   return (
     <div>
       <Row className="g-3 mb-4">
-        <Col xs={6} lg>
-          <StatCard icon={DocumentTextIcon} label="Total Invoices" value={stats?.totalInvoices || 0} color="var(--primary)" />
-        </Col>
-        <Col xs={6} lg>
+        <Col xs={6} lg={3}>
           <StatCard icon={CurrencyDollarIcon} label="Revenue" value={formatCurrency(stats?.totalRevenue || 0)} color="var(--success)" />
         </Col>
-        <Col xs={6} lg>
+        <Col xs={6} lg={3}>
+          <Link to="/expenses" style={{ textDecoration: 'none' }}>
+            <StatCard icon={BanknotesIcon} label="Expenses" value={formatCurrency(stats?.totalExpenses || 0)} color="var(--danger)" />
+          </Link>
+        </Col>
+        <Col xs={6} lg={3}>
+          <StatCard icon={CurrencyDollarIcon} label="Profit" value={formatCurrency(stats?.profit || 0)} color={(stats?.profit || 0) >= 0 ? 'var(--success)' : 'var(--danger)'} />
+        </Col>
+        <Col xs={6} lg={3}>
           <StatCard icon={ClockIcon} label="Outstanding" value={formatCurrency(stats?.outstanding || 0)} color="var(--warning)" />
         </Col>
-        <Col xs={6} lg>
+      </Row>
+      <Row className="g-3 mb-4">
+        <Col xs={6} lg={3}>
+          <StatCard icon={DocumentTextIcon} label="Total Invoices" value={stats?.totalInvoices || 0} color="var(--primary)" />
+        </Col>
+        <Col xs={6} lg={3}>
           <Link to="/orders" style={{ textDecoration: 'none' }}>
             <StatCard icon={ClipboardDocumentListIcon} label="Orders" value={`${stats?.totalOrders || 0} (${stats?.pendingOrders || 0} pending)`} color="#6366F1" />
           </Link>
         </Col>
-        <Col xs={6} lg>
+        <Col xs={6} lg={3}>
           <Link to="/credit-notes" style={{ textDecoration: 'none' }}>
-            <StatCard icon={ReceiptRefundIcon} label="Credit Notes" value={`${stats?.creditCount || 0} (${formatCurrency(stats?.totalCredits || 0)})`} color="var(--info)" />
+            <StatCard icon={ReceiptRefundIcon} label="Credit Notes" value={`${stats?.creditCount || 0}`} color="var(--info)" />
           </Link>
+        </Col>
+        <Col xs={6} lg={3}>
+          <StatCard icon={BanknotesIcon} label="This Month Expenses" value={formatCurrency(stats?.thisMonthExpenses || 0)} color="#D97706" />
         </Col>
       </Row>
 

@@ -8,6 +8,7 @@ const CreditNote = require('../models/CreditNote');
 const Settings = require('../models/Settings');
 const Counter = require('../models/Counter');
 const Order = require('../models/Order');
+const Expense = require('../models/Expense');
 
 exports.exportBackup = async (req, res) => {
   try {
@@ -17,6 +18,7 @@ exports.exportBackup = async (req, res) => {
     const quotations = await Quotation.find().lean();
     const creditNotes = await CreditNote.find().lean();
     const orders = await Order.find().lean();
+    const expenses = await Expense.find().lean();
     const settings = await Settings.findOne().lean();
     const counters = await Counter.find().lean();
 
@@ -30,9 +32,10 @@ exports.exportBackup = async (req, res) => {
         invoices: invoices.length,
         quotations: quotations.length,
         creditNotes: creditNotes.length,
-        orders: orders.length
+        orders: orders.length,
+        expenses: expenses.length
       },
-      data: { customers, products, invoices, quotations, creditNotes, orders, settings, counters }
+      data: { customers, products, invoices, quotations, creditNotes, orders, expenses, settings, counters }
     };
 
     if (process.env.VERCEL !== '1') {
@@ -63,7 +66,7 @@ exports.importBackup = async (req, res) => {
     const { data } = req.body;
     if (!data) return res.status(400).json({ message: 'No backup data provided' });
 
-    const results = { customers: 0, products: 0, invoices: 0, quotations: 0, creditNotes: 0, orders: 0 };
+    const results = { customers: 0, products: 0, invoices: 0, quotations: 0, creditNotes: 0, orders: 0, expenses: 0 };
 
     const restoreCollection = async (Model, docs, key) => {
       if (!docs?.length) return;
@@ -82,6 +85,7 @@ exports.importBackup = async (req, res) => {
     await restoreCollection(Quotation, data.quotations, 'quotations');
     await restoreCollection(CreditNote, data.creditNotes, 'creditNotes');
     await restoreCollection(Order, data.orders, 'orders');
+    await restoreCollection(Expense, data.expenses, 'expenses');
 
     if (data.counters?.length) {
       for (const doc of data.counters) {
@@ -110,7 +114,8 @@ exports.getDbStats = async (req, res) => {
       invoices: await Invoice.countDocuments(),
       quotations: await Quotation.countDocuments(),
       creditNotes: await CreditNote.countDocuments(),
-      orders: await Order.countDocuments()
+      orders: await Order.countDocuments(),
+      expenses: await Expense.countDocuments()
     };
     stats.totalDocuments = Object.values(stats).reduce((a, b) => a + b, 0);
 

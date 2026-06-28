@@ -1,6 +1,7 @@
 const Invoice = require('../models/Invoice');
 const Quotation = require('../models/Quotation');
 const Order = require('../models/Order');
+const Expense = require('../models/Expense');
 
 exports.getReport = async (req, res) => {
   try {
@@ -76,6 +77,21 @@ exports.getReport = async (req, res) => {
       .select('orderNumber productName category orderType customerSnapshot invoiceNumber invoice invoiceDate deliveryDate status approved approvedAt approvedBy quantity unitPrice')
       .sort('-createdAt');
 
+    const totalExpensesResult = await Expense.aggregate([
+      { $group: { _id: null, total: { $sum: '$amount' } } }
+    ]);
+    const totalExpenses = totalExpensesResult[0]?.total || 0;
+
+    const expensesByCategory = await Expense.aggregate([
+      { $group: { _id: '$category', total: { $sum: '$amount' }, count: { $sum: 1 } } },
+      { $sort: { total: -1 } }
+    ]);
+
+    const allExpenses = await Expense.find()
+      .populate('createdBy', 'name')
+      .select('title category amount date paymentMethod reference')
+      .sort('-date');
+
     res.json({
       totalQuotations,
       totalQuotationValue,
@@ -94,7 +110,11 @@ exports.getReport = async (req, res) => {
       totalOrders,
       ordersByStatus: orderStatusMap,
       approvedOrders,
-      orders: allOrders
+      orders: allOrders,
+      totalExpenses,
+      expensesByCategory,
+      expenses: allExpenses,
+      profit: totalSell - totalExpenses
     });
   } catch (error) {
     console.error('Report error:', error);
