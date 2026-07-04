@@ -72,7 +72,10 @@ export default function CustomerSelect({ value, onChange, onAddNew }) {
         />
       )}
       {showDropdown && (
-        <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 50, background: '#fff', border: '1px solid rgba(177,145,198,0.2)', borderRadius: '0 0 8px 8px', boxShadow: '0 8px 20px rgba(0,0,0,0.1)', maxHeight: 220, overflowY: 'auto' }}>
+        <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 50, background: '#fff', border: '1px solid rgba(177,145,198,0.2)', borderRadius: '0 0 8px 8px', boxShadow: '0 8px 20px rgba(0,0,0,0.1)', maxHeight: 260, overflowY: 'auto' }}>
+          <div onClick={onAddNew} style={{ position: 'sticky', top: 0, padding: '0.6rem 1rem', cursor: 'pointer', color: 'var(--primary)', fontWeight: 600, fontSize: '0.82rem', borderBottom: '1px solid #eee', background: '#fff' }}>
+            + Add New Customer
+          </div>
           {options.map(c => (
             <div key={c._id} onClick={() => handleSelect(c)} style={{ padding: '0.6rem 1rem', cursor: 'pointer', borderBottom: '1px solid #f0f0f0', fontSize: '0.85rem', transition: 'background 0.15s' }} onMouseEnter={e => e.target.style.background = 'var(--tint)'} onMouseLeave={e => e.target.style.background = '#fff'}>
               <strong>{c.name}</strong>{c.company && <span style={{ color: '#999' }}> — {c.company}</span>}
@@ -80,9 +83,6 @@ export default function CustomerSelect({ value, onChange, onAddNew }) {
             </div>
           ))}
           {options.length === 0 && <div style={{ padding: '0.8rem 1rem', color: '#999', fontSize: '0.85rem' }}>No customers found</div>}
-          <div onClick={onAddNew} style={{ padding: '0.6rem 1rem', cursor: 'pointer', color: 'var(--primary)', fontWeight: 600, fontSize: '0.82rem', borderTop: '1px solid #eee' }}>
-            + Add New Customer
-          </div>
         </div>
       )}
     </div>
