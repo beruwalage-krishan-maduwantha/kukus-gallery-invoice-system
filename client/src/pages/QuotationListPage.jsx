@@ -139,7 +139,6 @@ export default function QuotationListPage() {
                         <>
                           <button className="btn-sm-custom" style={btnStyle('rgba(177,145,198,0.1)', 'var(--primary)')} onClick={() => navigate(`/quotations/${q._id}/edit`)}>Edit</button>
                           <button className="btn-sm-custom" style={btnStyle('rgba(59,130,246,0.1)', 'var(--info)')} onClick={() => handleStatusChange(q._id, 'Sent')}>Send</button>
-                          <button className="btn-sm-custom" style={btnStyle('rgba(239,68,68,0.1)', 'var(--danger)')} onClick={() => setDeleteTarget(q)}>Del</button>
                         </>
                       )}
                       {q.status === 'Sent' && (
@@ -158,6 +157,7 @@ export default function QuotationListPage() {
                           View Invoice
                         </button>
                       )}
+                      <button className="btn-sm-custom" style={btnStyle('rgba(239,68,68,0.1)', 'var(--danger)')} onClick={() => setDeleteTarget(q)}>Del</button>
                     </div>
                   </td>
                 </tr>

@@ -319,11 +319,12 @@ exports.deleteInvoice = async (req, res) => {
   try {
     const invoice = await Invoice.findById(req.params.id);
     if (!invoice) return res.status(404).json({ message: 'Invoice not found' });
-    if (invoice.status !== 'Draft') return res.status(400).json({ message: 'Only draft invoices can be deleted' });
 
     await Customer.findByIdAndUpdate(invoice.customer, {
       $inc: { totalInvoices: -1, totalSpent: -invoice.grandTotal }
     });
+    await Order.deleteMany({ invoice: invoice._id });
+    await CreditNote.deleteMany({ invoice: invoice._id });
     await Invoice.findByIdAndDelete(req.params.id);
     res.json({ message: 'Invoice deleted' });
   } catch (error) {

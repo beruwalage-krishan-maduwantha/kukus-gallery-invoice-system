@@ -137,9 +137,7 @@ export default function InvoiceListPage() {
                       {inv.status !== 'Paid' && inv.status !== 'Cancelled' && (
                         <button className="btn-sm-custom" style={btnStyle('rgba(34,197,94,0.1)', 'var(--success)')} onClick={() => { setAdvanceTarget(inv); setAdvanceAmount(''); }}>Pay</button>
                       )}
-                      {inv.status === 'Draft' && (
-                        <button className="btn-sm-custom" style={btnStyle('rgba(239,68,68,0.1)', 'var(--danger)')} onClick={() => setDeleteTarget(inv)}>Del</button>
-                      )}
+                      <button className="btn-sm-custom" style={btnStyle('rgba(239,68,68,0.1)', 'var(--danger)')} onClick={() => setDeleteTarget(inv)}>Del</button>
                     </div>
                   </td>
                 </tr>

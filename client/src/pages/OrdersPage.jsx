@@ -2,13 +2,14 @@ import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Modal } from 'react-bootstrap';
 import toast from 'react-hot-toast';
-import { getOrders, updateOrderStatus, approveOrder } from '../api/orders';
+import { getOrders, updateOrderStatus, approveOrder, deleteOrder } from '../api/orders';
 import { generateOrderPdf, previewOrderPdf } from '../components/pdf/generateOrderPdf';
 import SearchInput from '../components/common/SearchInput';
 import DateRangeFilter from '../components/common/DateRangeFilter';
 import StatusBadge from '../components/common/StatusBadge';
 import EmptyState from '../components/common/EmptyState';
 import Pagination from '../components/common/Pagination';
+import ConfirmModal from '../components/common/ConfirmModal';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import { formatDate } from '../utils/formatDate';
 import { ORDER_STATUS_OPTIONS } from '../utils/constants';
@@ -27,6 +28,7 @@ export default function OrdersPage() {
   const [loading, setLoading] = useState(true);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [previewOrder, setPreviewOrder] = useState(null);
+  const [deleteTarget, setDeleteTarget] = useState(null);
 
   const fetchOrders = useCallback(async () => {
     setLoading(true);
@@ -79,6 +81,15 @@ export default function OrdersPage() {
     try {
       await generateOrderPdf(order);
     } catch { toast.error('Failed to generate PDF'); }
+  };
+
+  const handleDelete = async () => {
+    try {
+      await deleteOrder(deleteTarget._id);
+      toast.success('Order deleted');
+      setDeleteTarget(null);
+      fetchOrders();
+    } catch (err) { toast.error(err.response?.data?.message || 'Delete failed'); }
   };
 
   const closePreview = () => {
@@ -199,6 +210,9 @@ export default function OrdersPage() {
                       <button style={btnStyle('rgba(59,130,246,0.1)', 'var(--info)')} onClick={e => handleDownload(e, order)} title="Download PDF">
                         <ArrowDownTrayIcon style={{ width: 15, height: 15 }} />
                       </button>
+                      <button style={btnStyle('rgba(239,68,68,0.1)', 'var(--danger)')} onClick={e => { e.stopPropagation(); setDeleteTarget(order); }} title="Delete Order">
+                        Del
+                      </button>
                     </div>
                   </td>
                 </tr>
@@ -231,6 +245,8 @@ export default function OrdersPage() {
           </button>
         </Modal.Footer>
       </Modal>
+
+      <ConfirmModal show={!!deleteTarget} onHide={() => setDeleteTarget(null)} onConfirm={handleDelete} title="Delete Order" message={`Delete order ${deleteTarget?.orderNumber}? This cannot be undone.`} confirmText="Delete" />
     </div>
   );
 }

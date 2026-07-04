@@ -288,7 +288,6 @@ exports.deleteQuotation = async (req, res) => {
   try {
     const quotation = await Quotation.findById(req.params.id);
     if (!quotation) return res.status(404).json({ message: 'Quotation not found' });
-    if (quotation.status !== 'Draft') return res.status(400).json({ message: 'Only draft quotations can be deleted' });
 
     await Quotation.findByIdAndDelete(req.params.id);
     res.json({ message: 'Quotation deleted' });
