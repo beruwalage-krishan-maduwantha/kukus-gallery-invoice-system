@@ -11,6 +11,7 @@ const expenseSchema = new mongoose.Schema({
   date: { type: Date, default: Date.now },
   description: { type: String },
   paymentMethod: { type: String, enum: ['Cash', 'Bank Transfer', 'Cheque'], default: 'Cash' },
+  chequeRealiseDate: { type: Date },
   reference: { type: String },
   createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
 }, { timestamps: true });

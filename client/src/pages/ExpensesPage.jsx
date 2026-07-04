@@ -12,7 +12,7 @@ import { formatCurrency } from '../utils/formatCurrency';
 import { formatDate, formatDateInput } from '../utils/formatDate';
 import { EXPENSE_CATEGORIES, EXPENSE_PAYMENT_METHODS } from '../utils/constants';
 
-const emptyForm = { title: '', category: '', amount: '', date: formatDateInput(new Date()), description: '', paymentMethod: 'Cash', reference: '' };
+const emptyForm = { title: '', category: '', amount: '', date: formatDateInput(new Date()), description: '', paymentMethod: 'Cash', chequeRealiseDate: '', reference: '' };
 
 export default function ExpensesPage() {
   const [expenses, setExpenses] = useState([]);
@@ -54,7 +54,9 @@ export default function ExpensesPage() {
     setForm({
       title: exp.title, category: exp.category, amount: exp.amount,
       date: formatDateInput(exp.date), description: exp.description || '',
-      paymentMethod: exp.paymentMethod || 'Cash', reference: exp.reference || ''
+      paymentMethod: exp.paymentMethod || 'Cash',
+      chequeRealiseDate: exp.chequeRealiseDate ? formatDateInput(exp.chequeRealiseDate) : '',
+      reference: exp.reference || ''
     });
     setShowForm(true);
   };
@@ -63,11 +65,16 @@ export default function ExpensesPage() {
     if (!form.title || !form.category || !form.amount) return toast.error('Fill required fields');
     setSaving(true);
     try {
+      const payload = {
+        ...form,
+        amount: Number(form.amount),
+        chequeRealiseDate: form.paymentMethod === 'Cheque' && form.chequeRealiseDate ? form.chequeRealiseDate : null
+      };
       if (editingId) {
-        await updateExpense(editingId, { ...form, amount: Number(form.amount) });
+        await updateExpense(editingId, payload);
         toast.success('Expense updated');
       } else {
-        await createExpense({ ...form, amount: Number(form.amount) });
+        await createExpense(payload);
         toast.success('Expense added');
       }
       setShowForm(false);
@@ -136,7 +143,12 @@ export default function ExpensesPage() {
                     </span>
                   </td>
                   <td style={{ textAlign: 'right', fontWeight: 600, color: 'var(--danger)' }}>{formatCurrency(exp.amount)}</td>
-                  <td style={{ fontSize: '0.82rem', color: '#666' }}>{exp.paymentMethod}</td>
+                  <td style={{ fontSize: '0.82rem', color: '#666' }}>
+                    {exp.paymentMethod}
+                    {exp.paymentMethod === 'Cheque' && exp.chequeRealiseDate && (
+                      <div style={{ fontSize: '0.72rem', color: '#999' }}>Realise: {formatDate(exp.chequeRealiseDate)}</div>
+                    )}
+                  </td>
                   <td style={{ fontSize: '0.82rem', color: '#999' }}>{exp.reference || '—'}</td>
                   <td>
                     <div className="d-flex gap-1">
@@ -195,6 +207,14 @@ export default function ExpensesPage() {
                 </Form.Select>
               </Form.Group>
             </Col>
+            {form.paymentMethod === 'Cheque' && (
+              <Col md={6}>
+                <Form.Group>
+                  <Form.Label className="form-label-custom">Cheque Realise Date</Form.Label>
+                  <Form.Control className="form-input" type="date" value={form.chequeRealiseDate} onChange={e => setForm({ ...form, chequeRealiseDate: e.target.value })} />
+                </Form.Group>
+              </Col>
+            )}
             <Col xs={12}>
               <Form.Group>
                 <Form.Label className="form-label-custom">Reference / Receipt #</Form.Label>
