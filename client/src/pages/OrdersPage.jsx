@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Modal } from 'react-bootstrap';
 import toast from 'react-hot-toast';
-import { getOrders, updateOrderStatus, approveOrder, deleteOrder } from '../api/orders';
+import { getOrders, updateOrderStatus, deleteOrder } from '../api/orders';
 import { generateOrderPdf, previewOrderPdf } from '../components/pdf/generateOrderPdf';
 import SearchInput from '../components/common/SearchInput';
 import DateRangeFilter from '../components/common/DateRangeFilter';
@@ -13,7 +13,7 @@ import ConfirmModal from '../components/common/ConfirmModal';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import { formatDate } from '../utils/formatDate';
 import { ORDER_STATUS_OPTIONS } from '../utils/constants';
-import { ClipboardDocumentListIcon, CheckCircleIcon, EyeIcon, ArrowDownTrayIcon } from '@heroicons/react/24/outline';
+import { ClipboardDocumentListIcon, EyeIcon, ArrowDownTrayIcon } from '@heroicons/react/24/outline';
 
 export default function OrdersPage() {
   const navigate = useNavigate();
@@ -54,15 +54,6 @@ export default function OrdersPage() {
         setPreviewUrl(url);
         setPreviewOrder(order);
       }
-      fetchOrders();
-    } catch (err) { toast.error(err.response?.data?.message || 'Failed'); }
-  };
-
-  const handleApprove = async (e, orderId) => {
-    e.stopPropagation();
-    try {
-      await approveOrder(orderId);
-      toast.success('Order approved');
       fetchOrders();
     } catch (err) { toast.error(err.response?.data?.message || 'Failed'); }
   };
@@ -141,7 +132,6 @@ export default function OrdersPage() {
                 <th>Invoice Date</th>
                 <th>Delivery Date</th>
                 <th>Status</th>
-                <th>Approval</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -159,7 +149,10 @@ export default function OrdersPage() {
                     </span>
                   </td>
                   <td style={{ fontWeight: 500 }}>{order.productName}</td>
-                  <td>{order.customerSnapshot?.title ? `${order.customerSnapshot.title}. ` : ''}{order.customerSnapshot?.name}</td>
+                  <td>
+                    {order.customerSnapshot?.title ? `${order.customerSnapshot.title}. ` : ''}{order.customerSnapshot?.name}
+                    {order.customerSnapshot?.phone && <span style={{ color: '#999', fontSize: '0.78rem', marginLeft: 6 }}>{order.customerSnapshot.phone}</span>}
+                  </td>
                   <td>
                     <span
                       style={{ fontWeight: 600, color: 'var(--primary-dark)', cursor: 'pointer', textDecoration: 'underline' }}
@@ -182,25 +175,6 @@ export default function OrdersPage() {
                     >
                       {ORDER_STATUS_OPTIONS.map(s => <option key={s} value={s}>{s}</option>)}
                     </select>
-                  </td>
-                  <td onClick={e => e.stopPropagation()}>
-                    {order.approved ? (
-                      <span style={{
-                        display: 'inline-flex', alignItems: 'center', gap: 4,
-                        fontSize: '0.75rem', fontWeight: 600, color: 'var(--success)',
-                        background: 'rgba(34,197,94,0.1)', padding: '0.3rem 0.6rem', borderRadius: 6
-                      }}>
-                        <CheckCircleIcon style={{ width: 14, height: 14 }} /> Approved
-                      </span>
-                    ) : (
-                      <button
-                        className="btn-primary-custom"
-                        style={{ fontSize: '0.72rem', padding: '0.3rem 0.7rem' }}
-                        onClick={e => handleApprove(e, order._id)}
-                      >
-                        Approve
-                      </button>
-                    )}
                   </td>
                   <td onClick={e => e.stopPropagation()}>
                     <div className="d-flex gap-1">
