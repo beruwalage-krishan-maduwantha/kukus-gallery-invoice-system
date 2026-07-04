@@ -8,6 +8,7 @@ import RevenueChart from '../components/dashboard/RevenueChart';
 import StatusPieChart from '../components/dashboard/StatusPieChart';
 import RecentInvoices from '../components/dashboard/RecentInvoices';
 import StatusBadge from '../components/common/StatusBadge';
+import DateRangeFilter from '../components/common/DateRangeFilter';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import { formatCurrency } from '../utils/formatCurrency';
 import { formatDate } from '../utils/formatDate';
@@ -15,18 +16,32 @@ import { formatDate } from '../utils/formatDate';
 export default function DashboardPage() {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [dateFrom, setDateFrom] = useState('');
+  const [dateTo, setDateTo] = useState('');
 
   useEffect(() => {
-    getDashboardStats()
+    setLoading(true);
+    getDashboardStats({ dateFrom: dateFrom || undefined, dateTo: dateTo || undefined })
       .then(res => setStats(res.data))
       .catch(console.error)
       .finally(() => setLoading(false));
-  }, []);
+  }, [dateFrom, dateTo]);
 
-  if (loading) return <LoadingSpinner />;
+  if (loading && !stats) return <LoadingSpinner />;
 
   return (
     <div>
+      <div className="action-bar" style={{ marginBottom: '1rem' }}>
+        <div className="action-bar-left">
+          <DateRangeFilter
+            from={dateFrom} to={dateTo}
+            onFromChange={setDateFrom}
+            onToChange={setDateTo}
+            onClear={() => { setDateFrom(''); setDateTo(''); }}
+          />
+        </div>
+      </div>
+
       <Row className="g-3 mb-4">
         <Col xs={6} lg={3}>
           <StatCard icon={CurrencyDollarIcon} label="Revenue" value={formatCurrency(stats?.totalRevenue || 0)} color="var(--success)" />

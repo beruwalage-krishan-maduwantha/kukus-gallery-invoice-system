@@ -1,3 +1,3 @@
 import api from './axios';
 
-export const getReport = () => api.get('/reports');
+export const getReport = (params) => api.get('/reports', { params });

@@ -5,6 +5,7 @@ import { PlusIcon, DocumentDuplicateIcon } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 import { getQuotations, deleteQuotation, updateQuotationStatus, convertQuotationToInvoice } from '../api/quotations';
 import SearchInput from '../components/common/SearchInput';
+import DateRangeFilter from '../components/common/DateRangeFilter';
 import StatusBadge from '../components/common/StatusBadge';
 import EmptyState from '../components/common/EmptyState';
 import Pagination from '../components/common/Pagination';
@@ -22,6 +23,8 @@ export default function QuotationListPage() {
   const [pages, setPages] = useState(1);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
+  const [dateFrom, setDateFrom] = useState('');
+  const [dateTo, setDateTo] = useState('');
   const [loading, setLoading] = useState(true);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [convertTarget, setConvertTarget] = useState(null);
@@ -31,13 +34,13 @@ export default function QuotationListPage() {
   const fetchQuotations = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await getQuotations({ search, status: statusFilter || undefined, page, limit: 20 });
+      const res = await getQuotations({ search, status: statusFilter || undefined, dateFrom: dateFrom || undefined, dateTo: dateTo || undefined, page, limit: 20 });
       setQuotations(res.data.quotations);
       setTotal(res.data.total);
       setPages(res.data.pages);
     } catch { toast.error('Failed to load quotations'); }
     finally { setLoading(false); }
-  }, [search, statusFilter, page]);
+  }, [search, statusFilter, dateFrom, dateTo, page]);
 
   useEffect(() => { fetchQuotations(); }, [fetchQuotations]);
 
@@ -84,6 +87,12 @@ export default function QuotationListPage() {
             <option value="">All Status</option>
             {QUOTATION_STATUS_OPTIONS.map(s => <option key={s} value={s}>{s}</option>)}
           </select>
+          <DateRangeFilter
+            from={dateFrom} to={dateTo}
+            onFromChange={v => { setDateFrom(v); setPage(1); }}
+            onToChange={v => { setDateTo(v); setPage(1); }}
+            onClear={() => { setDateFrom(''); setDateTo(''); setPage(1); }}
+          />
           <span style={{ fontSize: '0.82rem', color: 'var(--accent)' }}>{total} quotations</span>
         </div>
         <Link to="/quotations/new">

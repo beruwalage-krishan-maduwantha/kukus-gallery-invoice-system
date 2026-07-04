@@ -5,6 +5,7 @@ import toast from 'react-hot-toast';
 import { getOrders, updateOrderStatus, approveOrder } from '../api/orders';
 import { generateOrderPdf, previewOrderPdf } from '../components/pdf/generateOrderPdf';
 import SearchInput from '../components/common/SearchInput';
+import DateRangeFilter from '../components/common/DateRangeFilter';
 import StatusBadge from '../components/common/StatusBadge';
 import EmptyState from '../components/common/EmptyState';
 import Pagination from '../components/common/Pagination';
@@ -21,6 +22,8 @@ export default function OrdersPage() {
   const [pages, setPages] = useState(1);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
+  const [dateFrom, setDateFrom] = useState('');
+  const [dateTo, setDateTo] = useState('');
   const [loading, setLoading] = useState(true);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [previewOrder, setPreviewOrder] = useState(null);
@@ -28,13 +31,13 @@ export default function OrdersPage() {
   const fetchOrders = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await getOrders({ search, status: statusFilter || undefined, page, limit: 20 });
+      const res = await getOrders({ search, status: statusFilter || undefined, dateFrom: dateFrom || undefined, dateTo: dateTo || undefined, page, limit: 20 });
       setOrders(res.data.orders);
       setTotal(res.data.total);
       setPages(res.data.pages);
     } catch { toast.error('Failed to load orders'); }
     finally { setLoading(false); }
-  }, [search, statusFilter, page]);
+  }, [search, statusFilter, dateFrom, dateTo, page]);
 
   useEffect(() => { fetchOrders(); }, [fetchOrders]);
 
@@ -99,6 +102,12 @@ export default function OrdersPage() {
             <option value="">All Status</option>
             {ORDER_STATUS_OPTIONS.map(s => <option key={s} value={s}>{s}</option>)}
           </select>
+          <DateRangeFilter
+            from={dateFrom} to={dateTo}
+            onFromChange={v => { setDateFrom(v); setPage(1); }}
+            onToChange={v => { setDateTo(v); setPage(1); }}
+            onClear={() => { setDateFrom(''); setDateTo(''); setPage(1); }}
+          />
           <span style={{ fontSize: '0.82rem', color: 'var(--accent)' }}>{total} orders</span>
         </div>
       </div>

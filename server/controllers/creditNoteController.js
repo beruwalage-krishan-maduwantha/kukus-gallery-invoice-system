@@ -3,10 +3,15 @@ const Customer = require('../models/Customer');
 
 exports.getCreditNotes = async (req, res) => {
   try {
-    const { customer, status, page = 1, limit = 20 } = req.query;
+    const { customer, status, dateFrom, dateTo, page = 1, limit = 20 } = req.query;
     const query = {};
     if (customer) query.customer = customer;
     if (status) query.status = status;
+    if (dateFrom || dateTo) {
+      query.createdAt = {};
+      if (dateFrom) query.createdAt.$gte = new Date(dateFrom);
+      if (dateTo) query.createdAt.$lte = new Date(dateTo);
+    }
 
     const total = await CreditNote.countDocuments(query);
     const creditNotes = await CreditNote.find(query)
@@ -25,8 +30,16 @@ exports.getCreditNotes = async (req, res) => {
 
 exports.getCustomerCredits = async (req, res) => {
   try {
+    const { dateFrom, dateTo } = req.query;
+    const match = { status: 'Active' };
+    if (dateFrom || dateTo) {
+      match.createdAt = {};
+      if (dateFrom) match.createdAt.$gte = new Date(dateFrom);
+      if (dateTo) match.createdAt.$lte = new Date(dateTo);
+    }
+
     const credits = await CreditNote.aggregate([
-      { $match: { status: 'Active' } },
+      { $match: match },
       {
         $group: {
           _id: '$customer',

@@ -5,6 +5,7 @@ import { CheckCircleIcon } from '@heroicons/react/24/outline';
 import { getReport } from '../api/reports';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import StatusBadge from '../components/common/StatusBadge';
+import DateRangeFilter from '../components/common/DateRangeFilter';
 import { formatCurrency } from '../utils/formatCurrency';
 import { formatDate } from '../utils/formatDate';
 
@@ -13,15 +14,18 @@ export default function ReportsPage() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('summary');
+  const [dateFrom, setDateFrom] = useState('');
+  const [dateTo, setDateTo] = useState('');
 
   useEffect(() => {
-    getReport()
+    setLoading(true);
+    getReport({ dateFrom: dateFrom || undefined, dateTo: dateTo || undefined })
       .then(res => setData(res.data))
       .catch(console.error)
       .finally(() => setLoading(false));
-  }, []);
+  }, [dateFrom, dateTo]);
 
-  if (loading) return <LoadingSpinner />;
+  if (loading && !data) return <LoadingSpinner />;
 
   const qStatus = data?.quotationByStatus || {};
 
@@ -38,6 +42,17 @@ export default function ReportsPage() {
 
   return (
     <div>
+      <div className="action-bar" style={{ marginBottom: '1rem' }}>
+        <div className="action-bar-left">
+          <DateRangeFilter
+            from={dateFrom} to={dateTo}
+            onFromChange={setDateFrom}
+            onToChange={setDateTo}
+            onClear={() => { setDateFrom(''); setDateTo(''); }}
+          />
+        </div>
+      </div>
+
       <div className="service-tabs" style={{ marginBottom: '1.5rem' }}>
         {tabs.map(t => (
           <button key={t.key} className={`service-tab ${activeTab === t.key ? 'active' : ''}`} onClick={() => setActiveTab(t.key)}>{t.label}</button>

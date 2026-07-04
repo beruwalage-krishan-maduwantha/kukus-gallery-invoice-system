@@ -6,6 +6,7 @@ import toast from 'react-hot-toast';
 import { getInvoices, deleteInvoice, updateInvoiceStatus } from '../api/invoices';
 import api from '../api/axios';
 import SearchInput from '../components/common/SearchInput';
+import DateRangeFilter from '../components/common/DateRangeFilter';
 import StatusBadge from '../components/common/StatusBadge';
 import EmptyState from '../components/common/EmptyState';
 import Pagination from '../components/common/Pagination';
@@ -23,6 +24,8 @@ export default function InvoiceListPage() {
   const [pages, setPages] = useState(1);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
+  const [dateFrom, setDateFrom] = useState('');
+  const [dateTo, setDateTo] = useState('');
   const [loading, setLoading] = useState(true);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [advanceTarget, setAdvanceTarget] = useState(null);
@@ -31,13 +34,13 @@ export default function InvoiceListPage() {
   const fetchInvoices = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await getInvoices({ search, status: statusFilter || undefined, page, limit: 20 });
+      const res = await getInvoices({ search, status: statusFilter || undefined, dateFrom: dateFrom || undefined, dateTo: dateTo || undefined, page, limit: 20 });
       setInvoices(res.data.invoices);
       setTotal(res.data.total);
       setPages(res.data.pages);
     } catch { toast.error('Failed to load invoices'); }
     finally { setLoading(false); }
-  }, [search, statusFilter, page]);
+  }, [search, statusFilter, dateFrom, dateTo, page]);
 
   useEffect(() => { fetchInvoices(); }, [fetchInvoices]);
 
@@ -80,6 +83,12 @@ export default function InvoiceListPage() {
             <option value="">All Status</option>
             {STATUS_OPTIONS.map(s => <option key={s} value={s}>{s}</option>)}
           </select>
+          <DateRangeFilter
+            from={dateFrom} to={dateTo}
+            onFromChange={v => { setDateFrom(v); setPage(1); }}
+            onToChange={v => { setDateTo(v); setPage(1); }}
+            onClear={() => { setDateFrom(''); setDateTo(''); setPage(1); }}
+          />
           <span style={{ fontSize: '0.82rem', color: 'var(--accent)' }}>{total} invoices</span>
         </div>
         <Link to="/invoices/new">

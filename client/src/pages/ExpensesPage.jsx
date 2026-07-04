@@ -4,6 +4,7 @@ import { PlusIcon, BanknotesIcon, TrashIcon } from '@heroicons/react/24/outline'
 import toast from 'react-hot-toast';
 import { getExpenses, createExpense, updateExpense, deleteExpense } from '../api/expenses';
 import SearchInput from '../components/common/SearchInput';
+import DateRangeFilter from '../components/common/DateRangeFilter';
 import EmptyState from '../components/common/EmptyState';
 import Pagination from '../components/common/Pagination';
 import ConfirmModal from '../components/common/ConfirmModal';
@@ -22,6 +23,8 @@ export default function ExpensesPage() {
   const [pages, setPages] = useState(1);
   const [search, setSearch] = useState('');
   const [catFilter, setCatFilter] = useState('');
+  const [dateFrom, setDateFrom] = useState('');
+  const [dateTo, setDateTo] = useState('');
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
@@ -32,14 +35,14 @@ export default function ExpensesPage() {
   const fetchExpenses = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await getExpenses({ search, category: catFilter || undefined, page, limit: 20 });
+      const res = await getExpenses({ search, category: catFilter || undefined, dateFrom: dateFrom || undefined, dateTo: dateTo || undefined, page, limit: 20 });
       setExpenses(res.data.expenses);
       setTotal(res.data.total);
       setTotalAmount(res.data.totalAmount);
       setPages(res.data.pages);
     } catch { toast.error('Failed to load expenses'); }
     finally { setLoading(false); }
-  }, [search, catFilter, page]);
+  }, [search, catFilter, dateFrom, dateTo, page]);
 
   useEffect(() => { fetchExpenses(); }, [fetchExpenses]);
 
@@ -103,6 +106,12 @@ export default function ExpensesPage() {
             <option value="">All Categories</option>
             {EXPENSE_CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
           </select>
+          <DateRangeFilter
+            from={dateFrom} to={dateTo}
+            onFromChange={v => { setDateFrom(v); setPage(1); }}
+            onToChange={v => { setDateTo(v); setPage(1); }}
+            onClear={() => { setDateFrom(''); setDateTo(''); setPage(1); }}
+          />
           <span style={{ fontSize: '0.82rem', color: 'var(--accent)' }}>{total} expenses</span>
           <span style={{ fontSize: '0.82rem', fontWeight: 600, color: 'var(--danger)' }}>{formatCurrency(totalAmount)}</span>
         </div>

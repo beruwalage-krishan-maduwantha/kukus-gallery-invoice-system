@@ -18,10 +18,15 @@ async function generateQuotationNumber(prefix = 'QT') {
 
 exports.getQuotations = async (req, res) => {
   try {
-    const { search, status, customer, page = 1, limit = 20, sort = '-createdAt' } = req.query;
+    const { search, status, customer, dateFrom, dateTo, page = 1, limit = 20, sort = '-createdAt' } = req.query;
     const query = {};
     if (status) query.status = status;
     if (customer) query.customer = customer;
+    if (dateFrom || dateTo) {
+      query.quotationDate = {};
+      if (dateFrom) query.quotationDate.$gte = new Date(dateFrom);
+      if (dateTo) query.quotationDate.$lte = new Date(dateTo);
+    }
     if (search) {
       query.$or = [
         { quotationNumber: { $regex: search, $options: 'i' } },

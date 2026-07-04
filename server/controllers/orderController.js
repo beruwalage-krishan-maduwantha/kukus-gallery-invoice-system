@@ -2,9 +2,14 @@ const Order = require('../models/Order');
 
 exports.getOrders = async (req, res) => {
   try {
-    const { search, status, page = 1, limit = 20 } = req.query;
+    const { search, status, dateFrom, dateTo, page = 1, limit = 20 } = req.query;
     const query = {};
     if (status) query.status = status;
+    if (dateFrom || dateTo) {
+      query.invoiceDate = {};
+      if (dateFrom) query.invoiceDate.$gte = new Date(dateFrom);
+      if (dateTo) query.invoiceDate.$lte = new Date(dateTo);
+    }
     if (search) {
       query.$or = [
         { orderNumber: { $regex: search, $options: 'i' } },

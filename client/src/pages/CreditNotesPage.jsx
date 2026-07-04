@@ -4,6 +4,7 @@ import { ReceiptRefundIcon } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 import { getCustomerCredits, getCreditNotes, deleteCreditNote } from '../api/creditNotes';
 import ConfirmModal from '../components/common/ConfirmModal';
+import DateRangeFilter from '../components/common/DateRangeFilter';
 import EmptyState from '../components/common/EmptyState';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import { formatCurrency } from '../utils/formatCurrency';
@@ -18,16 +19,18 @@ export default function CreditNotesPage() {
   const [customerNotes, setCustomerNotes] = useState([]);
   const [loadingNotes, setLoadingNotes] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState(null);
+  const [dateFrom, setDateFrom] = useState('');
+  const [dateTo, setDateTo] = useState('');
 
   const fetchCredits = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await getCustomerCredits();
+      const res = await getCustomerCredits({ dateFrom: dateFrom || undefined, dateTo: dateTo || undefined });
       setCustomerCredits(res.data.customerCredits);
       setTotalActiveAmount(res.data.totalActiveAmount);
     } catch { toast.error('Failed to load credit notes'); }
     finally { setLoading(false); }
-  }, []);
+  }, [dateFrom, dateTo]);
 
   useEffect(() => { fetchCredits(); }, [fetchCredits]);
 
@@ -64,6 +67,12 @@ export default function CreditNotesPage() {
             <span style={{ fontFamily: 'var(--font-heading)', fontSize: '1.2rem', fontWeight: 700, color: 'var(--primary-dark)' }}>{formatCurrency(totalActiveAmount)}</span>
             <span style={{ fontSize: '0.78rem', color: 'var(--accent)', marginLeft: '0.5rem' }}>({customerCredits.length} customers)</span>
           </div>
+          <DateRangeFilter
+            from={dateFrom} to={dateTo}
+            onFromChange={setDateFrom}
+            onToChange={setDateTo}
+            onClear={() => { setDateFrom(''); setDateTo(''); }}
+          />
         </div>
         <div style={{ fontSize: '0.78rem', color: 'var(--accent)' }}>
           Credit notes are created automatically when an invoice uses "Credits" payment type.
