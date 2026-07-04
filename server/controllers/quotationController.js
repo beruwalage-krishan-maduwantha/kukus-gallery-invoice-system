@@ -6,6 +6,7 @@ const Settings = require('../models/Settings');
 const Counter = require('../models/Counter');
 const Order = require('../models/Order');
 const generateInvoiceNumber = require('../utils/generateInvoiceNumber');
+const buildOrdersFromItems = require('../utils/buildOrdersFromItems');
 
 async function generateQuotationNumber(prefix = 'QT') {
   const counter = await Counter.findOneAndUpdate(
@@ -248,27 +249,19 @@ exports.convertToInvoice = async (req, res) => {
       $inc: { totalInvoices: 1, totalSpent: quotation.grandTotal }
     });
 
-    const ordersToCreate = processedItems
-      .filter(item => item.orderNumber)
-      .map(item => ({
-        orderNumber: item.orderNumber,
-        invoice: invoice._id,
-        invoiceNumber,
-        customer: quotation.customer._id,
-        customerSnapshot: {
-          title: customerDoc.title || '',
-          name: customerDoc.name,
-          phone: customerDoc.phone
-        },
-        productName: item.name,
-        category: item.category,
-        orderType: item.orderType,
-        quantity: item.quantity,
-        unitPrice: item.unitPrice,
-        invoiceDate: invoice.invoiceDate,
-        deliveryDate: invoice.deliveryDate,
-        status: 'Pending'
-      }));
+    const ordersToCreate = buildOrdersFromItems({
+      items: processedItems,
+      invoiceId: invoice._id,
+      invoiceNumber,
+      customerId: quotation.customer._id,
+      customerSnapshot: {
+        title: customerDoc.title || '',
+        name: customerDoc.name,
+        phone: customerDoc.phone
+      },
+      invoiceDate: invoice.invoiceDate,
+      deliveryDate: invoice.deliveryDate
+    });
     if (ordersToCreate.length > 0) {
       await Order.insertMany(ordersToCreate);
     }

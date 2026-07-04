@@ -5,6 +5,7 @@ const CreditNote = require('../models/CreditNote');
 const Settings = require('../models/Settings');
 const Order = require('../models/Order');
 const generateInvoiceNumber = require('../utils/generateInvoiceNumber');
+const buildOrdersFromItems = require('../utils/buildOrdersFromItems');
 
 exports.getInvoices = async (req, res) => {
   try {
@@ -157,27 +158,19 @@ exports.createInvoice = async (req, res) => {
       });
     }
 
-    const ordersToCreate = processedItems
-      .filter(item => item.orderNumber)
-      .map(item => ({
-        orderNumber: item.orderNumber,
-        invoice: invoice._id,
-        invoiceNumber,
-        customer: customerId,
-        customerSnapshot: {
-          title: customerDoc.title || '',
-          name: customerDoc.name,
-          phone: customerDoc.phone
-        },
-        productName: item.name,
-        category: item.category,
-        orderType: item.orderType,
-        quantity: item.quantity,
-        unitPrice: item.unitPrice,
-        invoiceDate: invoiceDate || new Date(),
-        deliveryDate: deliveryDate || undefined,
-        status: 'Pending'
-      }));
+    const ordersToCreate = buildOrdersFromItems({
+      items: processedItems,
+      invoiceId: invoice._id,
+      invoiceNumber,
+      customerId,
+      customerSnapshot: {
+        title: customerDoc.title || '',
+        name: customerDoc.name,
+        phone: customerDoc.phone
+      },
+      invoiceDate,
+      deliveryDate
+    });
     if (ordersToCreate.length > 0) {
       await Order.insertMany(ordersToCreate);
     }
