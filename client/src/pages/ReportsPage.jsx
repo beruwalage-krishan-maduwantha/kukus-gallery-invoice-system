@@ -115,28 +115,6 @@ export default function ReportsPage() {
               </tbody>
             </table>
           </div>
-
-          <h5 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.1rem', fontWeight: 600, color: 'var(--primary-dark)', marginBottom: '0.75rem' }}>Quotation Status</h5>
-          <div className="table-custom">
-            <table>
-              <thead>
-                <tr>
-                  <th>Status</th>
-                  <th style={{ textAlign: 'center' }}>Count</th>
-                  <th style={{ textAlign: 'right' }}>Value</th>
-                </tr>
-              </thead>
-              <tbody>
-                {['Draft', 'Sent', 'Accepted', 'Rejected', 'Expired', 'Converted'].map(status => (
-                  <tr key={status}>
-                    <td><StatusBadge status={status} /></td>
-                    <td style={{ textAlign: 'center', fontWeight: 600 }}>{qStatus[status]?.count || 0}</td>
-                    <td style={{ textAlign: 'right' }}>{formatCurrency(qStatus[status]?.value || 0)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
         </div>
       )}
 
