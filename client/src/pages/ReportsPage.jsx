@@ -31,6 +31,9 @@ export default function ReportsPage() {
 
   const oStatus = data?.ordersByStatus || {};
 
+  const totalInvoiceValue = data?.totalInvoiceValue || 0;
+  const ratioOf = (value) => totalInvoiceValue > 0 ? `${((value / totalInvoiceValue) * 100).toFixed(1)}%` : '-';
+
   const tabs = [
     { key: 'summary', label: 'Summary' },
     { key: 'invoices', label: 'Invoices' },
@@ -69,6 +72,7 @@ export default function ReportsPage() {
                   <th>Metric</th>
                   <th style={{ textAlign: 'right' }}>Count</th>
                   <th style={{ textAlign: 'right' }}>Value</th>
+                  <th style={{ textAlign: 'right' }}>Ratio</th>
                 </tr>
               </thead>
               <tbody>
@@ -76,41 +80,55 @@ export default function ReportsPage() {
                   <td style={{ fontWeight: 600, color: 'var(--primary-dark)' }}>Total Invoices</td>
                   <td style={{ textAlign: 'right' }}>{data?.totalInvoices || 0}</td>
                   <td style={{ textAlign: 'right', fontWeight: 600 }}>{formatCurrency(data?.totalInvoiceValue || 0)}</td>
+                  <td style={{ textAlign: 'right', color: 'var(--accent)' }}>{ratioOf(data?.totalInvoiceValue || 0)}</td>
                 </tr>
                 <tr>
                   <td style={{ fontWeight: 600, color: 'var(--primary-dark)' }}>Total Quotations</td>
                   <td style={{ textAlign: 'right' }}>{data?.totalQuotations || 0}</td>
                   <td style={{ textAlign: 'right', fontWeight: 600 }}>{formatCurrency(data?.totalQuotationValue || 0)}</td>
+                  <td style={{ textAlign: 'right', color: 'var(--accent)' }}>{ratioOf(data?.totalQuotationValue || 0)}</td>
                 </tr>
                 <tr>
                   <td style={{ fontWeight: 600, color: 'var(--success)' }}>Total Income</td>
                   <td style={{ textAlign: 'right' }}>{data?.paidCount || '-'}</td>
                   <td style={{ textAlign: 'right', fontWeight: 600, color: 'var(--success)' }}>{formatCurrency(data?.totalSell || 0)}</td>
+                  <td style={{ textAlign: 'right', color: 'var(--accent)' }}>{ratioOf(data?.totalSell || 0)}</td>
                 </tr>
                 <tr>
                   <td style={{ fontWeight: 600, color: '#6366F1' }}>Converted Quotations</td>
                   <td style={{ textAlign: 'right' }}>{data?.convertedCount || 0}</td>
                   <td style={{ textAlign: 'right', fontWeight: 600, color: '#6366F1' }}>{formatCurrency(data?.totalConvertedValue || 0)}</td>
+                  <td style={{ textAlign: 'right', color: 'var(--accent)' }}>{ratioOf(data?.totalConvertedValue || 0)}</td>
                 </tr>
                 <tr>
                   <td style={{ fontWeight: 600, color: 'var(--info)' }}>Conversion Rate</td>
                   <td style={{ textAlign: 'right' }}>{data?.totalQuotations || 0} quotations</td>
                   <td style={{ textAlign: 'right', fontWeight: 700, fontSize: '1.1rem', color: 'var(--info)' }}>{data?.conversionRate || 0}%</td>
+                  <td style={{ textAlign: 'right', color: 'var(--accent)' }}>-</td>
                 </tr>
                 <tr>
                   <td style={{ fontWeight: 600, color: '#6366F1' }}>Total Orders</td>
                   <td style={{ textAlign: 'right' }}>{data?.totalOrders || 0}</td>
                   <td style={{ textAlign: 'right', fontWeight: 600, color: '#6366F1' }}>{data?.approvedOrders || 0} approved</td>
+                  <td style={{ textAlign: 'right', color: 'var(--accent)' }}>-</td>
                 </tr>
                 <tr>
                   <td style={{ fontWeight: 600, color: 'var(--danger)' }}>Total Expenses</td>
                   <td style={{ textAlign: 'right' }}>{data?.expenses?.length || 0}</td>
                   <td style={{ textAlign: 'right', fontWeight: 600, color: 'var(--danger)' }}>{formatCurrency(data?.totalExpenses || 0)}</td>
+                  <td style={{ textAlign: 'right', color: 'var(--accent)' }}>{ratioOf(data?.totalExpenses || 0)}</td>
                 </tr>
                 <tr style={{ background: (data?.profit || 0) >= 0 ? 'rgba(34,197,94,0.05)' : 'rgba(239,68,68,0.05)' }}>
                   <td style={{ fontWeight: 700, fontSize: '1rem', color: (data?.profit || 0) >= 0 ? 'var(--success)' : 'var(--danger)' }}>Profit</td>
                   <td style={{ textAlign: 'right' }}>Income - Expenses</td>
                   <td style={{ textAlign: 'right', fontWeight: 700, fontSize: '1.1rem', color: (data?.profit || 0) >= 0 ? 'var(--success)' : 'var(--danger)' }}>{formatCurrency(data?.profit || 0)}</td>
+                  <td style={{ textAlign: 'right', color: 'var(--accent)' }}>{ratioOf(data?.profit || 0)}</td>
+                </tr>
+                <tr>
+                  <td style={{ fontWeight: 600, color: 'var(--success)' }}>Total Finished Orders</td>
+                  <td style={{ textAlign: 'right' }}>{oStatus['Done'] || 0}</td>
+                  <td style={{ textAlign: 'right' }}>-</td>
+                  <td style={{ textAlign: 'right', color: 'var(--accent)' }}>{(data?.totalOrders || 0) > 0 ? `${(((oStatus['Done'] || 0) / data.totalOrders) * 100).toFixed(1)}%` : '-'}</td>
                 </tr>
               </tbody>
             </table>
