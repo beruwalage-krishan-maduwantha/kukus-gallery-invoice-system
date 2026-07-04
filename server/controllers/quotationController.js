@@ -4,6 +4,7 @@ const Invoice = require('../models/Invoice');
 const Customer = require('../models/Customer');
 const Settings = require('../models/Settings');
 const Counter = require('../models/Counter');
+const Order = require('../models/Order');
 const generateInvoiceNumber = require('../utils/generateInvoiceNumber');
 
 async function generateQuotationNumber(prefix = 'QT') {
@@ -196,6 +197,25 @@ exports.convertToInvoice = async (req, res) => {
 
     const customerDoc = await Customer.findById(quotation.customer._id);
 
+    const processedItems = [];
+    for (const item of quotation.items) {
+      let orderNumber = '';
+      if (item.orderType) {
+        const prefix = item.orderType === 'Sample' ? 'SM' : 'BLK';
+        const counter = await Counter.findOneAndUpdate(
+          { _id: `order_${prefix.toLowerCase()}` },
+          { $inc: { seq: 1 } },
+          { new: true, upsert: true }
+        );
+        orderNumber = `${prefix}${String(counter.seq).padStart(3, '0')}`;
+      }
+      processedItems.push({
+        product: item.product, name: item.name, description: item.description,
+        category: item.category, orderType: item.orderType, orderNumber, quantity: item.quantity,
+        unitPrice: item.unitPrice, discount: item.discount, lineTotal: item.lineTotal
+      });
+    }
+
     const invoice = await Invoice.create({
       invoiceNumber,
       customer: quotation.customer._id,
@@ -203,11 +223,7 @@ exports.convertToInvoice = async (req, res) => {
         name: customerDoc.name, email: customerDoc.email,
         phone: customerDoc.phone, address: customerDoc.address, company: customerDoc.company
       },
-      items: quotation.items.map(item => ({
-        product: item.product, name: item.name, description: item.description,
-        category: item.category, orderType: item.orderType, quantity: item.quantity,
-        unitPrice: item.unitPrice, discount: item.discount, lineTotal: item.lineTotal
-      })),
+      items: processedItems,
       subtotal: quotation.subtotal,
       discountType: quotation.discountType,
       discountValue: quotation.discountValue,
@@ -226,6 +242,31 @@ exports.convertToInvoice = async (req, res) => {
     await Customer.findByIdAndUpdate(quotation.customer._id, {
       $inc: { totalInvoices: 1, totalSpent: quotation.grandTotal }
     });
+
+    const ordersToCreate = processedItems
+      .filter(item => item.orderNumber)
+      .map(item => ({
+        orderNumber: item.orderNumber,
+        invoice: invoice._id,
+        invoiceNumber,
+        customer: quotation.customer._id,
+        customerSnapshot: {
+          title: customerDoc.title || '',
+          name: customerDoc.name,
+          phone: customerDoc.phone
+        },
+        productName: item.name,
+        category: item.category,
+        orderType: item.orderType,
+        quantity: item.quantity,
+        unitPrice: item.unitPrice,
+        invoiceDate: invoice.invoiceDate,
+        deliveryDate: invoice.deliveryDate,
+        status: 'Pending'
+      }));
+    if (ordersToCreate.length > 0) {
+      await Order.insertMany(ordersToCreate);
+    }
 
     quotation.status = 'Converted';
     quotation.convertedInvoice = invoice._id;

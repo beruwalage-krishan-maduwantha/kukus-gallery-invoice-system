@@ -194,8 +194,8 @@ export default function ReportsPage() {
       {activeTab === 'orders' && (
         <div>
           <Row className="g-3 mb-4">
-            {['Pending', 'Processing', 'Alternative', 'Delivered'].map(status => (
-              <Col xs={6} md={3} key={status}>
+            {['Pending', 'Processing', 'Alternative', 'Delivered', 'Done'].map(status => (
+              <Col xs={6} md={2} key={status}>
                 <div className="card-custom" style={{ textAlign: 'center', padding: '1rem' }}>
                   <StatusBadge status={status} />
                   <div style={{ fontFamily: 'var(--font-heading)', fontSize: '1.4rem', fontWeight: 700, color: 'var(--primary-dark)', marginTop: '0.3rem' }}>{oStatus[status] || 0}</div>
