@@ -83,7 +83,7 @@ export default function ReportsPage() {
                   <td style={{ textAlign: 'right', fontWeight: 600 }}>{formatCurrency(data?.totalQuotationValue || 0)}</td>
                 </tr>
                 <tr>
-                  <td style={{ fontWeight: 600, color: 'var(--success)' }}>Total Sell (Paid)</td>
+                  <td style={{ fontWeight: 600, color: 'var(--success)' }}>Total Income</td>
                   <td style={{ textAlign: 'right' }}>{data?.paidCount || '-'}</td>
                   <td style={{ textAlign: 'right', fontWeight: 600, color: 'var(--success)' }}>{formatCurrency(data?.totalSell || 0)}</td>
                 </tr>
