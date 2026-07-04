@@ -13,7 +13,7 @@ import { formatCurrency } from '../utils/formatCurrency';
 import { formatDate, formatDateInput } from '../utils/formatDate';
 import { EXPENSE_CATEGORIES, EXPENSE_PAYMENT_METHODS } from '../utils/constants';
 
-const emptyForm = { title: '', category: '', amount: '', date: formatDateInput(new Date()), description: '', paymentMethod: 'Cash', chequeRealiseDate: '', reference: '' };
+const emptyForm = { title: '', category: '', amount: '', date: formatDateInput(new Date()), description: '', paymentMethod: 'Cash', chequeReleaseDate: '', reference: '' };
 
 export default function ExpensesPage() {
   const [expenses, setExpenses] = useState([]);
@@ -58,7 +58,7 @@ export default function ExpensesPage() {
       title: exp.title, category: exp.category, amount: exp.amount,
       date: formatDateInput(exp.date), description: exp.description || '',
       paymentMethod: exp.paymentMethod || 'Cash',
-      chequeRealiseDate: exp.chequeRealiseDate ? formatDateInput(exp.chequeRealiseDate) : '',
+      chequeReleaseDate: exp.chequeReleaseDate ? formatDateInput(exp.chequeReleaseDate) : '',
       reference: exp.reference || ''
     });
     setShowForm(true);
@@ -71,7 +71,7 @@ export default function ExpensesPage() {
       const payload = {
         ...form,
         amount: Number(form.amount),
-        chequeRealiseDate: form.paymentMethod === 'Cheque' && form.chequeRealiseDate ? form.chequeRealiseDate : null
+        chequeReleaseDate: form.paymentMethod === 'Cheque' && form.chequeReleaseDate ? form.chequeReleaseDate : null
       };
       if (editingId) {
         await updateExpense(editingId, payload);
@@ -154,8 +154,8 @@ export default function ExpensesPage() {
                   <td style={{ textAlign: 'right', fontWeight: 600, color: 'var(--danger)' }}>{formatCurrency(exp.amount)}</td>
                   <td style={{ fontSize: '0.82rem', color: '#666' }}>
                     {exp.paymentMethod}
-                    {exp.paymentMethod === 'Cheque' && exp.chequeRealiseDate && (
-                      <div style={{ fontSize: '0.72rem', color: '#999' }}>Realise: {formatDate(exp.chequeRealiseDate)}</div>
+                    {exp.paymentMethod === 'Cheque' && exp.chequeReleaseDate && (
+                      <div style={{ fontSize: '0.72rem', color: '#999' }}>Release: {formatDate(exp.chequeReleaseDate)}</div>
                     )}
                   </td>
                   <td style={{ fontSize: '0.82rem', color: '#999' }}>{exp.reference || '—'}</td>
@@ -219,8 +219,8 @@ export default function ExpensesPage() {
             {form.paymentMethod === 'Cheque' && (
               <Col md={6}>
                 <Form.Group>
-                  <Form.Label className="form-label-custom">Cheque Realise Date</Form.Label>
-                  <Form.Control className="form-input" type="date" value={form.chequeRealiseDate} onChange={e => setForm({ ...form, chequeRealiseDate: e.target.value })} />
+                  <Form.Label className="form-label-custom">Cheque Release Date</Form.Label>
+                  <Form.Control className="form-input" type="date" value={form.chequeReleaseDate} onChange={e => setForm({ ...form, chequeReleaseDate: e.target.value })} />
                 </Form.Group>
               </Col>
             )}
