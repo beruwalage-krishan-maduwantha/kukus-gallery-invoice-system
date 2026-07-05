@@ -200,8 +200,14 @@ export default function QuotationCreatePage() {
         </div>
 
         <div className="d-flex gap-2 flex-wrap">
-          <Button className="btn-outline-custom" onClick={() => handleSubmit('Draft')} disabled={saving}>Save as Draft</Button>
-          <Button className="btn-primary-custom" onClick={() => handleSubmit('Sent')} disabled={saving}>Save & Send</Button>
+          {isEdit ? (
+            <Button className="btn-primary-custom" onClick={() => handleSubmit()} disabled={saving}>{saving ? 'Saving...' : 'Save Changes'}</Button>
+          ) : (
+            <>
+              <Button className="btn-outline-custom" onClick={() => handleSubmit('Draft')} disabled={saving}>Save as Draft</Button>
+              <Button className="btn-primary-custom" onClick={() => handleSubmit('Sent')} disabled={saving}>Save & Send</Button>
+            </>
+          )}
           <Button variant="outline-secondary" onClick={() => navigate('/quotations')}>Cancel</Button>
         </div>
       </Col>

@@ -128,9 +128,19 @@ exports.updateQuotation = async (req, res) => {
   try {
     const quotation = await Quotation.findById(req.params.id);
     if (!quotation) return res.status(404).json({ message: 'Quotation not found' });
-    if (quotation.status !== 'Draft') return res.status(400).json({ message: 'Only draft quotations can be edited' });
+    if (quotation.status === 'Converted') return res.status(400).json({ message: 'Converted quotations cannot be edited' });
 
-    const { items, discountType, discountValue, notes, terms, validUntil, deliveryDate } = req.body;
+    const { customer: customerId, items, discountType, discountValue, notes, terms, quotationDate, validUntil, deliveryDate } = req.body;
+
+    if (customerId && String(customerId) !== String(quotation.customer)) {
+      const customerDoc = await Customer.findById(customerId);
+      if (!customerDoc) return res.status(404).json({ message: 'Customer not found' });
+      quotation.customer = customerId;
+      quotation.customerSnapshot = {
+        name: customerDoc.name, email: customerDoc.email,
+        phone: customerDoc.phone, address: customerDoc.address, company: customerDoc.company
+      };
+    }
 
     if (items) {
       const processedItems = items.map(item => {
@@ -153,6 +163,7 @@ exports.updateQuotation = async (req, res) => {
 
     if (notes !== undefined) quotation.notes = notes;
     if (terms !== undefined) quotation.terms = terms;
+    if (quotationDate) quotation.quotationDate = quotationDate;
     if (validUntil) quotation.validUntil = validUntil;
     if (deliveryDate) quotation.deliveryDate = deliveryDate;
 

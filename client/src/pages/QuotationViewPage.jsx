@@ -87,13 +87,13 @@ export default function QuotationViewPage() {
         </Button>
         <StatusBadge status={quotation.status} />
         <div style={{ marginLeft: 'auto' }} className="d-flex gap-2 flex-wrap">
+          {quotation.status !== 'Converted' && (
+            <Link to={`/quotations/${id}/edit`}>
+              <Button className="btn-outline-custom btn-sm-custom"><PencilIcon style={{ width: 14, height: 14, marginRight: 4 }} /> Edit</Button>
+            </Link>
+          )}
           {quotation.status === 'Draft' && (
-            <>
-              <Link to={`/quotations/${id}/edit`}>
-                <Button className="btn-outline-custom btn-sm-custom"><PencilIcon style={{ width: 14, height: 14, marginRight: 4 }} /> Edit</Button>
-              </Link>
-              <Button className="btn-sm-custom" style={{ background: 'rgba(59,130,246,0.1)', color: 'var(--info)', border: 'none', borderRadius: 6, fontWeight: 600 }} onClick={() => handleStatusChange('Sent')}>Mark as Sent</Button>
-            </>
+            <Button className="btn-sm-custom" style={{ background: 'rgba(59,130,246,0.1)', color: 'var(--info)', border: 'none', borderRadius: 6, fontWeight: 600 }} onClick={() => handleStatusChange('Sent')}>Mark as Sent</Button>
           )}
           {quotation.status === 'Sent' && (
             <>

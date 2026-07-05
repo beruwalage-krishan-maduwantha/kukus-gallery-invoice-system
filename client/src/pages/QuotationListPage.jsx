@@ -135,11 +135,11 @@ export default function QuotationListPage() {
                   <td onClick={e => e.stopPropagation()}>
                     <div className="d-flex gap-1 flex-wrap">
                       <button className="btn-outline-custom btn-sm-custom" onClick={() => navigate(`/quotations/${q._id}`)}>View</button>
+                      {q.status !== 'Converted' && (
+                        <button className="btn-sm-custom" style={btnStyle('rgba(177,145,198,0.1)', 'var(--primary)')} onClick={() => navigate(`/quotations/${q._id}/edit`)}>Edit</button>
+                      )}
                       {q.status === 'Draft' && (
-                        <>
-                          <button className="btn-sm-custom" style={btnStyle('rgba(177,145,198,0.1)', 'var(--primary)')} onClick={() => navigate(`/quotations/${q._id}/edit`)}>Edit</button>
-                          <button className="btn-sm-custom" style={btnStyle('rgba(59,130,246,0.1)', 'var(--info)')} onClick={() => handleStatusChange(q._id, 'Sent')}>Send</button>
-                        </>
+                        <button className="btn-sm-custom" style={btnStyle('rgba(59,130,246,0.1)', 'var(--info)')} onClick={() => handleStatusChange(q._id, 'Sent')}>Send</button>
                       )}
                       {q.status === 'Sent' && (
                         <>
