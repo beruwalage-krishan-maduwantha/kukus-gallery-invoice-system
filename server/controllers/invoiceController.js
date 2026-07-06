@@ -299,6 +299,7 @@ exports.addAdvancePayment = async (req, res) => {
       invoice.balance = 0;
     } else {
       invoice.status = 'Advance Paid';
+      invoice.balance = Math.round((invoice.grandTotal - invoice.advancePayment) * 100) / 100;
     }
 
     await invoice.save();
