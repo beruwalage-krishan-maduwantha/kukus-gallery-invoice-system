@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kukus Group of Companies</title>
+  <link rel="icon" type="image/png" href="/logo-group.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant:wght@500;600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #14171B;
+      --surface: #1E2329;
+      --surface-hover: #242A31;
+      --ink: #EDF0F3;
+      --muted: #8C97A2;
+      --lavender: #B191C6;
+      --lime: #D7F542;
+      --amber: #F0B24A;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      min-height: 100vh;
+      background: var(--bg);
+      background-image:
+        radial-gradient(ellipse 60% 40% at 50% 0%, rgba(177,145,198,0.10) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 35% at 15% 100%, rgba(215,245,66,0.06) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 35% at 85% 100%, rgba(240,178,74,0.06) 0%, transparent 60%);
+      color: var(--ink);
+      font-family: 'Montserrat', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 1.5rem;
+    }
+    .logo-group {
+      width: min(360px, 70vw);
+      margin-bottom: 0.5rem;
+    }
+    .tagline {
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.45em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-align: center;
+      margin-bottom: 3.5rem;
+    }
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+      width: 100%;
+      max-width: 1020px;
+    }
+    .card {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      background: var(--surface);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 24px;
+      padding: 2.5rem 1.75rem 2rem;
+      text-decoration: none;
+      color: var(--ink);
+      transition: transform 0.35s cubic-bezier(0.16,1,0.3,1), border-color 0.35s ease, box-shadow 0.35s ease, background 0.35s ease;
+      overflow: hidden;
+    }
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 15%; right: 15%;
+      height: 3px;
+      border-radius: 0 0 6px 6px;
+      background: var(--card-accent);
+      opacity: 0.85;
+    }
+    .card:hover {
+      transform: translateY(-6px);
+      background: var(--surface-hover);
+      border-color: color-mix(in srgb, var(--card-accent) 40%, transparent);
+      box-shadow: 0 18px 50px -12px color-mix(in srgb, var(--card-accent) 28%, transparent);
+    }
+    .card-logo {
+      height: 84px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1.5rem;
+    }
+    .card-logo img { max-height: 84px; max-width: 160px; }
+    .card-logo .monogram {
+      width: 76px; height: 76px;
+      border-radius: 50%;
+      border: 2px solid var(--card-accent);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Cormorant', serif;
+      font-size: 1.9rem; font-weight: 700;
+      color: var(--card-accent);
+    }
+    .card h2 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      margin-bottom: 0.4rem;
+    }
+    .card p {
+      font-size: 0.78rem;
+      color: var(--muted);
+      line-height: 1.6;
+      margin-bottom: 1.75rem;
+      flex: 1;
+    }
+    .card .open {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--card-accent);
+      border: 1px solid color-mix(in srgb, var(--card-accent) 55%, transparent);
+      border-radius: 999px;
+      padding: 0.6rem 1.5rem;
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+    .card:hover .open { background: var(--card-accent); color: #14171B; }
+    .card.soon { cursor: default; opacity: 0.75; }
+    .card.soon:hover { transform: none; box-shadow: none; background: var(--surface); }
+    .card.soon .open { border-style: dashed; }
+    .card.soon:hover .open { background: transparent; color: var(--card-accent); }
+
+    .card-kukus  { --card-accent: var(--lavender); }
+    .card-vertex { --card-accent: var(--lime); }
+    .card-parangiya { --card-accent: var(--amber); }
+
+    .card-kukus .card-logo img { filter: brightness(0) invert(1); }
+
+    footer {
+      margin-top: 3.5rem;
+      font-size: 0.68rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(140,151,162,0.55);
+      text-align: center;
+    }
+    @media (max-width: 860px) {
+      .cards { grid-template-columns: 1fr; max-width: 420px; }
+      .tagline { margin-bottom: 2.5rem; letter-spacing: 0.3em; }
+      body { padding: 2rem 1rem; }
+    }
+  </style>
+</head>
+<body>
+  <img class="logo-group" src="/logo-group.png" alt="Kukus Group of Companies" />
+  <div class="tagline">One Group &middot; Three Ventures</div>
+
+  <div class="cards">
+    <a class="card card-kukus" href="https://system.kukusgallery.com">
+      <div class="card-logo"><img src="/logo-kukus.png" alt="Kukus Gallery" /></div>
+      <h2>Kukus Gallery</h2>
+      <p>Trusted clothing manufacturing partners &mdash; design wear, corporate clothing, samples and bulk production.</p>
+      <span class="open">Open System</span>
+    </a>
+
+    <a class="card card-vertex" href="https://vertex-invoice-system.vercel.app">
+      <div class="card-logo"><img src="/logo-vertex.png" alt="Vertex Digital Solutions" /></div>
+      <h2>Vertex Digital Solutions</h2>
+      <p>Where brands rise &mdash; social media, campaigns, content production, branding and performance marketing.</p>
+      <span class="open">Open System</span>
+    </a>
+
+    <div class="card card-parangiya soon">
+      <div class="card-logo"><span class="monogram">PK</span></div>
+      <h2>Parangiya Kotte</h2>
+      <p>Authentic flavours from the heart of Kotte &mdash; restaurant management system.</p>
+      <span class="open">Coming Soon</span>
+    </div>
+  </div>
+
+  <footer>&copy; 2026 Kukus Group of Companies &middot; Pitakotte, Sri Lanka</footer>
+</body>
+</html>
