@@ -35,4 +35,4 @@ const brands = {
   }
 };
 
-export const BRAND = brands[import.meta.env.VITE_COMPANY] || brands.kukus;
+export const BRAND = brands[(import.meta.env.VITE_COMPANY || '').trim().toLowerCase()] || brands.kukus;
