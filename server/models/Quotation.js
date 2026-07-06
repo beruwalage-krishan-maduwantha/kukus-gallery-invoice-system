@@ -29,6 +29,8 @@ const quotationSchema = new mongoose.Schema({
   discountValue: { type: Number, default: 0 },
   discountAmount: { type: Number, default: 0 },
   grandTotal: { type: Number, required: true },
+  advancePayment: { type: Number, default: 0 },
+  balance: { type: Number, default: 0 },
   status: {
     type: String,
     enum: ['Draft', 'Sent', 'Accepted', 'Rejected', 'Expired', 'Converted'],

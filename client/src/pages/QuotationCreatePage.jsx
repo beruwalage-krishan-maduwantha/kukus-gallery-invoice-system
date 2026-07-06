@@ -25,6 +25,7 @@ export default function QuotationCreatePage() {
   const [items, setItems] = useState([{ ...emptyItem }]);
   const [discountType, setDiscountType] = useState('percentage');
   const [discountValue, setDiscountValue] = useState(0);
+  const [advancePayment, setAdvancePayment] = useState(0);
   const [quotationDate, setQuotationDate] = useState(formatDateInput(new Date()));
   const [validUntil, setValidUntil] = useState(() => {
     const d = new Date(); d.setDate(d.getDate() + 7);
@@ -49,6 +50,7 @@ export default function QuotationCreatePage() {
         setItems(q.items.map(i => ({ ...i, product: i.product || '' })));
         setDiscountType(q.discountType || 'percentage');
         setDiscountValue(q.discountValue || 0);
+        setAdvancePayment(q.advancePayment || 0);
         setQuotationDate(formatDateInput(q.quotationDate));
         setValidUntil(q.validUntil ? formatDateInput(q.validUntil) : '');
         setNotes(q.notes || '');
@@ -87,6 +89,7 @@ export default function QuotationCreatePage() {
           unitPrice: Number(i.unitPrice), discount: Number(i.discount) || 0
         })),
         discountType, discountValue,
+        advancePayment: Number(advancePayment) || 0,
         quotationDate, validUntil: validUntil || undefined,
         notes, terms, status
       };
@@ -177,7 +180,7 @@ export default function QuotationCreatePage() {
             <PlusIcon style={{ width: 16, height: 16, marginRight: 4 }} /> Add Item
           </Button>
           <div style={{ marginTop: '1.5rem' }}>
-            <InvoiceSummary subtotal={subtotal} discountType={discountType} discountValue={discountValue} onDiscountTypeChange={setDiscountType} onDiscountValueChange={setDiscountValue} />
+            <InvoiceSummary subtotal={subtotal} discountType={discountType} discountValue={discountValue} onDiscountTypeChange={setDiscountType} onDiscountValueChange={setDiscountValue} advancePayment={advancePayment} onAdvanceChange={setAdvancePayment} />
           </div>
         </div>
 

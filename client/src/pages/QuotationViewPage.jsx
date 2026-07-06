@@ -195,6 +195,16 @@ export default function QuotationViewPage() {
             <div className="invoice-total-row grand">
               <span>Grand Total</span><span>{formatCurrency(quotation.grandTotal)}</span>
             </div>
+            {quotation.advancePayment > 0 && (
+              <>
+                <div className="invoice-total-row" style={{ color: 'var(--success)' }}>
+                  <span>Advance</span><span>- {formatCurrency(quotation.advancePayment)}</span>
+                </div>
+                <div className="invoice-total-row grand">
+                  <span>Balance</span><span>{formatCurrency(quotation.balance ?? (quotation.grandTotal - quotation.advancePayment))}</span>
+                </div>
+              </>
+            )}
           </div>
         </div>
 

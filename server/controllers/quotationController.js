@@ -69,7 +69,7 @@ exports.createQuotation = async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
 
-    const { customer: customerId, items, discountType, discountValue, notes, terms, quotationDate, validUntil, deliveryDate } = req.body;
+    const { customer: customerId, items, discountType, discountValue, notes, terms, quotationDate, validUntil, deliveryDate, advancePayment } = req.body;
 
     const customerDoc = await Customer.findById(customerId);
     if (!customerDoc) return res.status(404).json({ message: 'Customer not found' });
@@ -90,6 +90,8 @@ exports.createQuotation = async (req, res) => {
     }
     discountAmount = Math.round(discountAmount * 100) / 100;
     const grandTotal = Math.round((subtotal - discountAmount) * 100) / 100;
+    const advance = Math.round((Number(advancePayment) || 0) * 100) / 100;
+    const balance = Math.round((grandTotal - advance) * 100) / 100;
 
     const sanitizedName = customerDoc.name.replace(/[^a-zA-Z0-9]/g, '_');
     const sanitizedPhone = customerDoc.phone.replace(/[^0-9]/g, '');
@@ -107,6 +109,7 @@ exports.createQuotation = async (req, res) => {
       items: processedItems,
       subtotal, discountType: discountType || 'percentage',
       discountValue: discountValue || 0, discountAmount, grandTotal,
+      advancePayment: advance, balance,
       status: req.body.status || 'Draft',
       quotationDate: quotationDate || new Date(),
       validUntil: validUntil || defaultValidUntil,
@@ -131,7 +134,7 @@ exports.updateQuotation = async (req, res) => {
     if (!quotation) return res.status(404).json({ message: 'Quotation not found' });
     if (quotation.status === 'Converted') return res.status(400).json({ message: 'Converted quotations cannot be edited' });
 
-    const { customer: customerId, items, discountType, discountValue, notes, terms, quotationDate, validUntil, deliveryDate } = req.body;
+    const { customer: customerId, items, discountType, discountValue, notes, terms, quotationDate, validUntil, deliveryDate, advancePayment } = req.body;
 
     if (customerId && String(customerId) !== String(quotation.customer)) {
       const customerDoc = await Customer.findById(customerId);
@@ -167,6 +170,10 @@ exports.updateQuotation = async (req, res) => {
     if (quotationDate) quotation.quotationDate = quotationDate;
     if (validUntil) quotation.validUntil = validUntil;
     if (deliveryDate) quotation.deliveryDate = deliveryDate;
+    if (advancePayment !== undefined) {
+      quotation.advancePayment = Math.round((Number(advancePayment) || 0) * 100) / 100;
+    }
+    quotation.balance = Math.round((quotation.grandTotal - (quotation.advancePayment || 0)) * 100) / 100;
 
     await quotation.save();
     const populated = await Quotation.findById(quotation._id)
@@ -234,6 +241,10 @@ exports.convertToInvoice = async (req, res) => {
       });
     }
 
+    const advance = Math.round((quotation.advancePayment || 0) * 100) / 100;
+    let invoiceStatus = 'Draft';
+    if (advance > 0) invoiceStatus = advance >= quotation.grandTotal ? 'Paid' : 'Advance Paid';
+
     const invoice = await Invoice.create({
       invoiceNumber,
       customer: quotation.customer._id,
@@ -247,7 +258,10 @@ exports.convertToInvoice = async (req, res) => {
       discountValue: quotation.discountValue,
       discountAmount: quotation.discountAmount,
       grandTotal: quotation.grandTotal,
-      status: 'Draft',
+      advancePayment: advance,
+      balance: invoiceStatus === 'Paid' ? 0 : Math.round((quotation.grandTotal - advance) * 100) / 100,
+      status: invoiceStatus,
+      paidDate: invoiceStatus === 'Paid' ? new Date() : undefined,
       invoiceDate: new Date(),
       deliveryDate: req.body.deliveryDate || undefined,
       paymentType: req.body.paymentType || 'Cash',
