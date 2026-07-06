@@ -226,7 +226,7 @@ exports.convertToInvoice = async (req, res) => {
     for (const item of quotation.items) {
       let orderNumber = '';
       if (item.orderType) {
-        const prefix = item.orderType === 'Sample' ? 'SM' : 'BLK';
+        const prefix = { Sample: 'SM', Bulk: 'BLK', Project: 'PRJ' }[item.orderType] || 'BLK';
         const counter = await Counter.findOneAndUpdate(
           { _id: `order_${prefix.toLowerCase()}` },
           { $inc: { seq: 1 } },

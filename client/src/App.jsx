@@ -40,7 +40,7 @@ export default function App() {
         <Toaster
           position="top-right"
           toastOptions={{
-            style: { fontFamily: 'var(--font-body)', fontSize: '0.9rem' },
+            style: { fontFamily: 'var(--font-body)', fontSize: '0.9rem', background: 'var(--surface)', color: 'var(--ink)' },
             success: { duration: 3000 },
             error: { duration: 4000 }
           }}

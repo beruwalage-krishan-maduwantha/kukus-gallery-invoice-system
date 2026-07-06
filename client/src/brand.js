@@ -9,6 +9,20 @@ const brands = {
     logo: '/logo.png',
     loginPlaceholder: 'admin@kukusgallery.com',
     mainAdminEmail: 'admin@kukusgallery.com',
+    ordersLabel: 'Orders',
+    orderNoun: 'Order',
+    statusLabels: {},
+    serviceTypes: ['Design Wear', 'Corporate Clothing'],
+    categories: {
+      'Design Wear': ['Main Size Development', 'Size Grading', 'Sample', 'Bulk Production'],
+      'Corporate Clothing': ['T-Shirts', 'Uniforms', 'DTF Printing', 'Embroidery']
+    },
+    units: ['piece', 'meter', 'yard', 'set', 'hour', 'lot'],
+    expenseCategories: [
+      'Raw Materials', 'Fabric', 'Trims & Accessories', 'Printing', 'Embroidery',
+      'Labour', 'Salaries', 'Rent', 'Utilities', 'Transport',
+      'Packaging', 'Equipment', 'Maintenance', 'Marketing', 'Office Supplies', 'Other'
+    ],
     pdf: {
       accent: [177, 145, 198],
       accentSoft: [248, 244, 251],
@@ -25,6 +39,21 @@ const brands = {
     logo: '/logo-vertex.png',
     loginPlaceholder: 'info.vertexdigitalsolutions@gmail.com',
     mainAdminEmail: 'info.vertexdigitalsolutions@gmail.com',
+    ordersLabel: 'Projects',
+    orderNoun: 'Project',
+    statusLabels: { Processing: 'In Progress', Alternative: 'Review' },
+    serviceTypes: ['Marketing & Campaigns', 'Content & Production', 'Design & Development'],
+    categories: {
+      'Marketing & Campaigns': ['Social Media Marketing', 'Performance Marketing', 'Creative Campaigns', 'Influencer Campaigns'],
+      'Content & Production': ['Content Production', 'Video & Podcast Production'],
+      'Design & Development': ['Branding & Design', 'Web Design & Development']
+    },
+    units: ['project', 'month', 'hour', 'piece', 'set', 'lot'],
+    expenseCategories: [
+      'Ad Spend (Meta/Google)', 'Software & Subscriptions', 'Hosting & Domains',
+      'Freelancers', 'Content Production', 'Equipment', 'Salaries', 'Rent',
+      'Utilities', 'Transport', 'Marketing', 'Office Supplies', 'Other'
+    ],
     pdf: {
       accent: [45, 52, 60],
       accentSoft: [244, 246, 238],

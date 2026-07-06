@@ -12,6 +12,11 @@
   --warning: #F59E0B;
   --danger: #EF4444;
   --info: #3B82F6;
+  --surface: #fff;
+  --ink: #1a1a2e;
+  --muted-ink: #666;
+  --soft-ink: #999;
+  --line: #eee;
   --font-heading: 'Cormorant', serif;
   --font-body: 'Montserrat', sans-serif;
   --sidebar-width: 260px;
@@ -946,35 +951,27 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-heading); }
 }
 
 /* ==================== VERTEX DIGITAL SOLUTIONS THEME ==================== */
-/* Activated by data-brand="vertex" on <html> (set from VITE_COMPANY). */
+/* Full dark charcoal + neon lime UI, activated by data-brand="vertex" on
+   <html> (set from VITE_COMPANY). Everything here is additive: the Kukus
+   theme above is untouched. */
 html[data-brand="vertex"] {
-  --primary: #7E9312;        /* olive lime - readable on light surfaces */
-  --primary-light: #D7F542;  /* neon lime - used on dark surfaces */
-  --primary-dark: #23282E;   /* charcoal - sidebar, login, table headers */
-  --accent: #6B7683;         /* slate gray secondary text */
-  --tint: #F0F2F4;           /* light gray page background */
-  --deep: #3A424A;
-  --brand-950: #14171B;
+  color-scheme: dark;
+  --primary: #D7F542;        /* neon lime */
+  --primary-light: #E3F96E;
+  --primary-dark: #E9EDF1;   /* light ink: this var is used as text color app-wide */
+  --accent: #97A3AF;         /* slate gray secondary text */
+  --tint: #22272E;           /* page background */
+  --deep: #C6E926;           /* button hover lime */
+  --brand-950: #1A1F25;      /* sidebar */
+  --surface: #2B323B;        /* cards */
+  --ink: #E9EDF1;
+  --muted-ink: #A5AFB9;
+  --soft-ink: #8C97A2;
+  --line: #3A424C;
   --font-heading: 'Montserrat', sans-serif;
 }
 
-/* Signature neon lime action button with dark text */
-html[data-brand="vertex"] .btn-primary-custom {
-  background: #D7F542;
-  color: #1A2005;
-}
-html[data-brand="vertex"] .btn-primary-custom:hover,
-html[data-brand="vertex"] .btn-primary-custom:focus,
-html[data-brand="vertex"] .btn-primary-custom:active {
-  background: #C6E926 !important;
-  color: #1A2005 !important;
-}
-
-/* Lime glow instead of lavender glow on the charcoal login screen */
-html[data-brand="vertex"] .login-page {
-  background-image: radial-gradient(ellipse at 30% 20%, rgba(215, 245, 66, 0.10) 0%, transparent 50%),
-                    radial-gradient(ellipse at 70% 80%, rgba(215, 245, 66, 0.05) 0%, transparent 50%);
-}
+html[data-brand="vertex"] body { color: var(--ink); }
 
 html[data-brand="vertex"] h1,
 html[data-brand="vertex"] h2,
@@ -984,4 +981,122 @@ html[data-brand="vertex"] h5,
 html[data-brand="vertex"] h6 {
   font-weight: 700;
   letter-spacing: -0.01em;
+}
+
+html[data-brand="vertex"] ::-webkit-scrollbar-thumb { background: #3E4750; }
+
+/* --- Dark surfaces --- */
+html[data-brand="vertex"] .topbar {
+  background: #262C34;
+  border-bottom-color: rgba(255, 255, 255, 0.06);
+}
+
+html[data-brand="vertex"] .card-custom,
+html[data-brand="vertex"] .stat-card,
+html[data-brand="vertex"] .table-custom,
+html[data-brand="vertex"] .chart-card {
+  background: var(--surface);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+  border-radius: 20px;
+}
+html[data-brand="vertex"] .card-custom:hover { box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35); }
+
+html[data-brand="vertex"] .table-custom thead th { background: #1B2026; }
+html[data-brand="vertex"] .table-custom tbody tr { border-bottom-color: rgba(255, 255, 255, 0.05); }
+html[data-brand="vertex"] .table-custom tbody tr:hover { background: rgba(215, 245, 66, 0.05); }
+
+/* --- Login: charcoal with lime glow, natural-colour logo --- */
+html[data-brand="vertex"] .login-page {
+  background: #1A1F25;
+  background-image: radial-gradient(ellipse at 30% 20%, rgba(215, 245, 66, 0.08) 0%, transparent 50%),
+                    radial-gradient(ellipse at 70% 80%, rgba(215, 245, 66, 0.04) 0%, transparent 50%);
+}
+html[data-brand="vertex"] .login-logo,
+html[data-brand="vertex"] .sidebar-logo { filter: none; }
+html[data-brand="vertex"] .login-card .form-input:focus { box-shadow: 0 0 0 3px rgba(215, 245, 66, 0.15); }
+
+/* --- Sidebar accents --- */
+html[data-brand="vertex"] .sidebar-header,
+html[data-brand="vertex"] .sidebar-footer { border-color: rgba(255, 255, 255, 0.06); }
+html[data-brand="vertex"] .sidebar-link:hover { background: rgba(215, 245, 66, 0.06); }
+html[data-brand="vertex"] .sidebar-link.active { background: rgba(215, 245, 66, 0.1); }
+html[data-brand="vertex"] .sidebar-brand { color: var(--primary); }
+
+/* --- Lime backgrounds need dark text --- */
+html[data-brand="vertex"] .btn-primary-custom,
+html[data-brand="vertex"] .sidebar-avatar,
+html[data-brand="vertex"] .pagination-btn.active,
+html[data-brand="vertex"] .service-tab.active {
+  color: #1A2005;
+}
+html[data-brand="vertex"] .btn-primary-custom:hover,
+html[data-brand="vertex"] .btn-primary-custom:focus {
+  color: #1A2005;
+  box-shadow: 0 4px 15px rgba(215, 245, 66, 0.25);
+}
+html[data-brand="vertex"] .btn-outline-custom:hover { color: #1A2005; }
+
+/* --- Forms --- */
+html[data-brand="vertex"] .form-input,
+html[data-brand="vertex"] .items-table .form-control,
+html[data-brand="vertex"] .items-table .form-select,
+html[data-brand="vertex"] .filter-select,
+html[data-brand="vertex"] .pagination-btn,
+html[data-brand="vertex"] .service-tab {
+  background: #232930;
+  border-color: rgba(255, 255, 255, 0.12);
+  color: var(--ink);
+}
+html[data-brand="vertex"] .form-input::placeholder { color: #5F6A75; }
+html[data-brand="vertex"] .form-input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(215, 245, 66, 0.12);
+}
+html[data-brand="vertex"] .items-table .form-control:focus,
+html[data-brand="vertex"] .items-table .form-select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(215, 245, 66, 0.1);
+}
+html[data-brand="vertex"] .items-table th { border-bottom-color: rgba(255, 255, 255, 0.08); }
+html[data-brand="vertex"] .form-section-title { border-bottom-color: rgba(255, 255, 255, 0.08); }
+
+/* --- Modals (react-bootstrap) --- */
+html[data-brand="vertex"] .modal-content {
+  background: var(--surface);
+  color: var(--ink);
+}
+html[data-brand="vertex"] .modal-header,
+html[data-brand="vertex"] .modal-footer { border-color: rgba(255, 255, 255, 0.08); }
+html[data-brand="vertex"] .modal .btn-close { filter: invert(1) grayscale(100%) brightness(180%); }
+html[data-brand="vertex"] .modal .form-control:not(.form-input),
+html[data-brand="vertex"] .modal .form-select:not(.form-input) {
+  background: #232930;
+  border-color: rgba(255, 255, 255, 0.12);
+  color: var(--ink);
+}
+
+/* Bare react-bootstrap selects/controls outside modals (e.g. summary discount) */
+html[data-brand="vertex"] .invoice-summary .form-select,
+html[data-brand="vertex"] .invoice-summary .form-control {
+  background: #232930;
+  border-color: rgba(255, 255, 255, 0.12);
+  color: var(--ink);
+}
+
+/* --- Paper cards: invoice/quotation document views stay light like the PDF --- */
+html[data-brand="vertex"] .invoice-view-card,
+html[data-brand="vertex"] .preview-panel {
+  color-scheme: light;
+  --primary: #7E9312;        /* olive lime for accents on paper */
+  --primary-light: #C8D96A;
+  --primary-dark: #23282E;   /* dark ink on paper */
+  --accent: #6B7683;
+  --tint: #F4F6EE;
+  --surface: #fff;
+  --ink: #1a1a2e;
+  --muted-ink: #666;
+  --soft-ink: #999;
+  --line: #eee;
+  background: #fff;
+  color: var(--ink);
 }

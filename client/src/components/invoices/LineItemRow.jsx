@@ -2,6 +2,7 @@ import { Form } from 'react-bootstrap';
 import { TrashIcon } from '@heroicons/react/24/outline';
 import { formatCurrency } from '../../utils/formatCurrency';
 import api from '../../api/axios';
+import { BRAND } from '../../brand';
 
 export default function LineItemRow({ item, index, products, onChange, onRemove }) {
   const handleChange = async (field, value) => {
@@ -12,13 +13,20 @@ export default function LineItemRow({ item, index, products, onChange, onRemove 
         updated.name = p.name;
         updated.category = p.category;
         updated.unitPrice = p.defaultPrice;
-        const smCategories = ['Sample', 'Sample Development', 'Embroidery', 'DTF Printing'];
-        const isSample = smCategories.includes(p.category);
-        updated.orderType = isSample ? 'Sample' : 'Bulk';
+        let counterType;
+        if (BRAND.key === 'vertex') {
+          updated.orderType = 'Project';
+          counterType = 'prj';
+        } else {
+          const smCategories = ['Sample', 'Sample Development', 'Embroidery', 'DTF Printing'];
+          const isSample = smCategories.includes(p.category);
+          updated.orderType = isSample ? 'Sample' : 'Bulk';
+          counterType = isSample ? 'sm' : 'blk';
+        }
         try {
-          const res = await api.get(`/invoices/next-order-number/${isSample ? 'sm' : 'blk'}`);
+          const res = await api.get(`/invoices/next-order-number/${counterType}`);
           updated.orderNumber = res.data.orderNumber;
-        } catch { updated.orderNumber = isSample ? 'SM---' : 'BLK---'; }
+        } catch { updated.orderNumber = `${counterType.toUpperCase()}---`; }
       }
     }
     const qty = Number(updated.quantity) || 0;

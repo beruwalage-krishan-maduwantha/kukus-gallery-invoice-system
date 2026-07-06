@@ -11,7 +11,7 @@ router.get('/next-order-number/:type', async (req, res) => {
   try {
     const Counter = require('../models/Counter');
     const type = req.params.type;
-    const prefix = type === 'sm' ? 'SM' : 'BLK';
+    const prefix = { sm: 'SM', blk: 'BLK', prj: 'PRJ' }[type] || 'BLK';
     const counter = await Counter.findOne({ _id: `order_${type}` });
     const next = (counter?.seq || 0) + 1;
     res.json({ orderNumber: `${prefix}${String(next).padStart(3, '0')}` });

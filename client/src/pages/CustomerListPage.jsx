@@ -166,7 +166,7 @@ export default function CustomerListPage() {
                                   <tr key={inv._id} style={{ borderBottom: '1px solid rgba(177,145,198,0.08)' }}>
                                     <td style={{ padding: '0.5rem', fontWeight: 600, color: 'var(--primary-dark)' }}>{inv.invoiceNumber}</td>
                                     <td style={{ padding: '0.5rem' }}>{formatDate(inv.invoiceDate)}</td>
-                                    <td style={{ padding: '0.5rem', fontSize: '0.78rem', color: '#666' }}>
+                                    <td style={{ padding: '0.5rem', fontSize: '0.78rem', color: 'var(--muted-ink)' }}>
                                       {inv.items?.map(item => item.name).join(', ') || '-'}
                                     </td>
                                     <td style={{ padding: '0.5rem', fontWeight: 600 }}>{formatCurrency(inv.grandTotal)}</td>

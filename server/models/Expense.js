@@ -4,7 +4,16 @@ const expenseSchema = new mongoose.Schema({
   title: { type: String, required: true },
   category: {
     type: String,
-    enum: ['Raw Materials', 'Fabric', 'Trims & Accessories', 'Printing', 'Embroidery', 'Labour', 'Salaries', 'Rent', 'Utilities', 'Transport', 'Packaging', 'Equipment', 'Maintenance', 'Marketing', 'Office Supplies', 'Other'],
+    enum: [
+      // Kukus Gallery (garments)
+      'Raw Materials', 'Fabric', 'Trims & Accessories', 'Printing', 'Embroidery',
+      'Labour', 'Packaging', 'Maintenance',
+      // Vertex Digital Solutions (agency)
+      'Ad Spend (Meta/Google)', 'Software & Subscriptions', 'Hosting & Domains',
+      'Freelancers', 'Content Production',
+      // shared
+      'Salaries', 'Rent', 'Utilities', 'Transport', 'Equipment', 'Marketing', 'Office Supplies', 'Other'
+    ],
     required: true
   },
   amount: { type: Number, required: true, min: 0 },

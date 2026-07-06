@@ -16,11 +16,11 @@ export default function InvoicePreview({ customer, items, subtotal, discountAmou
           <span style={{ color: 'var(--accent)', fontSize: '0.6rem', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Bill To</span>
           <br /><strong style={{ fontSize: '0.75rem' }}>{customer.name}</strong>
           {customer.phone && <br />}
-          {customer.phone && <span style={{ fontSize: '0.65rem', color: '#888' }}>{customer.phone}</span>}
+          {customer.phone && <span style={{ fontSize: '0.65rem', color: 'var(--muted-ink)' }}>{customer.phone}</span>}
         </div>
       )}
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.62rem', color: '#888', marginBottom: '0.5rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.62rem', color: 'var(--muted-ink)', marginBottom: '0.5rem' }}>
         <span>Date: {formatDate(invoiceDate)}</span>
         {deliveryDate && <span>Delivery: {formatDate(deliveryDate)}</span>}
       </div>
@@ -37,7 +37,7 @@ export default function InvoicePreview({ customer, items, subtotal, discountAmou
           <tbody>
             {items.filter(i => i.name).map((item, i) => (
               <tr key={i} style={{ borderBottom: '1px solid #f0f0f0' }}>
-                <td style={{ padding: '0.2rem' }}>{item.name} <span style={{ color: '#bbb' }}>x{item.quantity}</span></td>
+                <td style={{ padding: '0.2rem' }}>{item.name} <span style={{ color: 'var(--soft-ink)' }}>x{item.quantity}</span></td>
                 <td style={{ padding: '0.2rem', textAlign: 'center' }}>{item.orderType}</td>
                 <td style={{ padding: '0.2rem', textAlign: 'right' }}>{formatCurrency(item.lineTotal || 0)}</td>
               </tr>

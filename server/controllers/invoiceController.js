@@ -70,7 +70,7 @@ exports.createInvoice = async (req, res) => {
       const lineTotal = item.quantity * item.unitPrice * (1 - (item.discount || 0) / 100);
       let orderNumber = item.orderNumber || '';
       if (!orderNumber && item.orderType) {
-        const prefix = item.orderType === 'Sample' ? 'SM' : 'BLK';
+        const prefix = { Sample: 'SM', Bulk: 'BLK', Project: 'PRJ' }[item.orderType] || 'BLK';
         const counter = await Counter.findOneAndUpdate(
           { _id: `order_${prefix.toLowerCase()}` },
           { $inc: { seq: 1 } },

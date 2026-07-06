@@ -175,7 +175,7 @@ export default function QuotationListPage() {
           <Modal.Title className="modal-title-custom">Convert to Invoice</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <p style={{ fontSize: '0.85rem', color: '#666', marginBottom: '1rem' }}>
+          <p style={{ fontSize: '0.85rem', color: 'var(--muted-ink)', marginBottom: '1rem' }}>
             Set the delivery date and payment type for the new invoice.
           </p>
           <Row className="g-3">

@@ -13,6 +13,7 @@ import ConfirmModal from '../components/common/ConfirmModal';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import { formatDate } from '../utils/formatDate';
 import { ORDER_STATUS_OPTIONS } from '../utils/constants';
+import { BRAND } from '../brand';
 import { ClipboardDocumentListIcon, EyeIcon, ArrowDownTrayIcon } from '@heroicons/react/24/outline';
 
 export default function OrdersPage() {
@@ -48,7 +49,7 @@ export default function OrdersPage() {
     const newStatus = e.target.value;
     try {
       await updateOrderStatus(orderId, newStatus);
-      toast.success('Order status updated');
+      toast.success(`${BRAND.orderNoun} status updated`);
       if (newStatus === 'Processing') {
         const url = await previewOrderPdf(order);
         setPreviewUrl(url);
@@ -99,10 +100,10 @@ export default function OrdersPage() {
     <div>
       <div className="action-bar">
         <div className="action-bar-left">
-          <SearchInput value={search} onChange={(v) => { setSearch(v); setPage(1); }} placeholder="Search orders..." />
+          <SearchInput value={search} onChange={(v) => { setSearch(v); setPage(1); }} placeholder={`Search ${BRAND.ordersLabel.toLowerCase()}...`} />
           <select className="filter-select" value={statusFilter} onChange={e => { setStatusFilter(e.target.value); setPage(1); }}>
             <option value="">All Status</option>
-            {ORDER_STATUS_OPTIONS.map(s => <option key={s} value={s}>{s}</option>)}
+            {ORDER_STATUS_OPTIONS.map(s => <option key={s} value={s}>{BRAND.statusLabels[s] || s}</option>)}
           </select>
           <DateRangeFilter
             from={dateFrom} to={dateTo}
@@ -110,22 +111,22 @@ export default function OrdersPage() {
             onToChange={v => { setDateTo(v); setPage(1); }}
             onClear={() => { setDateFrom(''); setDateTo(''); setPage(1); }}
           />
-          <span style={{ fontSize: '0.82rem', color: 'var(--accent)' }}>{total} orders</span>
+          <span style={{ fontSize: '0.82rem', color: 'var(--accent)' }}>{total} {BRAND.ordersLabel.toLowerCase()}</span>
         </div>
       </div>
 
       {loading ? <LoadingSpinner /> : orders.length === 0 ? (
         <EmptyState
           icon={ClipboardDocumentListIcon}
-          title="No orders yet"
-          message="Orders are automatically created when invoices are created with order numbers."
+          title={`No ${BRAND.ordersLabel.toLowerCase()} yet`}
+          message={`${BRAND.ordersLabel} are automatically created when invoices are created with ${BRAND.orderNoun.toLowerCase()} numbers.`}
         />
       ) : (
         <div className="table-custom">
           <table>
             <thead>
               <tr>
-                <th>Order #</th>
+                <th>{BRAND.orderNoun} #</th>
                 <th>Product</th>
                 <th>Customer</th>
                 <th>Invoice</th>
@@ -151,7 +152,7 @@ export default function OrdersPage() {
                   <td style={{ fontWeight: 500 }}>{order.productName}</td>
                   <td>
                     {order.customerSnapshot?.title ? `${order.customerSnapshot.title}. ` : ''}{order.customerSnapshot?.name}
-                    {order.customerSnapshot?.phone && <span style={{ color: '#999', fontSize: '0.78rem', marginLeft: 6 }}>{order.customerSnapshot.phone}</span>}
+                    {order.customerSnapshot?.phone && <span style={{ color: 'var(--soft-ink)', fontSize: '0.78rem', marginLeft: 6 }}>{order.customerSnapshot.phone}</span>}
                   </td>
                   <td>
                     <span
@@ -173,7 +174,7 @@ export default function OrdersPage() {
                         fontWeight: 600, borderRadius: 6
                       }}
                     >
-                      {ORDER_STATUS_OPTIONS.map(s => <option key={s} value={s}>{s}</option>)}
+                      {ORDER_STATUS_OPTIONS.map(s => <option key={s} value={s}>{BRAND.statusLabels[s] || s}</option>)}
                     </select>
                   </td>
                   <td onClick={e => e.stopPropagation()}>
@@ -184,7 +185,7 @@ export default function OrdersPage() {
                       <button style={btnStyle('rgba(59,130,246,0.1)', 'var(--info)')} onClick={e => handleDownload(e, order)} title="Download PDF">
                         <ArrowDownTrayIcon style={{ width: 15, height: 15 }} />
                       </button>
-                      <button style={btnStyle('rgba(239,68,68,0.1)', 'var(--danger)')} onClick={e => { e.stopPropagation(); setDeleteTarget(order); }} title="Delete Order">
+                      <button style={btnStyle('rgba(239,68,68,0.1)', 'var(--danger)')} onClick={e => { e.stopPropagation(); setDeleteTarget(order); }} title={`Delete ${BRAND.orderNoun}`}>
                         Del
                       </button>
                     </div>
@@ -202,7 +203,7 @@ export default function OrdersPage() {
       <Modal show={!!previewUrl} onHide={closePreview} size="lg" centered>
         <Modal.Header closeButton>
           <Modal.Title className="modal-title-custom" style={{ fontSize: '1rem' }}>
-            Order PDF — {previewOrder?.orderNumber}
+            {BRAND.orderNoun} PDF — {previewOrder?.orderNumber}
           </Modal.Title>
         </Modal.Header>
         <Modal.Body style={{ padding: 0 }}>
@@ -220,7 +221,7 @@ export default function OrdersPage() {
         </Modal.Footer>
       </Modal>
 
-      <ConfirmModal show={!!deleteTarget} onHide={() => setDeleteTarget(null)} onConfirm={handleDelete} title="Delete Order" message={`Delete order ${deleteTarget?.orderNumber}? This cannot be undone.`} confirmText="Delete" />
+      <ConfirmModal show={!!deleteTarget} onHide={() => setDeleteTarget(null)} onConfirm={handleDelete} title={`Delete ${BRAND.orderNoun}`} message={`Delete ${BRAND.orderNoun.toLowerCase()} ${deleteTarget?.orderNumber}? This cannot be undone.`} confirmText="Delete" />
     </div>
   );
 }

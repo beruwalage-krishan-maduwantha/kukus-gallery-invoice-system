@@ -152,13 +152,13 @@ export default function ExpensesPage() {
                     </span>
                   </td>
                   <td style={{ textAlign: 'right', fontWeight: 600, color: 'var(--danger)' }}>{formatCurrency(exp.amount)}</td>
-                  <td style={{ fontSize: '0.82rem', color: '#666' }}>
+                  <td style={{ fontSize: '0.82rem', color: 'var(--muted-ink)' }}>
                     {exp.paymentMethod}
                     {exp.paymentMethod === 'Cheque' && exp.chequeReleaseDate && (
-                      <div style={{ fontSize: '0.72rem', color: '#999' }}>Release: {formatDate(exp.chequeReleaseDate)}</div>
+                      <div style={{ fontSize: '0.72rem', color: 'var(--soft-ink)' }}>Release: {formatDate(exp.chequeReleaseDate)}</div>
                     )}
                   </td>
-                  <td style={{ fontSize: '0.82rem', color: '#999' }}>{exp.reference || '—'}</td>
+                  <td style={{ fontSize: '0.82rem', color: 'var(--soft-ink)' }}>{exp.reference || '—'}</td>
                   <td>
                     <div className="d-flex gap-1">
                       <button style={btnStyle('rgba(177,145,198,0.1)', 'var(--primary)')} onClick={() => openEdit(exp)}>Edit</button>

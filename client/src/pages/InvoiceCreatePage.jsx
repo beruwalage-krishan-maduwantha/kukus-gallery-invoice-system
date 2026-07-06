@@ -13,6 +13,7 @@ import InvoiceSummary from '../components/invoices/InvoiceSummary';
 import InvoicePreview from '../components/invoices/InvoicePreview';
 import { PAYMENT_TYPES } from '../utils/constants';
 import { formatDateInput } from '../utils/formatDate';
+import { BRAND } from '../brand';
 
 const emptyItem = { product: '', name: '', category: '', orderType: '', quantity: 1, unitPrice: 0, discount: 0, lineTotal: 0 };
 
@@ -138,7 +139,7 @@ export default function InvoiceCreatePage() {
             onAddNew={() => setShowCustomerForm(true)}
           />
           {customerData && (
-            <div style={{ marginTop: '0.75rem', padding: '0.75rem', background: 'var(--tint)', borderRadius: 8, fontSize: '0.82rem', color: '#666' }}>
+            <div style={{ marginTop: '0.75rem', padding: '0.75rem', background: 'var(--tint)', borderRadius: 8, fontSize: '0.82rem', color: 'var(--muted-ink)' }}>
               {customerData.address && <div>{customerData.address}</div>}
               {customerData.email && <div>{customerData.email}</div>}
               {customerData.company && <div>Company: {customerData.company}</div>}
@@ -179,7 +180,7 @@ export default function InvoiceCreatePage() {
               <thead>
                 <tr>
                   <th>Product / Service</th>
-                  <th>Order #</th>
+                  <th>{BRAND.orderNoun} #</th>
                   <th>Qty</th>
                   <th>Unit Price</th>
                   <th>Disc %</th>

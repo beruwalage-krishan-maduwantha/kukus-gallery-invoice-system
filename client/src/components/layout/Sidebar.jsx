@@ -19,7 +19,7 @@ const navItems = [
   { to: '/', icon: HomeIcon, label: 'Dashboard', access: 'admin' },
   { to: '/quotations', icon: DocumentDuplicateIcon, label: 'Quotations', access: 'all' },
   { to: '/invoices', icon: DocumentTextIcon, label: 'Invoices', access: 'all' },
-  { to: '/orders', icon: ClipboardDocumentListIcon, label: 'Orders', access: 'all' },
+  { to: '/orders', icon: ClipboardDocumentListIcon, label: BRAND.ordersLabel, access: 'all' },
   { to: '/expenses', icon: BanknotesIcon, label: 'Expenses', access: 'admin' },
   { to: '/credit-notes', icon: ReceiptRefundIcon, label: 'Credit Notes', access: 'admin' },
   { to: '/reports', icon: ChartBarIcon, label: 'Reports', access: 'admin' },

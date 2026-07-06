@@ -115,7 +115,7 @@ export default function DashboardPage() {
               </thead>
               <tbody>
                 {(!stats?.recentOrders || stats.recentOrders.length === 0) ? (
-                  <tr><td colSpan={4} style={{ textAlign: 'center', padding: '2rem', color: '#999' }}>No orders yet</td></tr>
+                  <tr><td colSpan={4} style={{ textAlign: 'center', padding: '2rem', color: 'var(--soft-ink)' }}>No orders yet</td></tr>
                 ) : stats.recentOrders.map(o => (
                   <tr key={o._id} onClick={() => window.location.href = `/orders`} style={{ cursor: 'pointer' }}>
                     <td>

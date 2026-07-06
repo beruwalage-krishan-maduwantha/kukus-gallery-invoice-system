@@ -43,7 +43,7 @@ export default function StatusPieChart({ data = {} }) {
         {labels.length > 0 ? (
           <Doughnut data={chartData} options={options} />
         ) : (
-          <p style={{ textAlign: 'center', color: '#999', paddingTop: '5rem' }}>No data yet</p>
+          <p style={{ textAlign: 'center', color: 'var(--soft-ink)', paddingTop: '5rem' }}>No data yet</p>
         )}
       </div>
     </div>

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Topbar from './Topbar';
+import { BRAND } from '../../brand';
 
 const pageTitles = {
   '/': 'Dashboard',
@@ -9,7 +10,7 @@ const pageTitles = {
   '/invoices/new': 'New Invoice',
   '/quotations': 'Quotations',
   '/quotations/new': 'New Quotation',
-  '/orders': 'Orders',
+  '/orders': BRAND.ordersLabel,
   '/expenses': 'Expenses',
   '/credit-notes': 'Credit Notes',
   '/reports': 'Reports',

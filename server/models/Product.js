@@ -9,11 +9,11 @@ const productSchema = new mongoose.Schema({
   },
   serviceType: {
     type: String,
-    enum: ['Design Wear', 'Corporate Clothing'],
+    enum: ['Design Wear', 'Corporate Clothing', 'Marketing & Campaigns', 'Content & Production', 'Design & Development'],
     required: true
   },
   defaultPrice: { type: Number, required: true, min: 0 },
-  unit: { type: String, default: 'piece', enum: ['piece', 'meter', 'yard', 'set', 'hour', 'lot'] },
+  unit: { type: String, default: 'piece', enum: ['piece', 'meter', 'yard', 'set', 'hour', 'lot', 'project', 'month'] },
   isActive: { type: Boolean, default: true }
 }, { timestamps: true });
 

@@ -20,7 +20,7 @@ export default function RecentInvoices({ invoices = [] }) {
         </thead>
         <tbody>
           {invoices.length === 0 ? (
-            <tr><td colSpan={5} style={{ textAlign: 'center', padding: '2rem', color: '#999' }}>No invoices yet</td></tr>
+            <tr><td colSpan={5} style={{ textAlign: 'center', padding: '2rem', color: 'var(--soft-ink)' }}>No invoices yet</td></tr>
           ) : (
             invoices.map(inv => (
               <tr key={inv._id} onClick={() => navigate(`/invoices/${inv._id}`)}>

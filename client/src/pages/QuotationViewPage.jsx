@@ -217,7 +217,7 @@ export default function QuotationViewPage() {
           )}
           <div>
             <div className="invoice-footer-title">Terms & Conditions</div>
-            <div style={{ fontSize: '0.75rem', color: '#666', lineHeight: 1.7, whiteSpace: 'pre-line' }}>
+            <div style={{ fontSize: '0.75rem', color: 'var(--muted-ink)', lineHeight: 1.7, whiteSpace: 'pre-line' }}>
 {(settings?.pdfTerms || '').trim() || DEFAULT_TERMS}
             </div>
           </div>
@@ -230,7 +230,7 @@ export default function QuotationViewPage() {
           <Modal.Title className="modal-title-custom">Convert to Invoice</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <p style={{ fontSize: '0.85rem', color: '#666', marginBottom: '1rem' }}>
+          <p style={{ fontSize: '0.85rem', color: 'var(--muted-ink)', marginBottom: '1rem' }}>
             Set the delivery date and payment type for the new invoice.
           </p>
           <Row className="g-3">

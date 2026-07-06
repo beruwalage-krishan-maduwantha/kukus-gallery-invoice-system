@@ -1,23 +1,18 @@
+import { BRAND } from '../brand';
+
 export const STATUS_OPTIONS = ['Draft', 'Advance Paid', 'Paid', 'Overdue', 'Cancelled'];
 
-export const ORDER_TYPES = ['Sample', 'Bulk'];
+export const ORDER_TYPES = BRAND.key === 'vertex' ? ['Project'] : ['Sample', 'Bulk'];
 
 export const PAYMENT_TYPES = ['Bank Transfer', 'Cash', 'Credits'];
 
-export const SERVICE_TYPES = ['Design Wear', 'Corporate Clothing'];
+export const SERVICE_TYPES = BRAND.serviceTypes;
 
-export const CATEGORIES = {
-  'Design Wear': ['Main Size Development', 'Size Grading', 'Sample', 'Bulk Production'],
-  'Corporate Clothing': ['T-Shirts', 'Uniforms', 'DTF Printing', 'Embroidery']
-};
+export const CATEGORIES = BRAND.categories;
 
-export const ALL_CATEGORIES = [
-  'Main Size Development', 'Size Grading', 'Sample',
-  'Bulk Production',
-  'T-Shirts', 'Uniforms', 'DTF Printing', 'Embroidery', 'Other'
-];
+export const ALL_CATEGORIES = [...Object.values(BRAND.categories).flat(), 'Other'];
 
-export const UNITS = ['piece', 'meter', 'yard', 'set', 'hour', 'lot'];
+export const UNITS = BRAND.units;
 
 export const STATUS_COLORS = {
   Draft: { bg: 'rgba(154,123,175,0.12)', color: '#9A7BAF' },
@@ -41,10 +36,6 @@ export const QUOTATION_STATUS_OPTIONS = ['Draft', 'Sent', 'Accepted', 'Rejected'
 
 export const ORDER_STATUS_OPTIONS = ['Pending', 'Processing', 'Alternative', 'Delivered', 'Done'];
 
-export const EXPENSE_CATEGORIES = [
-  'Raw Materials', 'Fabric', 'Trims & Accessories', 'Printing', 'Embroidery',
-  'Labour', 'Salaries', 'Rent', 'Utilities', 'Transport',
-  'Packaging', 'Equipment', 'Maintenance', 'Marketing', 'Office Supplies', 'Other'
-];
+export const EXPENSE_CATEGORIES = BRAND.expenseCategories;
 
 export const EXPENSE_PAYMENT_METHODS = ['Cash', 'Bank Transfer', 'Cheque'];

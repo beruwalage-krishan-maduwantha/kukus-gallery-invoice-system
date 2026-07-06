@@ -126,10 +126,10 @@ export default function InvoiceViewPage() {
           <div>
             <table style={{ fontSize: '0.82rem', borderCollapse: 'collapse' }}>
               <tbody>
-                <tr><td style={{ color: '#888', paddingRight: '1rem', paddingBottom: '0.3rem' }}>Invoice No</td><td style={{ fontWeight: 600, color: 'var(--primary)', paddingBottom: '0.3rem' }}>{invoice.invoiceNumber}</td></tr>
-                <tr><td style={{ color: '#888', paddingRight: '1rem', paddingBottom: '0.3rem' }}>Date</td><td style={{ fontWeight: 600, paddingBottom: '0.3rem' }}>{formatDate(invoice.invoiceDate)}</td></tr>
-                {invoice.deliveryDate && <tr><td style={{ color: '#888', paddingRight: '1rem', paddingBottom: '0.3rem' }}>Delivery</td><td style={{ fontWeight: 600, paddingBottom: '0.3rem' }}>{formatDate(invoice.deliveryDate)}</td></tr>}
-                <tr><td style={{ color: '#888', paddingRight: '1rem' }}>Payment</td><td style={{ fontWeight: 500 }}>{invoice.paymentType}</td></tr>
+                <tr><td style={{ color: 'var(--muted-ink)', paddingRight: '1rem', paddingBottom: '0.3rem' }}>Invoice No</td><td style={{ fontWeight: 600, color: 'var(--primary)', paddingBottom: '0.3rem' }}>{invoice.invoiceNumber}</td></tr>
+                <tr><td style={{ color: 'var(--muted-ink)', paddingRight: '1rem', paddingBottom: '0.3rem' }}>Date</td><td style={{ fontWeight: 600, paddingBottom: '0.3rem' }}>{formatDate(invoice.invoiceDate)}</td></tr>
+                {invoice.deliveryDate && <tr><td style={{ color: 'var(--muted-ink)', paddingRight: '1rem', paddingBottom: '0.3rem' }}>Delivery</td><td style={{ fontWeight: 600, paddingBottom: '0.3rem' }}>{formatDate(invoice.deliveryDate)}</td></tr>}
+                <tr><td style={{ color: 'var(--muted-ink)', paddingRight: '1rem' }}>Payment</td><td style={{ fontWeight: 500 }}>{invoice.paymentType}</td></tr>
               </tbody>
             </table>
           </div>
@@ -195,7 +195,7 @@ export default function InvoiceViewPage() {
           )}
           <div>
             <div className="invoice-footer-title">Terms & Conditions</div>
-            <div style={{ fontSize: '0.75rem', color: '#666', lineHeight: 1.7, whiteSpace: 'pre-line' }}>
+            <div style={{ fontSize: '0.75rem', color: 'var(--muted-ink)', lineHeight: 1.7, whiteSpace: 'pre-line' }}>
 {(settings?.pdfTerms || '').trim() || DEFAULT_TERMS}
             </div>
           </div>

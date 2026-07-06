@@ -107,7 +107,7 @@ export default function SettingsPage() {
             <div style={{ background: 'var(--tint)', padding: '1rem 1.5rem', borderRadius: 10, flex: 1, minWidth: 200 }}>
               <div style={{ fontSize: '0.68rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--accent)', marginBottom: '0.3rem' }}>Logged in as</div>
               <div style={{ fontWeight: 600, color: 'var(--primary-dark)', fontSize: '1rem' }}>{user?.name}</div>
-              <div style={{ fontSize: '0.82rem', color: '#888' }}>{user?.email}</div>
+              <div style={{ fontSize: '0.82rem', color: 'var(--muted-ink)' }}>{user?.email}</div>
             </div>
             <Button className="btn-outline-custom btn-sm-custom" onClick={() => { setShowResetPw({ _id: user?.id, name: user?.name, email: user?.email }); setNewPassword(''); }}>
               Change Password
@@ -297,7 +297,7 @@ export default function SettingsPage() {
             <div style={{ background: 'var(--tint)', padding: '1.5rem', borderRadius: 12, textAlign: 'center' }}>
               <ArrowDownTrayIcon style={{ width: 32, height: 32, color: 'var(--primary)', marginBottom: '0.75rem' }} />
               <h6 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.1rem', color: 'var(--primary-dark)' }}>Download Backup</h6>
-              <p style={{ fontSize: '0.78rem', color: '#888', marginBottom: '1rem' }}>
+              <p style={{ fontSize: '0.78rem', color: 'var(--muted-ink)', marginBottom: '1rem' }}>
                 Export all data (customers, products, invoices, orders, quotations, credit notes) as a JSON file.
               </p>
               <Button className="btn-primary-custom" onClick={handleExport} disabled={exporting}>
@@ -310,7 +310,7 @@ export default function SettingsPage() {
             <div style={{ background: 'var(--tint)', padding: '1.5rem', borderRadius: 12, textAlign: 'center' }}>
               <ArrowUpTrayIcon style={{ width: 32, height: 32, color: 'var(--warning)', marginBottom: '0.75rem' }} />
               <h6 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.1rem', color: 'var(--primary-dark)' }}>Restore Backup</h6>
-              <p style={{ fontSize: '0.78rem', color: '#888', marginBottom: '1rem' }}>
+              <p style={{ fontSize: '0.78rem', color: 'var(--muted-ink)', marginBottom: '1rem' }}>
                 Upload a backup JSON file to restore missing data. Existing records won't be duplicated.
               </p>
               <input type="file" accept=".json" ref={fileInputRef} onChange={handleImport} style={{ display: 'none' }} />
@@ -407,7 +407,7 @@ export default function SettingsPage() {
             <div style={{ background: 'var(--tint)', padding: '1rem 1.5rem', borderRadius: 10, flex: 1, minWidth: 200 }}>
               <div style={{ fontSize: '0.68rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--accent)', marginBottom: '0.3rem' }}>Logged in as</div>
               <div style={{ fontWeight: 600, color: 'var(--primary-dark)', fontSize: '1rem' }}>{user?.name}</div>
-              <div style={{ fontSize: '0.82rem', color: '#888' }}>{user?.email}</div>
+              <div style={{ fontSize: '0.82rem', color: 'var(--muted-ink)' }}>{user?.email}</div>
             </div>
             <Button className="btn-outline-custom btn-sm-custom" onClick={() => { setShowResetPw({ _id: user?.id, name: user?.name, email: user?.email }); setNewPassword(''); }}>
               Change Password
@@ -424,7 +424,7 @@ export default function SettingsPage() {
             <div style={{ background: 'var(--tint)', padding: '1rem 1.5rem', borderRadius: 10, flex: 1, minWidth: 200 }}>
               <div style={{ fontSize: '0.68rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--accent)', marginBottom: '0.3rem' }}>Logged in as</div>
               <div style={{ fontWeight: 600, color: 'var(--primary-dark)', fontSize: '1rem' }}>{user?.name}</div>
-              <div style={{ fontSize: '0.82rem', color: '#888' }}>{user?.email}</div>
+              <div style={{ fontSize: '0.82rem', color: 'var(--muted-ink)' }}>{user?.email}</div>
             </div>
             <Button className="btn-outline-custom btn-sm-custom" onClick={() => { setShowResetPw({ _id: user?.id, name: user?.name, email: user?.email }); setNewPassword(''); }}>
               Change Password
@@ -496,7 +496,7 @@ export default function SettingsPage() {
           <Modal.Title className="modal-title-custom">Reset Password</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <p style={{ fontSize: '0.85rem', color: '#666' }}>Reset password for <strong>{showResetPw?.name}</strong> ({showResetPw?.email})</p>
+          <p style={{ fontSize: '0.85rem', color: 'var(--muted-ink)' }}>Reset password for <strong>{showResetPw?.name}</strong> ({showResetPw?.email})</p>
           <Form.Group>
             <Form.Label className="form-label-custom">New Password * (min 6 characters)</Form.Label>
             <Form.Control className="form-input" type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)} placeholder="Enter new password" />
