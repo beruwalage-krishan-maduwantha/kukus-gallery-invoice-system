@@ -22,6 +22,7 @@ exports.getQuotations = async (req, res) => {
     const { search, status, customer, dateFrom, dateTo, page = 1, limit = 20, sort = '-createdAt' } = req.query;
     const query = {};
     if (status) query.status = status;
+    else query.status = { $ne: 'Converted' };
     if (customer) query.customer = customer;
     if (dateFrom || dateTo) {
       query.quotationDate = {};
