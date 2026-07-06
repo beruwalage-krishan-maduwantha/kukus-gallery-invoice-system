@@ -7,3 +7,4 @@ server/uploads/*.pdf
 .vercel
 .claude/
 backups/
+invoice_system_vertex_digital_solutions/
