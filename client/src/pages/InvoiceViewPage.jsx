@@ -10,7 +10,7 @@ import ConfirmModal from '../components/common/ConfirmModal';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import { formatCurrency } from '../utils/formatCurrency';
 import { formatDate } from '../utils/formatDate';
-import { generateInvoicePdf, previewInvoicePdf } from '../components/pdf/generatePdf';
+import { generateInvoicePdf, previewInvoicePdf, DEFAULT_TERMS } from '../components/pdf/generatePdf';
 
 export default function InvoiceViewPage() {
   const { id } = useParams();
@@ -196,32 +196,7 @@ export default function InvoiceViewPage() {
           <div>
             <div className="invoice-footer-title">Terms & Conditions</div>
             <div style={{ fontSize: '0.75rem', color: '#666', lineHeight: 1.7, whiteSpace: 'pre-line' }}>
-{`1. Sample Charges
-Sample charges are non-refundable. Upon order confirmation, the full sample payment will be credited towards the total order value.
-
-2. Price Adjustments
-All prices are based on the approved design specifications.
-
-3. Design & Approval
-Product designs, colors, logos, and images must be provided before order confirmation. Any applicable discounts will be clearly mentioned in the quotation.
-
-4. Bulk Order Payment Terms
-50% advance payment is required to commence production. The remaining balance must be settled upon receiving the order.
-
-5. Payment Methods
-Payments can be made via Bank Transfer, Cash, Mintpay, or Koko Pay. Mintpay and Koko Pay are valid for balance payments only. Advance payments must be made via Bank Transfer, Cheque, or Cash. Payments made through Mintpay and Koko Pay will incur an additional 15% charge.
-
-6. Quotation Validity
-This quotation is valid for 7 days from the date issued.
-
-7. Delivery & Customization
-The delivery date will be specified on the invoice. All material details and customization requirements will be clearly mentioned in the quotation.
-
-8. Alterations
-If any alterations are required, products must be handed over within 7 days of delivery. All alteration requests should be arranged at once. Any further alterations after the initial 7-day period can be done free of charge by visiting the factory during working days.
-
-9. Design Confidentiality
-Client-specific designs will not be used for other clients without prior written permission.`}
+{(settings?.pdfTerms || '').trim() || DEFAULT_TERMS}
             </div>
           </div>
         </div>

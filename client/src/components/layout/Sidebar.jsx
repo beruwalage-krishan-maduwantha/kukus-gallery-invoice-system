@@ -1,5 +1,6 @@
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { BRAND } from '../../brand';
 import {
   HomeIcon,
   DocumentTextIcon,
@@ -38,7 +39,7 @@ export default function Sidebar({ show, onClose }) {
       {show && <div className="sidebar-overlay" onClick={onClose} />}
       <aside className={`sidebar ${show ? 'show' : ''}`}>
         <div className="sidebar-header">
-          <img src="/logo.png" alt="Kukus Gallery" className="sidebar-logo" />
+          <img src={BRAND.logo} alt={BRAND.name} className="sidebar-logo" />
           <span className="sidebar-brand">System</span>
         </div>
 

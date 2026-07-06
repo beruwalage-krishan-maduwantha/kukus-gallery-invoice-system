@@ -6,11 +6,12 @@ import { getSettings, updateSettings } from '../api/settings';
 import api from '../api/axios';
 import { useAuth } from '../context/AuthContext';
 import LoadingSpinner from '../components/common/LoadingSpinner';
+import { BRAND } from '../brand';
 
 export default function SettingsPage() {
   const { user } = useAuth();
   const isAdmin = user?.role === 'admin';
-  const isMainAdmin = user?.email === 'admin@kukusgallery.com';
+  const isMainAdmin = user?.email === BRAND.mainAdminEmail;
   const [form, setForm] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -217,6 +218,12 @@ export default function SettingsPage() {
                 <Form.Control className="form-input" as="textarea" rows={12} value={form.defaultTerms} onChange={e => update('defaultTerms', e.target.value)} style={{ fontSize: '0.82rem', lineHeight: 1.7 }} />
               </Form.Group>
             </Col>
+            <Col xs={12}>
+              <Form.Group>
+                <Form.Label className="form-label-custom">PDF Terms & Conditions Page</Form.Label>
+                <Form.Control className="form-input" as="textarea" rows={12} value={form.pdfTerms || ''} onChange={e => update('pdfTerms', e.target.value)} style={{ fontSize: '0.82rem', lineHeight: 1.7 }} placeholder="Full Terms & Conditions text printed on the second page of PDF invoices and quotations. Leave empty to use the built-in default." />
+              </Form.Group>
+            </Col>
           </Row>
         </div>
 
@@ -369,7 +376,7 @@ export default function SettingsPage() {
                         }}>Edit</button>
                         <button className="btn-sm-custom" style={{ background: 'rgba(245,158,11,0.1)', color: 'var(--warning)', border: 'none', borderRadius: 6, padding: '0.35rem 0.6rem', fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer' }}
                           onClick={() => { setShowResetPw(u); setNewPassword(''); }}>Reset PW</button>
-                        {u.email !== 'admin@kukusgallery.com' && (
+                        {u.email !== BRAND.mainAdminEmail && (
                           <button className="btn-sm-custom" style={{
                             background: u.isActive ? 'rgba(239,68,68,0.1)' : 'rgba(34,197,94,0.1)',
                             color: u.isActive ? 'var(--danger)' : 'var(--success)',

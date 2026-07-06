@@ -944,3 +944,44 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-heading); }
   .topbar-title { font-size: 0.9rem; }
   .login-card { margin: 0.5rem; padding: 1.2rem; }
 }
+
+/* ==================== VERTEX DIGITAL SOLUTIONS THEME ==================== */
+/* Activated by data-brand="vertex" on <html> (set from VITE_COMPANY). */
+html[data-brand="vertex"] {
+  --primary: #7E9312;        /* olive lime - readable on light surfaces */
+  --primary-light: #D7F542;  /* neon lime - used on dark surfaces */
+  --primary-dark: #23282E;   /* charcoal - sidebar, login, table headers */
+  --accent: #6B7683;         /* slate gray secondary text */
+  --tint: #F0F2F4;           /* light gray page background */
+  --deep: #3A424A;
+  --brand-950: #14171B;
+  --font-heading: 'Montserrat', sans-serif;
+}
+
+/* Signature neon lime action button with dark text */
+html[data-brand="vertex"] .btn-primary-custom {
+  background: #D7F542;
+  color: #1A2005;
+}
+html[data-brand="vertex"] .btn-primary-custom:hover,
+html[data-brand="vertex"] .btn-primary-custom:focus,
+html[data-brand="vertex"] .btn-primary-custom:active {
+  background: #C6E926 !important;
+  color: #1A2005 !important;
+}
+
+/* Lime glow instead of lavender glow on the charcoal login screen */
+html[data-brand="vertex"] .login-page {
+  background-image: radial-gradient(ellipse at 30% 20%, rgba(215, 245, 66, 0.10) 0%, transparent 50%),
+                    radial-gradient(ellipse at 70% 80%, rgba(215, 245, 66, 0.05) 0%, transparent 50%);
+}
+
+html[data-brand="vertex"] h1,
+html[data-brand="vertex"] h2,
+html[data-brand="vertex"] h3,
+html[data-brand="vertex"] h4,
+html[data-brand="vertex"] h5,
+html[data-brand="vertex"] h6 {
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}

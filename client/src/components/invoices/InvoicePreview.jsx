@@ -1,5 +1,6 @@
 import { formatCurrency } from '../../utils/formatCurrency';
 import { formatDate } from '../../utils/formatDate';
+import { BRAND } from '../../brand';
 
 export default function InvoicePreview({ customer, items, subtotal, discountAmount, grandTotal, invoiceDate, deliveryDate }) {
   return (
@@ -7,8 +8,7 @@ export default function InvoicePreview({ customer, items, subtotal, discountAmou
       <h5 className="preview-title">Live Preview</h5>
 
       <div style={{ borderBottom: '1px solid #eee', paddingBottom: '0.5rem', marginBottom: '0.5rem' }}>
-        <strong style={{ color: 'var(--primary-dark)', fontSize: '0.8rem' }}>Kukus Gallery Pvt Ltd</strong>
-        <br /><span style={{ color: '#999', fontSize: '0.65rem' }}>484/8/F Wettasinghe Gardens, Pitakotte</span>
+        <strong style={{ color: 'var(--primary-dark)', fontSize: '0.8rem' }}>{BRAND.legalName}</strong>
       </div>
 
       {customer && (

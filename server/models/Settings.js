@@ -12,6 +12,7 @@ const settingsSchema = new mongoose.Schema({
   defaultPaymentTerms: { type: String, default: 'Net 30' },
   defaultNotes: { type: String, default: 'Thank you for your business!' },
   defaultTerms: { type: String, default: 'Payment is due within the specified payment terms. Late payments may incur additional charges.' },
+  pdfTerms: { type: String, default: '' },
   invoicePrefix: { type: String, default: 'KG' },
   bankDetails: {
     bankName: { type: String, default: '' },

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate, Navigate } from 'react-router-dom';
 import { Form, Button, Alert, Spinner } from 'react-bootstrap';
 import { useAuth } from '../context/AuthContext';
+import { BRAND } from '../brand';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -33,7 +34,7 @@ export default function LoginPage() {
   return (
     <div className="login-page">
       <div className="login-card">
-        <img src="/logo.png" alt="Kukus Gallery" className="login-logo" />
+        <img src={BRAND.logo} alt={BRAND.name} className="login-logo" />
         <h2 className="login-title">System</h2>
         <p className="login-subtitle">Sign in to continue</p>
 
@@ -45,7 +46,7 @@ export default function LoginPage() {
             <Form.Control
               type="email"
               className="form-input"
-              placeholder="admin@kukusgallery.com"
+              placeholder={BRAND.loginPlaceholder}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required

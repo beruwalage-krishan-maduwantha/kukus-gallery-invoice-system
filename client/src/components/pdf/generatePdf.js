@@ -1,5 +1,8 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { BRAND } from '../../brand';
+
+const PDF = BRAND.pdf;
 
 function formatLKR(amount) {
   const num = Number(amount) || 0;
@@ -32,7 +35,7 @@ function compressImage(src, maxWidth, quality) {
   });
 }
 
-const TERMS_TEXT = `1. Sample Charges
+export const DEFAULT_TERMS = `1. Sample Charges
 Sample charges are non-refundable. Upon order confirmation, the full sample payment will be credited towards the total order value.
 
 2. Price Adjustments
@@ -60,12 +63,13 @@ If any alterations are required, products must be handed over within 7 days of d
 Client-specific designs will not be used for other clients without prior written permission.`;
 
 function drawFooter(doc, pageWidth, pageHeight, margin, settings) {
-  doc.setDrawColor(177, 145, 198);
+  doc.setDrawColor(...PDF.accent);
   doc.setLineWidth(0.2);
   doc.line(margin, pageHeight - 6, pageWidth - margin, pageHeight - 6);
-  doc.setTextColor(154, 123, 175);
+  doc.setTextColor(...PDF.muted);
   doc.setFontSize(4.5);
-  doc.text(`${settings?.companyName || 'Kukus Gallery Pvt Ltd'} | ${settings?.website || 'www.kukusgallery.com'}`, pageWidth / 2, pageHeight - 3, { align: 'center' });
+  const footerText = [settings?.companyName || BRAND.legalName, settings?.website].filter(Boolean).join(' | ');
+  doc.text(footerText, pageWidth / 2, pageHeight - 3, { align: 'center' });
 }
 
 function drawInvoiceContent(doc, data, settings, logoBase64, title) {
@@ -85,30 +89,31 @@ function drawInvoiceContent(doc, data, settings, logoBase64, title) {
   }
 
   // === HEADER: Company name (left, bigger) + INVOICE box (right) ===
-  doc.setTextColor(44, 22, 64);
+  doc.setTextColor(...PDF.heading);
   doc.setFontSize(12);
   doc.setFont('helvetica', 'bold');
-  doc.text(settings?.companyName || 'Kukus Gallery Pvt Ltd', margin, 12);
+  doc.text(settings?.companyName || BRAND.legalName, margin, 12);
   doc.setFontSize(5.5);
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(100, 100, 100);
   const addr = (settings?.address || '').replace(', Sri Lanka', '');
   doc.text(addr, margin, 17);
-  doc.text(`Tel: ${settings?.landline || '011 287 0057'}`, margin, 21);
+  const tel = settings?.landline || settings?.phone || '';
+  if (tel) doc.text(`Tel: ${tel}`, margin, 21);
   doc.text(settings?.email || '', margin, 25);
 
   // INVOICE/QUOTATION box (right, centered text)
-  doc.setFillColor(248, 244, 251);
-  doc.setDrawColor(212, 189, 227);
+  doc.setFillColor(...PDF.accentSoft);
+  doc.setDrawColor(...PDF.border);
   doc.roundedRect(pageWidth - margin - 40, 5, 40, 20, 3, 3, 'FD');
-  doc.setTextColor(177, 145, 198);
+  doc.setTextColor(...PDF.accent);
   doc.setFontSize(14);
   doc.setFont('helvetica', 'bold');
   doc.text(title, pageWidth - margin - 20, 18, { align: 'center' });
 
   // === DIVIDER LINE ===
   let y = 34;
-  doc.setDrawColor(212, 189, 227);
+  doc.setDrawColor(...PDF.border);
   doc.setLineWidth(0.3);
   doc.line(margin, y, pageWidth - margin, y);
 
@@ -117,12 +122,12 @@ function drawInvoiceContent(doc, data, settings, logoBase64, title) {
   const snap = data.customerSnapshot || {};
 
   // Bill To - left side
-  doc.setTextColor(154, 123, 175);
+  doc.setTextColor(...PDF.muted);
   doc.setFontSize(5.5);
   doc.setFont('helvetica', 'bold');
   doc.text('BILL TO', margin, y);
   y += 3.5;
-  doc.setTextColor(44, 22, 64);
+  doc.setTextColor(...PDF.heading);
   doc.setFontSize(6.5);
   doc.setFont('helvetica', 'bold');
   doc.text(`${snap.title ? snap.title + '. ' : ''}${snap.name || ''}`, margin, y);
@@ -140,7 +145,7 @@ function drawInvoiceContent(doc, data, settings, logoBase64, title) {
   let metaY = y - 3;
 
   const metaRows = [
-    { label: 'Invoice No', value: data.invoiceNumber || data.quotationNumber, color: [177, 145, 198], bold: true },
+    { label: 'Invoice No', value: data.invoiceNumber || data.quotationNumber, color: PDF.accent, bold: true },
     { label: 'Date', value: fmtDate(data.invoiceDate || data.quotationDate) },
   ];
   if (data.deliveryDate) metaRows.push({ label: 'Delivery', value: fmtDate(data.deliveryDate) });
@@ -170,8 +175,8 @@ function drawInvoiceContent(doc, data, settings, logoBase64, title) {
     startY: y,
     head: [['Product / Service', 'Qty', 'Unit Price', 'Disc', 'Total']],
     body: tableBody,
-    headStyles: { fillColor: [177, 145, 198], textColor: 255, fontSize: 5.5, fontStyle: 'bold', cellPadding: 2.5, halign: 'center' },
-    alternateRowStyles: { fillColor: [248, 244, 251] },
+    headStyles: { fillColor: PDF.accent, textColor: 255, fontSize: 5.5, fontStyle: 'bold', cellPadding: 2.5, halign: 'center' },
+    alternateRowStyles: { fillColor: PDF.accentSoft },
     styles: { fontSize: 6, cellPadding: 2, textColor: [30, 30, 30], lineColor: [220, 220, 220], lineWidth: 0.1, valign: 'middle' },
     columnStyles: {
       0: { cellWidth: 'auto', halign: 'left' },
@@ -181,7 +186,7 @@ function drawInvoiceContent(doc, data, settings, logoBase64, title) {
       4: { cellWidth: 26, halign: 'right', fontStyle: 'bold' }
     },
     margin: { left: margin, right: margin }, theme: 'grid',
-    tableLineColor: [177, 145, 198], tableLineWidth: 0.2
+    tableLineColor: PDF.accent, tableLineWidth: 0.2
   });
 
   y = doc.lastAutoTable.finalY + 4;
@@ -194,7 +199,7 @@ function drawInvoiceContent(doc, data, settings, logoBase64, title) {
   const boxHeight = 22;
 
   if (settings?.bankDetails?.bankName) {
-    doc.setFillColor(177, 145, 198);
+    doc.setFillColor(...PDF.accent);
     doc.roundedRect(margin, bankY, contentWidth, boxHeight, 2, 2, 'F');
 
     // Left side - Bank details
@@ -249,7 +254,7 @@ function drawTermsPage(doc, settings) {
   doc.addPage('a5', 'portrait');
 
   let y = 15;
-  doc.setTextColor(44, 22, 64);
+  doc.setTextColor(...PDF.heading);
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(10);
   doc.text('Terms & Conditions', pageWidth / 2, y, { align: 'center' });
@@ -258,7 +263,8 @@ function drawTermsPage(doc, settings) {
   doc.setTextColor(80, 80, 80);
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(6);
-  const termsLines = doc.splitTextToSize(TERMS_TEXT, contentWidth);
+  const termsText = (settings?.pdfTerms || '').trim() || DEFAULT_TERMS;
+  const termsLines = doc.splitTextToSize(termsText, contentWidth);
   const lineHeight = 2.8;
   for (let i = 0; i < termsLines.length; i++) {
     if (y + lineHeight > pageHeight - 8) {
@@ -276,7 +282,7 @@ function drawTermsPage(doc, settings) {
 async function buildPdf(data, settings, title) {
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a5' });
   let logoBase64 = null;
-  try { logoBase64 = await compressImage('/logo.png', 200, 0.6); } catch {}
+  try { logoBase64 = await compressImage(BRAND.logo, 200, 0.6); } catch {}
   drawInvoiceContent(doc, data, settings, logoBase64, title);
   drawTermsPage(doc, settings);
   return doc;
