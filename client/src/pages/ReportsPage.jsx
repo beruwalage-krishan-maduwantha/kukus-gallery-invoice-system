@@ -106,7 +106,7 @@ export default function ReportsPage() {
                 <tr>
                   <td style={{ fontWeight: 600, color: 'var(--info)' }}>Conversion Rate</td>
                   <td style={{ textAlign: 'right' }}>{data?.totalQuotations || 0} quotations</td>
-                  <td style={{ textAlign: 'right', fontWeight: 700, fontSize: '1.1rem', color: 'var(--info)' }}>{data?.conversionRate || 0}%</td>
+                  <td style={{ textAlign: 'right', fontWeight: 700, color: 'var(--info)' }}>{data?.conversionRate || 0}%</td>
                   <td style={{ textAlign: 'right', color: 'var(--accent)' }}>-</td>
                 </tr>
                 <tr>
@@ -122,9 +122,9 @@ export default function ReportsPage() {
                   <td style={{ textAlign: 'right', color: 'var(--accent)' }}>{ratioOf(data?.totalExpenses || 0)}</td>
                 </tr>
                 <tr style={{ background: (data?.profit || 0) >= 0 ? 'rgba(34,197,94,0.05)' : 'rgba(239,68,68,0.05)' }}>
-                  <td style={{ fontWeight: 700, fontSize: '1rem', color: (data?.profit || 0) >= 0 ? 'var(--success)' : 'var(--danger)' }}>Profit</td>
+                  <td style={{ fontWeight: 700, color: (data?.profit || 0) >= 0 ? 'var(--success)' : 'var(--danger)' }}>Profit</td>
                   <td style={{ textAlign: 'right' }}>Income - Expenses</td>
-                  <td style={{ textAlign: 'right', fontWeight: 700, fontSize: '1.1rem', color: (data?.profit || 0) >= 0 ? 'var(--success)' : 'var(--danger)' }}>{formatCurrency(data?.profit || 0)}</td>
+                  <td style={{ textAlign: 'right', fontWeight: 700, color: (data?.profit || 0) >= 0 ? 'var(--success)' : 'var(--danger)' }}>{formatCurrency(data?.profit || 0)}</td>
                   <td style={{ textAlign: 'right', color: 'var(--accent)' }}>{ratioOf(data?.profit || 0)}</td>
                 </tr>
                 <tr>
@@ -351,8 +351,8 @@ export default function ReportsPage() {
                   <td style={{ textAlign: 'right', fontWeight: 700, color: '#6366F1' }}>{formatCurrency(data?.totalConvertedValue || 0)}</td>
                 </tr>
                 <tr style={{ background: 'rgba(59,130,246,0.05)' }}>
-                  <td style={{ fontWeight: 700, color: 'var(--info)', fontSize: '1rem' }}>Conversion Rate</td>
-                  <td style={{ textAlign: 'right', fontWeight: 700, color: 'var(--info)', fontSize: '1.2rem' }}>{data?.conversionRate || 0}%</td>
+                  <td style={{ fontWeight: 700, color: 'var(--info)' }}>Conversion Rate</td>
+                  <td style={{ textAlign: 'right', fontWeight: 700, color: 'var(--info)' }}>{data?.conversionRate || 0}%</td>
                 </tr>
                 <tr>
                   <td style={{ fontWeight: 600 }}>Total Invoices</td>
@@ -363,8 +363,8 @@ export default function ReportsPage() {
                   <td style={{ textAlign: 'right', fontWeight: 600 }}>{formatCurrency(data?.totalInvoiceValue || 0)}</td>
                 </tr>
                 <tr style={{ background: 'rgba(34,197,94,0.05)' }}>
-                  <td style={{ fontWeight: 700, color: 'var(--success)', fontSize: '1rem' }}>Total Sell (Paid Invoices)</td>
-                  <td style={{ textAlign: 'right', fontWeight: 700, color: 'var(--success)', fontSize: '1.2rem' }}>{formatCurrency(data?.totalSell || 0)}</td>
+                  <td style={{ fontWeight: 700, color: 'var(--success)' }}>Total Sell (Paid Invoices)</td>
+                  <td style={{ textAlign: 'right', fontWeight: 700, color: 'var(--success)' }}>{formatCurrency(data?.totalSell || 0)}</td>
                 </tr>
               </tbody>
             </table>
