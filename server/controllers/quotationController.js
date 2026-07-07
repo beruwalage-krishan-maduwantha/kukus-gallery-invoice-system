@@ -7,6 +7,7 @@ const Counter = require('../models/Counter');
 const Order = require('../models/Order');
 const generateInvoiceNumber = require('../utils/generateInvoiceNumber');
 const buildOrdersFromItems = require('../utils/buildOrdersFromItems');
+const { skipsOrderNumber } = require('../utils/orderNumberRules');
 
 async function generateQuotationNumber(prefix = 'QT') {
   const counter = await Counter.findOneAndUpdate(
@@ -225,7 +226,7 @@ exports.convertToInvoice = async (req, res) => {
     const processedItems = [];
     for (const item of quotation.items) {
       let orderNumber = '';
-      if (item.orderType) {
+      if (item.orderType && !skipsOrderNumber(item, quotation.items)) {
         const prefix = { Sample: 'SM', Bulk: 'BLK', Project: 'PRJ' }[item.orderType] || 'BLK';
         const counter = await Counter.findOneAndUpdate(
           { _id: `order_${prefix.toLowerCase()}` },

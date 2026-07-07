@@ -6,6 +6,7 @@ const Settings = require('../models/Settings');
 const Order = require('../models/Order');
 const generateInvoiceNumber = require('../utils/generateInvoiceNumber');
 const buildOrdersFromItems = require('../utils/buildOrdersFromItems');
+const { skipsOrderNumber } = require('../utils/orderNumberRules');
 
 exports.getInvoices = async (req, res) => {
   try {
@@ -68,8 +69,8 @@ exports.createInvoice = async (req, res) => {
     const processedItems = [];
     for (const item of items) {
       const lineTotal = item.quantity * item.unitPrice * (1 - (item.discount || 0) / 100);
-      let orderNumber = item.orderNumber || '';
-      if (!orderNumber && item.orderType) {
+      let orderNumber = skipsOrderNumber(item, items) ? '' : (item.orderNumber || '');
+      if (!orderNumber && item.orderType && !skipsOrderNumber(item, items)) {
         const prefix = { Sample: 'SM', Bulk: 'BLK', Project: 'PRJ' }[item.orderType] || 'BLK';
         const counter = await Counter.findOneAndUpdate(
           { _id: `order_${prefix.toLowerCase()}` },
