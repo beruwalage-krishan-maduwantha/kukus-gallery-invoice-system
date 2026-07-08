@@ -190,7 +190,7 @@ exports.updateInvoice = async (req, res) => {
     const invoice = await Invoice.findById(req.params.id);
     if (!invoice) return res.status(404).json({ message: 'Invoice not found' });
 
-    const { items, discountType, discountValue, paymentType, notes, terms, deliveryDate, advancePayment } = req.body;
+    const { items, discountType, discountValue, paymentType, notes, terms, invoiceDate, deliveryDate, advancePayment } = req.body;
 
     if (items) {
       const processedItems = items.map(item => {
@@ -242,6 +242,7 @@ exports.updateInvoice = async (req, res) => {
     }
     if (notes !== undefined) invoice.notes = notes;
     if (terms !== undefined) invoice.terms = terms;
+    if (invoiceDate) invoice.invoiceDate = invoiceDate;
     if (deliveryDate) invoice.deliveryDate = deliveryDate;
 
     await invoice.save();
