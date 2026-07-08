@@ -137,14 +137,19 @@ exports.updateQuotation = async (req, res) => {
 
     const { customer: customerId, items, discountType, discountValue, notes, terms, quotationDate, validUntil, deliveryDate, advancePayment } = req.body;
 
-    if (customerId && String(customerId) !== String(quotation.customer)) {
-      const customerDoc = await Customer.findById(customerId);
-      if (!customerDoc) return res.status(404).json({ message: 'Customer not found' });
-      quotation.customer = customerId;
-      quotation.customerSnapshot = {
-        name: customerDoc.name, email: customerDoc.email,
-        phone: customerDoc.phone, address: customerDoc.address, company: customerDoc.company
-      };
+    {
+      // refresh the snapshot from the (possibly new) customer so later
+      // customer edits (e.g. adding a company) reach existing documents
+      const targetCustomerId = customerId || quotation.customer;
+      const customerDoc = await Customer.findById(targetCustomerId);
+      if (customerId && !customerDoc) return res.status(404).json({ message: 'Customer not found' });
+      if (customerDoc) {
+        quotation.customer = targetCustomerId;
+        quotation.customerSnapshot = {
+          name: customerDoc.name, email: customerDoc.email,
+          phone: customerDoc.phone, address: customerDoc.address, company: customerDoc.company
+        };
+      }
     }
 
     if (items) {

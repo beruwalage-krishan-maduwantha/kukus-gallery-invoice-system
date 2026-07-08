@@ -192,6 +192,17 @@ exports.updateInvoice = async (req, res) => {
 
     const { items, discountType, discountValue, paymentType, notes, terms, invoiceDate, deliveryDate, advancePayment } = req.body;
 
+    // refresh the snapshot so later customer edits (e.g. adding a company)
+    // reach existing invoices when they are edited
+    const customerDoc = await Customer.findById(invoice.customer);
+    if (customerDoc) {
+      invoice.customerSnapshot = {
+        title: customerDoc.title || '',
+        name: customerDoc.name, email: customerDoc.email,
+        phone: customerDoc.phone, address: customerDoc.address, company: customerDoc.company
+      };
+    }
+
     if (items) {
       const processedItems = items.map(item => {
         const lineTotal = item.quantity * item.unitPrice * (1 - (item.discount || 0) / 100);

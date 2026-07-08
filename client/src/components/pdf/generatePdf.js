@@ -135,6 +135,7 @@ function drawInvoiceContent(doc, data, settings, logoBase64, title) {
   doc.setFontSize(6);
   doc.setTextColor(100, 100, 100);
   let billY = y + 3.5;
+  if (snap.company) { doc.setFont('helvetica', 'bold'); doc.text(snap.company, margin, billY); doc.setFont('helvetica', 'normal'); billY += 3; }
   if (snap.address) { doc.text(snap.address, margin, billY); billY += 3; }
   if (snap.phone) { doc.text(`Phone: ${snap.phone}`, margin, billY); billY += 3; }
   if (snap.email) { doc.text(`Email: ${snap.email}`, margin, billY); billY += 3; }
