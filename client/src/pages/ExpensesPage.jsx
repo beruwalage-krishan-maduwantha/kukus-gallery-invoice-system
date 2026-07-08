@@ -3,6 +3,7 @@ import { Button, Modal, Form, Row, Col } from 'react-bootstrap';
 import { PlusIcon, BanknotesIcon, TrashIcon } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 import { getExpenses, createExpense, updateExpense, deleteExpense } from '../api/expenses';
+import api from '../api/axios';
 import SearchInput from '../components/common/SearchInput';
 import DateRangeFilter from '../components/common/DateRangeFilter';
 import EmptyState from '../components/common/EmptyState';
@@ -31,6 +32,9 @@ export default function ExpensesPage() {
   const [form, setForm] = useState({ ...emptyForm });
   const [saving, setSaving] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState(null);
+  const [attachFile, setAttachFile] = useState(null);
+  const [existingAttachment, setExistingAttachment] = useState(null);
+  const [removeAttachment, setRemoveAttachment] = useState(false);
 
   const fetchExpenses = useCallback(async () => {
     setLoading(true);
@@ -49,6 +53,9 @@ export default function ExpensesPage() {
   const openAdd = () => {
     setEditingId(null);
     setForm({ ...emptyForm });
+    setAttachFile(null);
+    setExistingAttachment(null);
+    setRemoveAttachment(false);
     setShowForm(true);
   };
 
@@ -61,7 +68,39 @@ export default function ExpensesPage() {
       chequeReleaseDate: exp.chequeReleaseDate ? formatDateInput(exp.chequeReleaseDate) : '',
       reference: exp.reference || ''
     });
+    setAttachFile(null);
+    setExistingAttachment(exp.attachment?.filename ? exp.attachment : null);
+    setRemoveAttachment(false);
     setShowForm(true);
+  };
+
+  const handleFilePick = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (file.size > 7 * 1024 * 1024) {
+      toast.error('File too large — maximum 7 MB');
+      e.target.value = '';
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      const base64 = String(reader.result).split(',')[1];
+      setAttachFile({ name: file.name, type: file.type || 'application/octet-stream', size: file.size, data: base64 });
+      setRemoveAttachment(false);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const downloadAttachment = async (exp) => {
+    try {
+      const res = await api.get(`/expenses/${exp._id}/attachment`, { responseType: 'blob' });
+      const url = URL.createObjectURL(res.data);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = exp.attachment?.filename || 'attachment';
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch { toast.error('Failed to download attachment'); }
   };
 
   const handleSave = async () => {
@@ -71,7 +110,9 @@ export default function ExpensesPage() {
       const payload = {
         ...form,
         amount: Number(form.amount),
-        chequeReleaseDate: form.paymentMethod === 'Cheque' && form.chequeReleaseDate ? form.chequeReleaseDate : null
+        chequeReleaseDate: form.paymentMethod === 'Cheque' && form.chequeReleaseDate ? form.chequeReleaseDate : null,
+        attachment: attachFile ? { name: attachFile.name, type: attachFile.type, data: attachFile.data } : undefined,
+        removeAttachment: removeAttachment || undefined
       };
       if (editingId) {
         await updateExpense(editingId, payload);
@@ -158,7 +199,16 @@ export default function ExpensesPage() {
                       <div style={{ fontSize: '0.72rem', color: 'var(--soft-ink)' }}>Release: {formatDate(exp.chequeReleaseDate)}</div>
                     )}
                   </td>
-                  <td style={{ fontSize: '0.82rem', color: 'var(--soft-ink)' }}>{exp.reference || '—'}</td>
+                  <td style={{ fontSize: '0.82rem', color: 'var(--soft-ink)' }}>
+                    {exp.reference || '—'}
+                    {exp.attachment?.filename && (
+                      <div>
+                        <button onClick={() => downloadAttachment(exp)} title={exp.attachment.filename} style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', color: 'var(--info)', fontSize: '0.75rem', fontWeight: 600, textDecoration: 'underline' }}>
+                          📎 {exp.attachment.filename.length > 22 ? exp.attachment.filename.slice(0, 20) + '…' : exp.attachment.filename}
+                        </button>
+                      </div>
+                    )}
+                  </td>
                   <td>
                     <div className="d-flex gap-1">
                       <button style={btnStyle('rgba(177,145,198,0.1)', 'var(--primary)')} onClick={() => openEdit(exp)}>Edit</button>
@@ -228,6 +278,29 @@ export default function ExpensesPage() {
               <Form.Group>
                 <Form.Label className="form-label-custom">Reference / Receipt #</Form.Label>
                 <Form.Control className="form-input" value={form.reference} onChange={e => setForm({ ...form, reference: e.target.value })} placeholder="Optional" />
+              </Form.Group>
+            </Col>
+            <Col xs={12}>
+              <Form.Group>
+                <Form.Label className="form-label-custom">Attach Receipt / File</Form.Label>
+                <Form.Control className="form-input" type="file" onChange={handleFilePick} />
+                {attachFile && (
+                  <div style={{ fontSize: '0.78rem', marginTop: '0.4rem', color: 'var(--success)' }}>
+                    New file: {attachFile.name} ({(attachFile.size / 1024).toFixed(0)} KB)
+                  </div>
+                )}
+                {!attachFile && existingAttachment && !removeAttachment && (
+                  <div style={{ fontSize: '0.78rem', marginTop: '0.4rem', color: 'var(--muted-ink)', display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span>Current: {existingAttachment.filename} ({((existingAttachment.size || 0) / 1024).toFixed(0)} KB)</span>
+                    <button type="button" onClick={() => setRemoveAttachment(true)} style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontSize: '0.75rem', fontWeight: 600, padding: 0 }}>Remove</button>
+                  </div>
+                )}
+                {removeAttachment && (
+                  <div style={{ fontSize: '0.78rem', marginTop: '0.4rem', color: 'var(--danger)' }}>
+                    Attachment will be removed on save
+                  </div>
+                )}
+                <div style={{ fontSize: '0.7rem', color: 'var(--soft-ink)', marginTop: '0.25rem' }}>Any file type, up to 7 MB</div>
               </Form.Group>
             </Col>
             <Col xs={12}>

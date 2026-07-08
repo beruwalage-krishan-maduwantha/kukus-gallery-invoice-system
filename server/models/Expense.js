@@ -22,6 +22,11 @@ const expenseSchema = new mongoose.Schema({
   paymentMethod: { type: String, enum: ['Cash', 'Bank Transfer', 'Cheque'], default: 'Cash' },
   chequeReleaseDate: { type: Date },
   reference: { type: String },
+  attachment: {
+    filename: { type: String, default: '' },
+    mimeType: { type: String, default: '' },
+    size: { type: Number, default: 0 }
+  },
   createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
 }, { timestamps: true });
 
