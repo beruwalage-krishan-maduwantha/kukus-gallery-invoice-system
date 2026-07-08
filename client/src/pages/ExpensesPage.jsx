@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Button, Modal, Form, Row, Col } from 'react-bootstrap';
-import { PlusIcon, BanknotesIcon, TrashIcon } from '@heroicons/react/24/outline';
+import { PlusIcon, BanknotesIcon, TrashIcon, EyeIcon, ArrowDownTrayIcon } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 import { getExpenses, createExpense, updateExpense, deleteExpense } from '../api/expenses';
 import api from '../api/axios';
@@ -35,6 +35,9 @@ export default function ExpensesPage() {
   const [attachFile, setAttachFile] = useState(null);
   const [existingAttachment, setExistingAttachment] = useState(null);
   const [removeAttachment, setRemoveAttachment] = useState(false);
+  const [previewExp, setPreviewExp] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(null);
+  const [previewType, setPreviewType] = useState('');
 
   const fetchExpenses = useCallback(async () => {
     setLoading(true);
@@ -101,6 +104,23 @@ export default function ExpensesPage() {
       a.click();
       URL.revokeObjectURL(url);
     } catch { toast.error('Failed to download attachment'); }
+  };
+
+  const openPreview = async (exp) => {
+    try {
+      const res = await api.get(`/expenses/${exp._id}/attachment`, { responseType: 'blob' });
+      const type = res.data.type || exp.attachment?.mimeType || '';
+      setPreviewType(type);
+      setPreviewUrl(URL.createObjectURL(res.data));
+      setPreviewExp(exp);
+    } catch { toast.error('Failed to load attachment'); }
+  };
+
+  const closePreview = () => {
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
+    setPreviewUrl(null);
+    setPreviewExp(null);
+    setPreviewType('');
   };
 
   const handleSave = async () => {
@@ -211,6 +231,11 @@ export default function ExpensesPage() {
                   </td>
                   <td>
                     <div className="d-flex gap-1">
+                      {exp.attachment?.filename && (
+                        <button style={btnStyle('rgba(59,130,246,0.1)', 'var(--info)')} onClick={() => openPreview(exp)} title="Preview bill">
+                          <EyeIcon style={{ width: 15, height: 15 }} />
+                        </button>
+                      )}
                       <button style={btnStyle('rgba(177,145,198,0.1)', 'var(--primary)')} onClick={() => openEdit(exp)}>Edit</button>
                       <button style={btnStyle('rgba(239,68,68,0.1)', 'var(--danger)')} onClick={() => setDeleteTarget(exp)}>Del</button>
                     </div>
@@ -316,6 +341,32 @@ export default function ExpensesPage() {
           <Button className="btn-primary-custom" onClick={handleSave} disabled={saving}>
             {saving ? 'Saving...' : (editingId ? 'Update' : 'Add Expense')}
           </Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Bill Preview Modal */}
+      <Modal show={!!previewUrl} onHide={closePreview} size="lg" centered>
+        <Modal.Header closeButton>
+          <Modal.Title className="modal-title-custom" style={{ fontSize: '1rem' }}>
+            {previewExp?.title} — {previewExp?.attachment?.filename}
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body style={{ padding: 0, textAlign: 'center', background: 'rgba(0,0,0,0.03)' }}>
+          {previewType.startsWith('image/') ? (
+            <img src={previewUrl} alt={previewExp?.attachment?.filename} style={{ maxWidth: '100%', maxHeight: '75vh' }} />
+          ) : previewType === 'application/pdf' ? (
+            <iframe src={previewUrl} style={{ width: '100%', height: '75vh', border: 'none' }} title="Bill preview" />
+          ) : (
+            <div style={{ padding: '3rem 1rem', color: 'var(--muted-ink)', fontSize: '0.9rem' }}>
+              This file type can't be previewed here.<br />Use the download button below to open it.
+            </div>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <button className="btn-outline-custom" onClick={closePreview}>Close</button>
+          <button className="btn-primary-custom" onClick={() => { if (previewExp) downloadAttachment(previewExp); }}>
+            <ArrowDownTrayIcon style={{ width: 16, height: 16, marginRight: 6 }} /> Download
+          </button>
         </Modal.Footer>
       </Modal>
 
