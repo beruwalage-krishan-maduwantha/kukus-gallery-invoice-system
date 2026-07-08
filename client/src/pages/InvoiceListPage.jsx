@@ -122,7 +122,7 @@ export default function InvoiceListPage() {
             </thead>
             <tbody>
               {invoices.map(inv => (
-                <tr key={inv._id} onClick={() => navigate(`/invoices/${inv._id}`)} style={{ cursor: 'pointer' }}>
+                <tr key={inv._id} onClick={() => window.open(`/invoices/${inv._id}`, '_blank')} style={{ cursor: 'pointer' }}>
                   <td style={{ fontWeight: 600, color: 'var(--primary-dark)' }}>{inv.invoiceNumber}</td>
                   <td>{inv.customerSnapshot?.title ? `${inv.customerSnapshot.title}. ` : ''}{inv.customerSnapshot?.name || inv.customer?.name}</td>
                   <td>{formatDate(inv.invoiceDate)}</td>
@@ -132,7 +132,7 @@ export default function InvoiceListPage() {
                   <td><StatusBadge status={inv.status} /></td>
                   <td onClick={e => e.stopPropagation()}>
                     <div className="d-flex gap-1 flex-wrap">
-                      <button className="btn-outline-custom btn-sm-custom" onClick={() => navigate(`/invoices/${inv._id}`)}>View</button>
+                      <button className="btn-outline-custom btn-sm-custom" onClick={() => window.open(`/invoices/${inv._id}`, '_blank')}>View</button>
                       <button className="btn-sm-custom" style={btnStyle('rgba(177,145,198,0.1)', 'var(--primary)')} onClick={() => navigate(`/invoices/${inv._id}/edit`)}>Edit</button>
                       {inv.status !== 'Paid' && inv.status !== 'Cancelled' && (
                         <button className="btn-sm-custom" style={btnStyle('rgba(34,197,94,0.1)', 'var(--success)')} onClick={() => { setAdvanceTarget(inv); setAdvanceAmount(''); }}>Pay</button>

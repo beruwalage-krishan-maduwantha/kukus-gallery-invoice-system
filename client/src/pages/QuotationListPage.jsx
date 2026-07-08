@@ -125,7 +125,7 @@ export default function QuotationListPage() {
             </thead>
             <tbody>
               {quotations.map(q => (
-                <tr key={q._id} onClick={() => navigate(`/quotations/${q._id}`)} style={{ cursor: 'pointer' }}>
+                <tr key={q._id} onClick={() => window.open(`/quotations/${q._id}`, '_blank')} style={{ cursor: 'pointer' }}>
                   <td style={{ fontWeight: 600, color: 'var(--primary-dark)' }}>{q.quotationNumber}</td>
                   <td>{q.customerSnapshot?.name || q.customer?.name}</td>
                   <td>{formatDate(q.quotationDate)}</td>
@@ -134,7 +134,7 @@ export default function QuotationListPage() {
                   <td><StatusBadge status={q.status} /></td>
                   <td onClick={e => e.stopPropagation()}>
                     <div className="d-flex gap-1 flex-wrap">
-                      <button className="btn-outline-custom btn-sm-custom" onClick={() => navigate(`/quotations/${q._id}`)}>View</button>
+                      <button className="btn-outline-custom btn-sm-custom" onClick={() => window.open(`/quotations/${q._id}`, '_blank')}>View</button>
                       {q.status !== 'Converted' && (
                         <button className="btn-sm-custom" style={btnStyle('rgba(177,145,198,0.1)', 'var(--primary)')} onClick={() => navigate(`/quotations/${q._id}/edit`)}>Edit</button>
                       )}
