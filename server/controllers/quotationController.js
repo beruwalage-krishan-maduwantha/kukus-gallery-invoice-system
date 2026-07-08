@@ -20,7 +20,7 @@ async function generateQuotationNumber(prefix = 'QT') {
 
 exports.getQuotations = async (req, res) => {
   try {
-    const { search, status, customer, dateFrom, dateTo, page = 1, limit = 20, sort = '-createdAt' } = req.query;
+    const { search, status, customer, dateFrom, dateTo, page = 1, limit = 20, sort = '-quotationDate -createdAt' } = req.query;
     const query = {};
     if (status) query.status = status;
     else query.status = { $ne: 'Converted' };
