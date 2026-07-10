@@ -27,7 +27,7 @@ export default function RecentInvoices({ invoices = [] }) {
                 <td style={{ fontWeight: 600, color: 'var(--primary-dark)' }}>{inv.invoiceNumber}</td>
                 <td>{inv.customerSnapshot?.name}</td>
                 <td>{formatDate(inv.invoiceDate)}</td>
-                <td>{formatCurrency(inv.grandTotal)}</td>
+                <td className="money">{formatCurrency(inv.grandTotal)}</td>
                 <td><StatusBadge status={inv.status} /></td>
               </tr>
             ))

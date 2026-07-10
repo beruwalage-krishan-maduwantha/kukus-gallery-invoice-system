@@ -358,8 +358,8 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-heading); }
 }
 
 .stat-card-value {
-  font-family: var(--font-heading);
-  font-size: 1.6rem;
+  font-family: var(--font-body);
+  font-size: 1.35rem;
   font-weight: 700;
   color: var(--primary-dark);
   margin: 0;
@@ -950,15 +950,12 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-heading); }
   .login-card { margin: 0.5rem; padding: 1.2rem; }
 }
 
-/* Unified number typography: amounts everywhere use the heading font,
-   matching the dashboard Revenue card */
+/* Unified number typography: one clean sans style for every amount */
 .money,
 .invoice-total-row span:last-child,
 .summary-row span:last-child {
-  font-family: var(--font-heading);
+  font-family: var(--font-body);
   font-weight: 700;
-  font-size: 1.08em;
-  letter-spacing: 0.01em;
 }
 
 /* ==================== VERTEX DIGITAL SOLUTIONS THEME ==================== */

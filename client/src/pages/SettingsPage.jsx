@@ -281,12 +281,12 @@ export default function SettingsPage() {
               { label: 'Credit Notes', count: dbStats.creditNotes }
             ].map(item => (
               <div key={item.label} style={{ background: 'var(--tint)', padding: '0.6rem 1rem', borderRadius: 8, textAlign: 'center', minWidth: 90 }}>
-                <div style={{ fontFamily: 'var(--font-heading)', fontSize: '1.3rem', fontWeight: 700, color: 'var(--primary-dark)' }}>{item.count}</div>
+                <div style={{ fontFamily: 'var(--font-body)', fontSize: '1.1rem', fontWeight: 700, color: 'var(--primary-dark)' }}>{item.count}</div>
                 <div style={{ fontSize: '0.68rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--accent)' }}>{item.label}</div>
               </div>
             ))}
             <div style={{ background: 'rgba(59,130,246,0.08)', padding: '0.6rem 1rem', borderRadius: 8, textAlign: 'center', minWidth: 90 }}>
-              <div style={{ fontFamily: 'var(--font-heading)', fontSize: '1.3rem', fontWeight: 700, color: 'var(--info)' }}>{dbStats.totalDocuments}</div>
+              <div style={{ fontFamily: 'var(--font-body)', fontSize: '1.1rem', fontWeight: 700, color: 'var(--info)' }}>{dbStats.totalDocuments}</div>
               <div style={{ fontSize: '0.68rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--info)' }}>Total</div>
             </div>
           </div>
