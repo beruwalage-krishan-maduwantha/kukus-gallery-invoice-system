@@ -126,9 +126,9 @@ export default function InvoiceListPage() {
                   <td style={{ fontWeight: 600, color: 'var(--primary-dark)' }}>{inv.invoiceNumber}</td>
                   <td>{inv.customerSnapshot?.title ? `${inv.customerSnapshot.title}. ` : ''}{inv.customerSnapshot?.name || inv.customer?.name}</td>
                   <td>{formatDate(inv.invoiceDate)}</td>
-                  <td className="money" style={{ fontWeight: 600 }}>{formatCurrency(inv.grandTotal)}</td>
+                  <td className="money">{formatCurrency(inv.grandTotal)}</td>
                   <td className="money" style={{ color: inv.advancePayment > 0 ? 'var(--success)' : '#ccc' }}>{formatCurrency(inv.advancePayment || 0)}</td>
-                  <td className="money" style={{ fontWeight: 600, color: (inv.balance || 0) > 0 ? 'var(--danger)' : 'var(--success)' }}>{formatCurrency(inv.balance || 0)}</td>
+                  <td className="money" style={{ color: (inv.balance || 0) > 0 ? 'var(--danger)' : 'var(--success)' }}>{formatCurrency(inv.balance || 0)}</td>
                   <td><StatusBadge status={inv.status} /></td>
                   <td onClick={e => e.stopPropagation()}>
                     <div className="d-flex gap-1 flex-wrap">

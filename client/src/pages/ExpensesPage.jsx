@@ -185,7 +185,7 @@ export default function ExpensesPage() {
             onClear={() => { setDateFrom(''); setDateTo(''); setPage(1); }}
           />
           <span style={{ fontSize: '0.82rem', color: 'var(--accent)' }}>{total} expenses</span>
-          <span className="money" style={{ fontSize: '0.82rem', fontWeight: 600, color: 'var(--danger)' }}>{formatCurrency(totalAmount)}</span>
+          <span className="money" style={{ fontSize: '0.82rem', color: 'var(--danger)' }}>{formatCurrency(totalAmount)}</span>
         </div>
         <Button className="btn-primary-custom" onClick={openAdd}>
           <PlusIcon style={{ width: 16, height: 16, marginRight: 6 }} /> Add Expense
@@ -223,7 +223,7 @@ export default function ExpensesPage() {
                       {exp.category}
                     </span>
                   </td>
-                  <td className="money" style={{ textAlign: 'right', fontWeight: 600, color: 'var(--danger)' }}>{formatCurrency(exp.amount)}</td>
+                  <td className="money" style={{ textAlign: 'right', color: 'var(--danger)' }}>{formatCurrency(exp.amount)}</td>
                   <td style={{ fontSize: '0.82rem', color: 'var(--muted-ink)' }}>
                     {exp.paymentMethod}
                     {exp.paymentMethod === 'Cheque' && exp.chequeReleaseDate && (

@@ -360,7 +360,7 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-heading); }
 .stat-card-value {
   font-family: var(--font-body);
   font-size: 1.35rem;
-  font-weight: 700;
+  font-weight: 400;
   color: var(--primary-dark);
   margin: 0;
   line-height: 1;
@@ -951,11 +951,9 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-heading); }
 }
 
 /* Unified number typography: one clean sans style for every amount */
-.money,
-.invoice-total-row span:last-child,
-.summary-row span:last-child {
+.money {
   font-family: var(--font-body);
-  font-weight: 700;
+  font-weight: 400;
 }
 
 /* ==================== VERTEX DIGITAL SOLUTIONS THEME ==================== */

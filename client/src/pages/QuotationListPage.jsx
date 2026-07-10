@@ -130,7 +130,7 @@ export default function QuotationListPage() {
                   <td>{q.customerSnapshot?.name || q.customer?.name}</td>
                   <td>{formatDate(q.quotationDate)}</td>
                   <td>{formatDate(q.validUntil)}</td>
-                  <td className="money" style={{ fontWeight: 600 }}>{formatCurrency(q.grandTotal)}</td>
+                  <td className="money">{formatCurrency(q.grandTotal)}</td>
                   <td><StatusBadge status={q.status} /></td>
                   <td onClick={e => e.stopPropagation()}>
                     <div className="d-flex gap-1 flex-wrap">

@@ -64,7 +64,7 @@ export default function CreditNotesPage() {
         <div className="action-bar-left">
           <div style={{ background: 'rgba(59,130,246,0.08)', padding: '0.6rem 1.2rem', borderRadius: 10 }}>
             <span style={{ fontSize: '0.72rem', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--info)' }}>Total Active Credits: </span>
-            <span style={{ fontFamily: 'var(--font-body)', fontSize: '1.05rem', fontWeight: 700, color: 'var(--primary-dark)' }}>{formatCurrency(totalActiveAmount)}</span>
+            <span style={{ fontFamily: 'var(--font-body)', fontSize: '1.05rem', color: 'var(--primary-dark)' }}>{formatCurrency(totalActiveAmount)}</span>
             <span style={{ fontSize: '0.78rem', color: 'var(--accent)', marginLeft: '0.5rem' }}>({customerCredits.length} customers)</span>
           </div>
           <DateRangeFilter
