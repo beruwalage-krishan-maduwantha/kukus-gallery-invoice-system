@@ -123,6 +123,17 @@ export default function ExpensesPage() {
     setPreviewType('');
   };
 
+  const deleteAttachment = async () => {
+    if (!previewExp) return;
+    if (!window.confirm(`Delete the attached file "${previewExp.attachment?.filename}"? The expense itself will be kept.`)) return;
+    try {
+      await updateExpense(previewExp._id, { removeAttachment: true });
+      toast.success('Attachment deleted');
+      closePreview();
+      fetchExpenses();
+    } catch (err) { toast.error(err.response?.data?.message || 'Failed to delete attachment'); }
+  };
+
   const handleSave = async () => {
     if (!form.title || !form.category || !form.amount) return toast.error('Fill required fields');
     setSaving(true);
@@ -363,6 +374,9 @@ export default function ExpensesPage() {
           )}
         </Modal.Body>
         <Modal.Footer>
+          <button onClick={deleteAttachment} style={{ marginRight: 'auto', background: 'rgba(239,68,68,0.1)', color: 'var(--danger)', border: 'none', borderRadius: 8, padding: '0.55rem 1.2rem', fontSize: '0.82rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', cursor: 'pointer' }}>
+            <TrashIcon style={{ width: 15, height: 15, marginRight: 6, verticalAlign: 'text-bottom' }} /> Delete File
+          </button>
           <button className="btn-outline-custom" onClick={closePreview}>Close</button>
           <button className="btn-primary-custom" onClick={() => { if (previewExp) downloadAttachment(previewExp); }}>
             <ArrowDownTrayIcon style={{ width: 16, height: 16, marginRight: 6 }} /> Download
