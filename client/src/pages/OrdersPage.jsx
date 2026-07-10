@@ -141,7 +141,7 @@ export default function OrdersPage() {
                 <tr key={order._id}>
                   <td>
                     <span style={{
-                      fontSize: '0.78rem', fontWeight: 700,
+                      fontSize: '0.78rem', fontWeight: 700, whiteSpace: 'nowrap', display: 'inline-block',
                       color: order.orderType === 'Sample' ? 'var(--primary)' : 'var(--info)',
                       background: order.orderType === 'Sample' ? 'rgba(177,145,198,0.12)' : 'rgba(59,130,246,0.1)',
                       padding: '0.25rem 0.6rem', borderRadius: 4
