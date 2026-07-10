@@ -327,8 +327,8 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      {/* User Management - Main Admin sees all, other admins see only their own account */}
-      {isMainAdmin ? (
+      {/* User Management - visible to every admin; the main admin account stays protected */}
+      {isAdmin ? (
         <div className="card-custom mb-4">
           <div className="d-flex justify-content-between align-items-center mb-3">
             <h5 className="form-section-title" style={{ margin: 0, border: 0, padding: 0 }}>
