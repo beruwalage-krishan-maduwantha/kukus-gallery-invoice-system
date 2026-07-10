@@ -4,6 +4,8 @@ import { Button, Modal, Form, Row, Col } from 'react-bootstrap';
 import { PlusIcon, DocumentDuplicateIcon } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 import { getQuotations, deleteQuotation, updateQuotationStatus, convertQuotationToInvoice } from '../api/quotations';
+import { getSettings } from '../api/settings';
+import { printQuotationPdf } from '../components/pdf/generatePdf';
 import SearchInput from '../components/common/SearchInput';
 import DateRangeFilter from '../components/common/DateRangeFilter';
 import StatusBadge from '../components/common/StatusBadge';
@@ -135,6 +137,9 @@ export default function QuotationListPage() {
                   <td onClick={e => e.stopPropagation()}>
                     <div className="d-flex gap-1 flex-wrap">
                       <button className="btn-outline-custom btn-sm-custom" onClick={() => window.open(`/quotations/${q._id}`, '_blank')}>View</button>
+                      <button className="btn-sm-custom" style={btnStyle('rgba(59,130,246,0.1)', 'var(--info)')} title="Print" onClick={async () => {
+                        try { const s = await getSettings(); await printQuotationPdf(q, s.data); } catch { toast.error('Print failed'); }
+                      }}>Print</button>
                       {q.status !== 'Converted' && (
                         <button className="btn-sm-custom" style={btnStyle('rgba(177,145,198,0.1)', 'var(--primary)')} onClick={() => navigate(`/quotations/${q._id}/edit`)}>Edit</button>
                       )}

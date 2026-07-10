@@ -4,6 +4,8 @@ import { Button, Modal, Form } from 'react-bootstrap';
 import { PlusIcon, DocumentTextIcon } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 import { getInvoices, deleteInvoice, updateInvoiceStatus } from '../api/invoices';
+import { getSettings } from '../api/settings';
+import { printInvoicePdf } from '../components/pdf/generatePdf';
 import api from '../api/axios';
 import SearchInput from '../components/common/SearchInput';
 import DateRangeFilter from '../components/common/DateRangeFilter';
@@ -134,6 +136,9 @@ export default function InvoiceListPage() {
                     <div className="d-flex gap-1 flex-wrap">
                       <button className="btn-outline-custom btn-sm-custom" onClick={() => window.open(`/invoices/${inv._id}`, '_blank')}>View</button>
                       <button className="btn-sm-custom" style={btnStyle('rgba(177,145,198,0.1)', 'var(--primary)')} onClick={() => navigate(`/invoices/${inv._id}/edit`)}>Edit</button>
+                      <button className="btn-sm-custom" style={btnStyle('rgba(59,130,246,0.1)', 'var(--info)')} title="Print" onClick={async () => {
+                        try { const s = await getSettings(); await printInvoicePdf(inv, s.data); } catch { toast.error('Print failed'); }
+                      }}>Print</button>
                       {inv.status !== 'Paid' && inv.status !== 'Cancelled' && (
                         <button className="btn-sm-custom" style={btnStyle('rgba(34,197,94,0.1)', 'var(--success)')} onClick={() => { setAdvanceTarget(inv); setAdvanceAmount(''); }}>Pay</button>
                       )}

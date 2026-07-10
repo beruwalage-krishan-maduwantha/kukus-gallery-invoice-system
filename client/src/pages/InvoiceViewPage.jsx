@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Button, Modal } from 'react-bootstrap';
-import { ArrowLeftIcon, PencilIcon, ArrowDownTrayIcon, EyeIcon } from '@heroicons/react/24/outline';
+import { ArrowLeftIcon, PencilIcon, ArrowDownTrayIcon, EyeIcon, PrinterIcon } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 import { getInvoice, updateInvoiceStatus, deleteInvoice } from '../api/invoices';
 import { getSettings } from '../api/settings';
@@ -10,7 +10,7 @@ import ConfirmModal from '../components/common/ConfirmModal';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import { formatCurrency } from '../utils/formatCurrency';
 import { formatDate } from '../utils/formatDate';
-import { generateInvoicePdf, previewInvoicePdf, DEFAULT_TERMS } from '../components/pdf/generatePdf';
+import { generateInvoicePdf, previewInvoicePdf, printInvoicePdf, DEFAULT_TERMS } from '../components/pdf/generatePdf';
 
 export default function InvoiceViewPage() {
   const { id } = useParams();
@@ -85,6 +85,9 @@ export default function InvoiceViewPage() {
           )}
           <Button className="btn-outline-custom btn-sm-custom" onClick={handlePreviewPdf}>
             <EyeIcon style={{ width: 14, height: 14, marginRight: 4 }} /> Preview PDF
+          </Button>
+          <Button className="btn-outline-custom btn-sm-custom" onClick={() => { if (invoice && settings) printInvoicePdf(invoice, settings); }}>
+            <PrinterIcon style={{ width: 14, height: 14, marginRight: 4 }} /> Print
           </Button>
           <Button className="btn-primary-custom btn-sm-custom" onClick={handleDownloadPdf}>
             <ArrowDownTrayIcon style={{ width: 14, height: 14, marginRight: 4 }} /> Download PDF

@@ -308,3 +308,15 @@ export async function previewQuotationPdf(quotation, settings) {
   const doc = await buildPdf(quotation, settings, 'QUOTATION');
   return doc.output('bloburl');
 }
+
+export async function printInvoicePdf(invoice, settings) {
+  const doc = await buildPdf(invoice, settings, 'INVOICE');
+  doc.autoPrint();
+  window.open(doc.output('bloburl'), '_blank');
+}
+
+export async function printQuotationPdf(quotation, settings) {
+  const doc = await buildPdf(quotation, settings, 'QUOTATION');
+  doc.autoPrint();
+  window.open(doc.output('bloburl'), '_blank');
+}

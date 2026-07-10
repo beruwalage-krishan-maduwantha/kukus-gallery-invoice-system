@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Button, Modal, Form, Row, Col } from 'react-bootstrap';
-import { ArrowLeftIcon, PencilIcon, ArrowDownTrayIcon, ArrowPathIcon, EyeIcon } from '@heroicons/react/24/outline';
+import { ArrowLeftIcon, PencilIcon, ArrowDownTrayIcon, ArrowPathIcon, EyeIcon, PrinterIcon } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 import { getQuotation, updateQuotationStatus, deleteQuotation, convertQuotationToInvoice } from '../api/quotations';
 import { getSettings } from '../api/settings';
@@ -11,7 +11,7 @@ import LoadingSpinner from '../components/common/LoadingSpinner';
 import { formatCurrency } from '../utils/formatCurrency';
 import { formatDate, formatDateInput } from '../utils/formatDate';
 import { PAYMENT_TYPES } from '../utils/constants';
-import { generateQuotationPdf, previewQuotationPdf, DEFAULT_TERMS } from '../components/pdf/generatePdf';
+import { generateQuotationPdf, previewQuotationPdf, printQuotationPdf, DEFAULT_TERMS } from '../components/pdf/generatePdf';
 
 export default function QuotationViewPage() {
   const { id } = useParams();
@@ -113,6 +113,9 @@ export default function QuotationViewPage() {
           )}
           <Button className="btn-outline-custom btn-sm-custom" onClick={handlePreviewPdf}>
             <EyeIcon style={{ width: 14, height: 14, marginRight: 4 }} /> Preview PDF
+          </Button>
+          <Button className="btn-outline-custom btn-sm-custom" onClick={() => { if (quotation && settings) printQuotationPdf(quotation, settings); }}>
+            <PrinterIcon style={{ width: 14, height: 14, marginRight: 4 }} /> Print
           </Button>
           <Button className="btn-primary-custom btn-sm-custom" onClick={handleDownloadPdf}>
             <ArrowDownTrayIcon style={{ width: 14, height: 14, marginRight: 4 }} /> Download PDF
