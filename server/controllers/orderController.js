@@ -21,7 +21,8 @@ exports.getOrders = async (req, res) => {
 
     const total = await Order.countDocuments(query);
     const orders = await Order.find(query)
-      .sort('-createdAt')
+      .collation({ locale: 'en', numericOrdering: true })
+      .sort({ invoiceDate: -1, orderNumber: 1 })
       .skip((page - 1) * limit)
       .limit(Number(limit));
 
