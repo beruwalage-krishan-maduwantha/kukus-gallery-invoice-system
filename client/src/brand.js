@@ -20,8 +20,8 @@ const brands = {
     units: ['piece', 'meter', 'yard', 'set', 'hour', 'lot'],
     expenseCategories: [
       'Raw Materials', 'Fabric', 'Trims & Accessories', 'Printing', 'Embroidery',
-      'Labour', 'Salaries', 'Rent', 'Utilities', 'Transport',
-      'Packaging', 'Equipment', 'Maintenance', 'Marketing', 'Office Supplies', 'Other'
+      'Labour', 'Salaries', 'Rent', 'Utilities', 'Transport', 'Fuel',
+      'Packaging', 'Equipment', 'Maintenance', 'Marketing', 'Office Supplies', 'Snacks', 'Other'
     ],
     pdf: {
       accent: [177, 145, 198],
@@ -52,7 +52,7 @@ const brands = {
     expenseCategories: [
       'Ad Spend (Meta/Google)', 'Software & Subscriptions', 'Hosting & Domains',
       'Freelancers', 'Content Production', 'Equipment', 'Salaries', 'Rent',
-      'Utilities', 'Transport', 'Marketing', 'Office Supplies', 'Other'
+      'Utilities', 'Transport', 'Fuel', 'Marketing', 'Office Supplies', 'Snacks', 'Other'
     ],
     pdf: {
       accent: [45, 52, 60],

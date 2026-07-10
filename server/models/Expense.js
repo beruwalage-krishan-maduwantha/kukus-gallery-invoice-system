@@ -12,7 +12,7 @@ const expenseSchema = new mongoose.Schema({
       'Ad Spend (Meta/Google)', 'Software & Subscriptions', 'Hosting & Domains',
       'Freelancers', 'Content Production',
       // shared
-      'Salaries', 'Rent', 'Utilities', 'Transport', 'Equipment', 'Marketing', 'Office Supplies', 'Other'
+      'Salaries', 'Rent', 'Utilities', 'Transport', 'Fuel', 'Equipment', 'Marketing', 'Office Supplies', 'Snacks', 'Other'
     ],
     required: true
   },
