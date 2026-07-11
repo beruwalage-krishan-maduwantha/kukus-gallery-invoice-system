@@ -167,10 +167,19 @@ function drawInvoiceContent(doc, data, settings, logoBase64, title) {
   y = Math.max(billY, metaY) + 2;
 
   // Items table - no # column, lavender header
-  const tableBody = data.items.map((item) => [
-    item.name, item.quantity,
-    formatLKR(item.unitPrice), item.discount > 0 ? `${item.discount}%` : '-', formatLKR(item.lineTotal)
-  ]);
+  const tableBody = data.items.map((item) => {
+  const productText = item.description
+    ? `${item.name}\n${item.description}`
+    : item.name;
+
+  return [
+    productText,
+    item.quantity,
+    formatLKR(item.unitPrice),
+    item.discount > 0 ? `${item.discount}%` : '-',
+    formatLKR(item.lineTotal)
+  ];
+});
 
   autoTable(doc, {
     startY: y,

@@ -37,7 +37,28 @@ export default function InvoicePreview({ customer, items, subtotal, discountAmou
           <tbody>
             {items.filter(i => i.name).map((item, i) => (
               <tr key={i} style={{ borderBottom: '1px solid #f0f0f0' }}>
-                <td style={{ padding: '0.2rem' }}>{item.name} <span style={{ color: 'var(--soft-ink)' }}>x{item.quantity}</span></td>
+                <td style={{ padding: '0.2rem' }}>
+  <div>
+    {item.name}{' '}
+    <span style={{ color: 'var(--soft-ink)' }}>
+      x{item.quantity}
+    </span>
+  </div>
+
+  {item.description && (
+    <div
+      style={{
+        marginTop: '2px',
+        fontSize: '0.55rem',
+        lineHeight: 1.3,
+        color: 'var(--muted-ink)',
+        whiteSpace: 'pre-line'
+      }}
+    >
+      {item.description}
+    </div>
+  )}
+</td>
                 <td style={{ padding: '0.2rem', textAlign: 'center' }}>{item.orderType}</td>
                 <td style={{ padding: '0.2rem', textAlign: 'right' }}>{formatCurrency(item.lineTotal || 0)}</td>
               </tr>

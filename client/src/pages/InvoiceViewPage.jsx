@@ -151,7 +151,26 @@ export default function InvoiceViewPage() {
           <tbody>
             {invoice.items.map((item, i) => (
               <tr key={i}>
-                <td style={{ fontWeight: 500 }}>{item.name}</td>
+                <td>
+  <div style={{ fontWeight: 500 }}>
+    {item.name}
+  </div>
+
+  {item.description && (
+    <div
+      style={{
+        marginTop: '0.25rem',
+        fontSize: '0.75rem',
+        fontWeight: 400,
+        lineHeight: 1.4,
+        color: 'var(--muted-ink)',
+        whiteSpace: 'pre-line'
+      }}
+    >
+      {item.description}
+    </div>
+  )}
+</td>
                 <td style={{ textAlign: 'center' }}>{item.quantity}</td>
                 <td style={{ textAlign: 'right' }}>{formatCurrency(item.unitPrice)}</td>
                 <td style={{ textAlign: 'center' }}>{item.discount > 0 ? `${item.discount}%` : '-'}</td>

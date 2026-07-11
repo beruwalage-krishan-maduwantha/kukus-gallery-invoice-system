@@ -15,7 +15,7 @@ import { PAYMENT_TYPES } from '../utils/constants';
 import { formatDateInput } from '../utils/formatDate';
 import { BRAND } from '../brand';
 
-const emptyItem = { product: '', name: '', category: '', orderType: '', quantity: 1, unitPrice: 0, discount: 0, lineTotal: 0 };
+const emptyItem = { product: '', name: '', description: '', category: '', orderType: '', quantity: 1, unitPrice: 0, discount: 0, lineTotal: 0 };
 
 export default function InvoiceCreatePage() {
   const { id } = useParams();
@@ -47,7 +47,7 @@ export default function InvoiceCreatePage() {
         const inv = res.data;
         setCustomerId(inv.customer?._id || '');
         setCustomerData(inv.customer);
-        setItems(inv.items.map(i => ({ ...i, product: i.product || '' })));
+        setItems(inv.items.map(i => ({ ...i, product: i.product || '', description: i.description || '' })));
         setDiscountType(inv.discountType || 'percentage');
         setDiscountValue(inv.discountValue || 0);
         setPaymentType(inv.paymentType || 'Cash');

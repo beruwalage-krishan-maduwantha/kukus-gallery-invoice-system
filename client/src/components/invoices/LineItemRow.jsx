@@ -11,6 +11,7 @@ export default function LineItemRow({ item, index, products, onChange, onRemove 
       const p = products.find(p => p._id === value);
       if (p) {
         updated.name = p.name;
+        updated.description = p.description || '';
         updated.category = p.category;
         updated.unitPrice = p.defaultPrice;
         let counterType;
@@ -39,14 +40,39 @@ export default function LineItemRow({ item, index, products, onChange, onRemove 
   return (
     <tr>
       <td style={{ width: '30%' }}>
-        <Form.Select size="sm" value={item.product || ''} onChange={e => handleChange('product', e.target.value)}>
-          <option value="">-- Select Product --</option>
-          {products.map(p => <option key={p._id} value={p._id}>{p.name}</option>)}
-        </Form.Select>
-        {!item.product && (
-          <Form.Control size="sm" className="mt-1" placeholder="Or type name..." value={item.name || ''} onChange={e => handleChange('name', e.target.value)} />
-        )}
-      </td>
+  <Form.Select
+    size="sm"
+    value={item.product || ''}
+    onChange={e => handleChange('product', e.target.value)}
+  >
+    <option value="">-- Select Product --</option>
+    {products.map(p => (
+      <option key={p._id} value={p._id}>
+        {p.name}
+      </option>
+    ))}
+  </Form.Select>
+
+  {!item.product && (
+    <Form.Control
+      size="sm"
+      className="mt-1"
+      placeholder="Or type name..."
+      value={item.name || ''}
+      onChange={e => handleChange('name', e.target.value)}
+    />
+  )}
+
+  <Form.Control
+    size="sm"
+    as="textarea"
+    rows={2}
+    className="mt-1"
+    placeholder="Item description..."
+    value={item.description || ''}
+    onChange={e => handleChange('description', e.target.value)}
+  />
+</td>
       <td style={{ width: '10%', textAlign: 'center' }}>
         {item.orderNumber ? (
           <span style={{ fontSize: '0.75rem', fontWeight: 700, color: item.orderType === 'Sample' ? 'var(--primary)' : 'var(--info)', background: item.orderType === 'Sample' ? 'rgba(177,145,198,0.12)' : 'rgba(59,130,246,0.1)', padding: '0.2rem 0.5rem', borderRadius: 4 }}>
