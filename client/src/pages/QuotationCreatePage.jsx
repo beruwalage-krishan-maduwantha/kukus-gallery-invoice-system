@@ -14,7 +14,7 @@ import InvoicePreview from '../components/invoices/InvoicePreview';
 import { formatDateInput } from '../utils/formatDate';
 import { BRAND } from '../brand';
 
-const emptyItem = { product: '', name: '', category: '', orderType: '', quantity: 1, unitPrice: 0, discount: 0, lineTotal: 0 };
+const emptyItem = { product: '', name: '',description: '', category: '', orderType: '', quantity: 1, unitPrice: 0, discount: 0, lineTotal: 0 };
 
 export default function QuotationCreatePage() {
   const { id } = useParams();
@@ -85,7 +85,7 @@ export default function QuotationCreatePage() {
       const data = {
         customer: customerId,
         items: items.filter(i => i.name).map(i => ({
-          product: i.product || undefined, name: i.name, category: i.category,
+          product: i.product || undefined, name: i.name,description: i.description || '', category: i.category,
           orderType: i.orderType, quantity: Number(i.quantity),
           unitPrice: Number(i.unitPrice), discount: Number(i.discount) || 0
         })),
