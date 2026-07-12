@@ -1,10 +1,11 @@
 const express = require('express');
 const { getOrders, updateOrderStatus, approveOrder, deleteOrder, updateJobSheet, getJobSheetImage } = require('../controllers/orderController');
-const { auth } = require('../middleware/auth');
+const { auth, requireSection } = require('../middleware/auth');
 
 const router = express.Router();
 
 router.use(auth);
+router.use(requireSection('orders'));
 
 router.get('/', getOrders);
 router.patch('/:id/status', updateOrderStatus);

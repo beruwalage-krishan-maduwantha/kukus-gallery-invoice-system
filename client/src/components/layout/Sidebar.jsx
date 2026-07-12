@@ -1,6 +1,7 @@
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { BRAND } from '../../brand';
+import { hasSection } from '../../utils/permissions';
 import {
   HomeIcon,
   DocumentTextIcon,
@@ -16,23 +17,22 @@ import {
 } from '@heroicons/react/24/outline';
 
 const navItems = [
-  { to: '/', icon: HomeIcon, label: 'Dashboard', access: 'admin' },
-  { to: '/quotations', icon: DocumentDuplicateIcon, label: 'Quotations', access: 'all' },
-  { to: '/invoices', icon: DocumentTextIcon, label: 'Invoices', access: 'all' },
-  { to: '/orders', icon: ClipboardDocumentListIcon, label: BRAND.ordersLabel, access: 'all' },
-  { to: '/expenses', icon: BanknotesIcon, label: 'Expenses', access: 'all' },
-  { to: '/credit-notes', icon: ReceiptRefundIcon, label: 'Credit Notes', access: 'admin' },
-  { to: '/reports', icon: ChartBarIcon, label: 'Reports', access: 'admin' },
-  { to: '/customers', icon: UserGroupIcon, label: 'Customers', access: 'all' },
-  { to: '/products', icon: CubeIcon, label: 'Products', access: 'admin' },
-  { to: '/settings', icon: Cog6ToothIcon, label: 'Settings', access: 'all' },
+  { to: '/', icon: HomeIcon, label: 'Dashboard', section: 'dashboard' },
+  { to: '/quotations', icon: DocumentDuplicateIcon, label: 'Quotations', section: 'quotations' },
+  { to: '/invoices', icon: DocumentTextIcon, label: 'Invoices', section: 'invoices' },
+  { to: '/orders', icon: ClipboardDocumentListIcon, label: BRAND.ordersLabel, section: 'orders' },
+  { to: '/expenses', icon: BanknotesIcon, label: 'Expenses', section: 'expenses' },
+  { to: '/credit-notes', icon: ReceiptRefundIcon, label: 'Credit Notes', section: 'creditNotes' },
+  { to: '/reports', icon: ChartBarIcon, label: 'Reports', section: 'reports' },
+  { to: '/customers', icon: UserGroupIcon, label: 'Customers', section: 'customers' },
+  { to: '/products', icon: CubeIcon, label: 'Products', section: 'products' },
+  { to: '/settings', icon: Cog6ToothIcon, label: 'Settings', section: null }
 ];
 
 export default function Sidebar({ show, onClose }) {
   const { user, logout } = useAuth();
-  const isAdmin = user?.role === 'admin';
 
-  const visibleItems = navItems.filter(item => item.access === 'all' || (item.access === 'admin' && isAdmin));
+  const visibleItems = navItems.filter(item => !item.section || hasSection(user, item.section));
 
   return (
     <>
@@ -65,7 +65,7 @@ export default function Sidebar({ show, onClose }) {
             </div>
             <div className="sidebar-user-info">
               <span className="sidebar-user-name">{user?.name}</span>
-              <span className="sidebar-user-role">{user?.role}</span>
+              <span className="sidebar-user-role">{user?.jobRoleName || user?.role}</span>
             </div>
           </div>
           <button className="sidebar-logout" onClick={logout} title="Logout">

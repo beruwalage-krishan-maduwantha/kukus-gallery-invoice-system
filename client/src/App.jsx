@@ -6,6 +6,7 @@ import ProtectedRoute from './components/common/ProtectedRoute';
 import AppLayout from './components/layout/AppLayout';
 import LoginPage from './pages/LoginPage';
 import LoadingSpinner from './components/common/LoadingSpinner';
+import { hasSection, firstAllowedPath } from './utils/permissions';
 
 const DashboardPage = lazy(() => import('./pages/DashboardPage'));
 const InvoiceListPage = lazy(() => import('./pages/InvoiceListPage'));
@@ -23,13 +24,11 @@ const ProductListPage = lazy(() => import('./pages/ProductListPage'));
 const SettingsPage = lazy(() => import('./pages/SettingsPage'));
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
 
-function DashboardGuard() {
+function LazyPage({ Component, section }) {
   const { user } = useAuth();
-  if (user?.role === 'staff') return <Navigate to="/quotations" replace />;
-  return <Suspense fallback={<LoadingSpinner />}><DashboardPage /></Suspense>;
-}
-
-function LazyPage({ Component }) {
+  if (section && !hasSection(user, section)) {
+    return <Navigate to={firstAllowedPath(user)} replace />;
+  }
   return <Suspense fallback={<LoadingSpinner />}><Component /></Suspense>;
 }
 
@@ -49,21 +48,21 @@ export default function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route element={<ProtectedRoute />}>
             <Route element={<AppLayout />}>
-              <Route path="/" element={<DashboardGuard />} />
-              <Route path="/invoices" element={<LazyPage Component={InvoiceListPage} />} />
-              <Route path="/invoices/new" element={<LazyPage Component={InvoiceCreatePage} />} />
-              <Route path="/invoices/:id" element={<LazyPage Component={InvoiceViewPage} />} />
-              <Route path="/invoices/:id/edit" element={<LazyPage Component={InvoiceCreatePage} />} />
-              <Route path="/quotations" element={<LazyPage Component={QuotationListPage} />} />
-              <Route path="/quotations/new" element={<LazyPage Component={QuotationCreatePage} />} />
-              <Route path="/quotations/:id" element={<LazyPage Component={QuotationViewPage} />} />
-              <Route path="/quotations/:id/edit" element={<LazyPage Component={QuotationCreatePage} />} />
-              <Route path="/orders" element={<LazyPage Component={OrdersPage} />} />
-              <Route path="/expenses" element={<LazyPage Component={ExpensesPage} />} />
-              <Route path="/credit-notes" element={<LazyPage Component={CreditNotesPage} />} />
-              <Route path="/reports" element={<LazyPage Component={ReportsPage} />} />
-              <Route path="/customers" element={<LazyPage Component={CustomerListPage} />} />
-              <Route path="/products" element={<LazyPage Component={ProductListPage} />} />
+              <Route path="/" element={<LazyPage Component={DashboardPage} section="dashboard" />} />
+              <Route path="/invoices" element={<LazyPage Component={InvoiceListPage} section="invoices" />} />
+              <Route path="/invoices/new" element={<LazyPage Component={InvoiceCreatePage} section="invoices" />} />
+              <Route path="/invoices/:id" element={<LazyPage Component={InvoiceViewPage} section="invoices" />} />
+              <Route path="/invoices/:id/edit" element={<LazyPage Component={InvoiceCreatePage} section="invoices" />} />
+              <Route path="/quotations" element={<LazyPage Component={QuotationListPage} section="quotations" />} />
+              <Route path="/quotations/new" element={<LazyPage Component={QuotationCreatePage} section="quotations" />} />
+              <Route path="/quotations/:id" element={<LazyPage Component={QuotationViewPage} section="quotations" />} />
+              <Route path="/quotations/:id/edit" element={<LazyPage Component={QuotationCreatePage} section="quotations" />} />
+              <Route path="/orders" element={<LazyPage Component={OrdersPage} section="orders" />} />
+              <Route path="/expenses" element={<LazyPage Component={ExpensesPage} section="expenses" />} />
+              <Route path="/credit-notes" element={<LazyPage Component={CreditNotesPage} section="creditNotes" />} />
+              <Route path="/reports" element={<LazyPage Component={ReportsPage} section="reports" />} />
+              <Route path="/customers" element={<LazyPage Component={CustomerListPage} section="customers" />} />
+              <Route path="/products" element={<LazyPage Component={ProductListPage} section="products" />} />
               <Route path="/settings" element={<LazyPage Component={SettingsPage} />} />
             </Route>
           </Route>

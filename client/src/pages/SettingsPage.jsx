@@ -7,6 +7,7 @@ import api from '../api/axios';
 import { useAuth } from '../context/AuthContext';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import { BRAND } from '../brand';
+import { SECTIONS } from '../utils/permissions';
 
 export default function SettingsPage() {
   const { user } = useAuth();
@@ -22,11 +23,16 @@ export default function SettingsPage() {
   const [users, setUsers] = useState([]);
   const [showUserForm, setShowUserForm] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
-  const [userForm, setUserForm] = useState({ name: '', email: '', password: '', role: 'staff' });
+  const [userForm, setUserForm] = useState({ name: '', email: '', password: '', role: 'staff', jobRole: '' });
   const [showResetPw, setShowResetPw] = useState(null);
   const [newPassword, setNewPassword] = useState('');
+  const [roles, setRoles] = useState([]);
+  const [showRoleForm, setShowRoleForm] = useState(false);
+  const [editingRole, setEditingRole] = useState(null);
+  const [roleForm, setRoleForm] = useState({ name: '', permissions: [] });
 
   const fetchUsers = () => { if (isAdmin) api.get('/users').then(res => setUsers(res.data)).catch(() => {}); };
+  const fetchRoles = () => { if (isAdmin) api.get('/roles').then(res => setRoles(res.data)).catch(() => {}); };
 
   useEffect(() => {
     const promises = [getSettings(), api.get('/backup/stats')];
@@ -36,6 +42,7 @@ export default function SettingsPage() {
       setForm(setRes.data);
       setDbStats(statsRes.data);
       if (usersRes) setUsers(usersRes.data);
+      fetchRoles();
     }).catch(() => toast.error('Failed to load settings'))
       .finally(() => setLoading(false));
   }, []);
@@ -329,13 +336,14 @@ export default function SettingsPage() {
 
       {/* User Management - visible to every admin; the main admin account stays protected */}
       {isAdmin ? (
+        <>
         <div className="card-custom mb-4">
           <div className="d-flex justify-content-between align-items-center mb-3">
             <h5 className="form-section-title" style={{ margin: 0, border: 0, padding: 0 }}>
               <UsersIcon style={{ width: 20, height: 20, marginRight: 8, display: 'inline' }} />
               User Management
             </h5>
-            <Button className="btn-primary-custom btn-sm-custom" onClick={() => { setEditingUser(null); setUserForm({ name: '', email: '', password: '', role: 'staff' }); setShowUserForm(true); }}>
+            <Button className="btn-primary-custom btn-sm-custom" onClick={() => { setEditingUser(null); setUserForm({ name: '', email: '', password: '', role: 'staff', jobRole: '' }); setShowUserForm(true); }}>
               <PlusIcon style={{ width: 14, height: 14, marginRight: 4 }} /> Add User
             </Button>
           </div>
@@ -359,7 +367,7 @@ export default function SettingsPage() {
                       <span className="status-badge" style={{
                         background: u.role === 'admin' ? 'rgba(99,102,241,0.1)' : 'rgba(177,145,198,0.12)',
                         color: u.role === 'admin' ? '#6366F1' : 'var(--accent)'
-                      }}>{u.role}</span>
+                      }}>{u.role === 'admin' ? 'admin' : (u.jobRole?.name || 'staff')}</span>
                     </td>
                     <td>
                       <span className="status-badge" style={{
@@ -371,7 +379,7 @@ export default function SettingsPage() {
                       <div className="d-flex gap-1">
                         <button className="btn-outline-custom btn-sm-custom" onClick={() => {
                           setEditingUser(u);
-                          setUserForm({ name: u.name, email: u.email, password: '', role: u.role });
+                          setUserForm({ name: u.name, email: u.email, password: '', role: u.role, jobRole: u.jobRole?._id || '' });
                           setShowUserForm(true);
                         }}>Edit</button>
                         <button className="btn-sm-custom" style={{ background: 'rgba(245,158,11,0.1)', color: 'var(--warning)', border: 'none', borderRadius: 6, padding: '0.35rem 0.6rem', fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer' }}
@@ -397,6 +405,53 @@ export default function SettingsPage() {
             </table>
           </div>
         </div>
+
+        {/* Job Roles */}
+        <div className="card-custom mb-4">
+          <div className="d-flex justify-content-between align-items-center mb-3">
+            <h5 className="form-section-title" style={{ margin: 0, border: 0, padding: 0 }}>Job Roles</h5>
+            <Button className="btn-primary-custom btn-sm-custom" onClick={() => { setEditingRole(null); setRoleForm({ name: '', permissions: [] }); setShowRoleForm(true); }}>
+              <PlusIcon style={{ width: 14, height: 14, marginRight: 4 }} /> Add Role
+            </Button>
+          </div>
+          <p style={{ fontSize: '0.78rem', color: 'var(--muted-ink)', marginBottom: '0.75rem' }}>
+            Create job roles (e.g. Production Manager, Accountant) and choose which sections each role can access. Assign a role when adding or editing a user.
+          </p>
+          {roles.length === 0 ? (
+            <p style={{ fontSize: '0.82rem', color: 'var(--soft-ink)' }}>No job roles yet — users with the basic Staff role see Quotations, Invoices, {BRAND.ordersLabel}, Customers and Expenses.</p>
+          ) : (
+            <div className="table-custom" style={{ boxShadow: 'none' }}>
+              <table>
+                <thead>
+                  <tr><th>Role</th><th>Can Access</th><th>Users</th><th>Actions</th></tr>
+                </thead>
+                <tbody>
+                  {roles.map(r => (
+                    <tr key={r._id}>
+                      <td style={{ fontWeight: 600, color: 'var(--primary-dark)' }}>{r.name}</td>
+                      <td style={{ fontSize: '0.78rem' }}>
+                        {r.permissions.map(pk => SECTIONS.find(s => s.key === pk)?.label || pk).join(', ')}
+                      </td>
+                      <td>{r.usersCount}</td>
+                      <td>
+                        <div className="d-flex gap-1">
+                          <button className="btn-outline-custom btn-sm-custom" onClick={() => { setEditingRole(r); setRoleForm({ name: r.name, permissions: [...r.permissions] }); setShowRoleForm(true); }}>Edit</button>
+                          <button className="btn-sm-custom" style={{ background: 'rgba(239,68,68,0.1)', color: 'var(--danger)', border: 'none', borderRadius: 6, padding: '0.35rem 0.6rem', fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer' }}
+                            onClick={async () => {
+                              if (!window.confirm(`Delete role "${r.name}"?`)) return;
+                              try { await api.delete(`/roles/${r._id}`); toast.success('Role deleted'); fetchRoles(); }
+                              catch (err) { toast.error(err.response?.data?.message || 'Failed'); }
+                            }}>Del</button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+        </>
       ) : isAdmin ? (
         <div className="card-custom mb-4">
           <h5 className="form-section-title" style={{ margin: 0, border: 0, padding: 0, marginBottom: '1rem' }}>
@@ -449,9 +504,17 @@ export default function SettingsPage() {
             <Col md={6}>
               <Form.Group>
                 <Form.Label className="form-label-custom">Role</Form.Label>
-                <Form.Select className="form-input" value={userForm.role} onChange={e => setUserForm({ ...userForm, role: e.target.value })}>
-                  <option value="staff">Staff</option>
-                  <option value="admin">Admin</option>
+                <Form.Select className="form-input"
+                  value={userForm.role === 'admin' ? 'admin' : (userForm.jobRole || 'staff')}
+                  onChange={e => {
+                    const v = e.target.value;
+                    if (v === 'admin') setUserForm({ ...userForm, role: 'admin', jobRole: '' });
+                    else if (v === 'staff') setUserForm({ ...userForm, role: 'staff', jobRole: '' });
+                    else setUserForm({ ...userForm, role: 'staff', jobRole: v });
+                  }}>
+                  <option value="admin">Admin (full access)</option>
+                  <option value="staff">Staff (basic)</option>
+                  {roles.map(r => <option key={r._id} value={r._id}>{r.name}</option>)}
                 </Form.Select>
               </Form.Group>
             </Col>
@@ -476,7 +539,7 @@ export default function SettingsPage() {
           <Button className="btn-primary-custom" onClick={async () => {
             try {
               if (editingUser) {
-                await api.put(`/users/${editingUser._id}`, { name: userForm.name, email: userForm.email, role: userForm.role });
+                await api.put(`/users/${editingUser._id}`, { name: userForm.name, email: userForm.email, role: userForm.role, jobRole: userForm.jobRole || null });
                 toast.success('User updated');
               } else {
                 if (!userForm.name || !userForm.email || !userForm.password) return toast.error('Fill all required fields');
@@ -487,6 +550,60 @@ export default function SettingsPage() {
               fetchUsers();
             } catch (err) { toast.error(err.response?.data?.message || 'Failed'); }
           }}>{editingUser ? 'Update' : 'Create User'}</Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Job Role Modal */}
+      <Modal show={isAdmin && showRoleForm} onHide={() => setShowRoleForm(false)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title className="modal-title-custom">{editingRole ? 'Edit Job Role' : 'Add Job Role'}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form.Group className="mb-3">
+            <Form.Label className="form-label-custom">Role Name *</Form.Label>
+            <Form.Control className="form-input" value={roleForm.name} onChange={e => setRoleForm({ ...roleForm, name: e.target.value })} placeholder="e.g. Production Manager" />
+          </Form.Group>
+          <Form.Label className="form-label-custom">Can Access *</Form.Label>
+          <Row className="g-2">
+            {SECTIONS.map(s => (
+              <Col xs={6} key={s.key}>
+                <Form.Check
+                  type="checkbox"
+                  id={`role-perm-${s.key}`}
+                  label={s.label}
+                  checked={roleForm.permissions.includes(s.key)}
+                  onChange={e => {
+                    const next = e.target.checked
+                      ? [...roleForm.permissions, s.key]
+                      : roleForm.permissions.filter(k => k !== s.key);
+                    setRoleForm({ ...roleForm, permissions: next });
+                  }}
+                />
+              </Col>
+            ))}
+          </Row>
+          <div style={{ fontSize: '0.72rem', color: 'var(--soft-ink)', marginTop: '0.75rem' }}>
+            Settings (own account & password) is always available to every user.
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="outline-secondary" onClick={() => setShowRoleForm(false)}>Cancel</Button>
+          <Button className="btn-primary-custom" onClick={async () => {
+            if (!roleForm.name.trim()) return toast.error('Enter a role name');
+            if (roleForm.permissions.length === 0) return toast.error('Select at least one section');
+            try {
+              if (editingRole) {
+                await api.put(`/roles/${editingRole._id}`, roleForm);
+                toast.success('Role updated');
+              } else {
+                await api.post('/roles', roleForm);
+                toast.success('Role created');
+              }
+              setShowRoleForm(false);
+              fetchRoles();
+              fetchUsers();
+            } catch (err) { toast.error(err.response?.data?.message || 'Failed'); }
+          }}>{editingRole ? 'Update Role' : 'Create Role'}</Button>
         </Modal.Footer>
       </Modal>
 

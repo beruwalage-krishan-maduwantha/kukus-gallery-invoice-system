@@ -1,14 +1,17 @@
 const express = require('express');
 const { body } = require('express-validator');
 const { getProducts, getProduct, createProduct, updateProduct, deleteProduct } = require('../controllers/productController');
-const { auth } = require('../middleware/auth');
+const { auth, requireSection } = require('../middleware/auth');
 
 const router = express.Router();
 
 router.use(auth);
 
-router.get('/', getProducts);
-router.get('/:id', getProduct);
+// product list is needed for quotation/invoice line items
+router.get('/', requireSection('products', 'quotations', 'invoices'), getProducts);
+router.get('/:id', requireSection('products', 'quotations', 'invoices'), getProduct);
+
+router.use(requireSection('products'));
 
 router.post('/', [
   body('name').trim().notEmpty().withMessage('Name is required'),

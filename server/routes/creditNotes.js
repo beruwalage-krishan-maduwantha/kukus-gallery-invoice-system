@@ -1,10 +1,11 @@
 const express = require('express');
 const { body } = require('express-validator');
 const { getCreditNotes, getCustomerCredits, createCreditNote, updateCreditNote, deleteCreditNote } = require('../controllers/creditNoteController');
-const { auth } = require('../middleware/auth');
+const { auth, requireSection } = require('../middleware/auth');
 
 const router = express.Router();
 router.use(auth);
+router.use(requireSection('creditNotes'));
 
 router.get('/', getCreditNotes);
 router.get('/by-customer', getCustomerCredits);

@@ -1,13 +1,13 @@
 const express = require('express');
 const { body } = require('express-validator');
 const { getInvoices, getInvoice, createInvoice, updateInvoice, updateStatus, addAdvancePayment, deleteInvoice } = require('../controllers/invoiceController');
-const { auth } = require('../middleware/auth');
+const { auth, requireSection } = require('../middleware/auth');
 
 const router = express.Router();
 
 router.use(auth);
 
-router.get('/next-order-number/:type', async (req, res) => {
+router.get('/next-order-number/:type', requireSection('quotations', 'invoices'), async (req, res) => {
   try {
     const Counter = require('../models/Counter');
     const type = req.params.type;
@@ -17,6 +17,8 @@ router.get('/next-order-number/:type', async (req, res) => {
     res.json({ orderNumber: `${prefix}${String(next).padStart(3, '0')}` });
   } catch { res.status(500).json({ message: 'Server error' }); }
 });
+
+router.use(requireSection('invoices'));
 
 router.get('/', getInvoices);
 router.get('/:id', getInvoice);

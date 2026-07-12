@@ -3,6 +3,7 @@ import { useNavigate, Navigate } from 'react-router-dom';
 import { Form, Button, Alert, Spinner } from 'react-bootstrap';
 import { useAuth } from '../context/AuthContext';
 import { BRAND } from '../brand';
+import { firstAllowedPath } from '../utils/permissions';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -13,8 +14,7 @@ export default function LoginPage() {
   const navigate = useNavigate();
 
   if (isAuthenticated) {
-    const dest = user?.role === 'staff' ? '/quotations' : '/';
-    return <Navigate to={dest} replace />;
+    return <Navigate to={firstAllowedPath(user)} replace />;
   }
 
   const handleSubmit = async (e) => {
@@ -23,7 +23,7 @@ export default function LoginPage() {
     setLoading(true);
     try {
       const res = await login(email, password);
-      navigate(res.user.role === 'staff' ? '/quotations' : '/');
+      navigate(firstAllowedPath(res.user));
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed');
     } finally {

@@ -1,10 +1,11 @@
 const express = require('express');
 const { body } = require('express-validator');
 const { getQuotations, getQuotation, createQuotation, updateQuotation, updateStatus, convertToInvoice, deleteQuotation } = require('../controllers/quotationController');
-const { auth } = require('../middleware/auth');
+const { auth, requireSection } = require('../middleware/auth');
 
 const router = express.Router();
 router.use(auth);
+router.use(requireSection('quotations'));
 
 router.get('/', getQuotations);
 router.get('/:id', getQuotation);
