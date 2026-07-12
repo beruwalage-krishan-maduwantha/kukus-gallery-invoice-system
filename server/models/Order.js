@@ -24,7 +24,29 @@ const orderSchema = new mongoose.Schema({
   },
   approved: { type: Boolean, default: false },
   approvedAt: { type: Date },
-  approvedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+  approvedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  jobSheet: {
+    filled: { type: Boolean, default: false },
+    // Sample job sheets
+    sizeOption: { type: String, enum: ['', 'Standard Size', 'Client Size'], default: '' },
+    // Bulk job sheets
+    sizeBreakdown: [{
+      color: { type: String, default: '' },
+      s: { type: Number, default: 0 },
+      m: { type: Number, default: 0 },
+      l: { type: Number, default: 0 },
+      xl: { type: Number, default: 0 },
+      xxl: { type: Number, default: 0 }
+    }],
+    trims: [{
+      item: { type: String, default: '' },
+      quantity: { type: String, default: '' }
+    }],
+    // shared
+    notes: { type: String, default: '' },
+    designImage: { filename: { type: String, default: '' }, mimeType: { type: String, default: '' } },
+    materialImage: { filename: { type: String, default: '' }, mimeType: { type: String, default: '' } }
+  }
 }, { timestamps: true });
 
 orderSchema.index({ invoice: 1 });

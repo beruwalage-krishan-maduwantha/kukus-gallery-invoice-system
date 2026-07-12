@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { formatDateInput } from '../../utils/formatDate';
 
 const PRESETS = [
@@ -50,11 +51,13 @@ const PRESETS = [
   }
 ];
 
-export default function DateRangeFilter({ from, to, onFromChange, onToChange, onClear }) {
+export default function DateRangeFilter({ from, to, onFromChange, onToChange, onClear, defaultPreset = '' }) {
+  const [preset, setPreset] = useState(defaultPreset);
+
   const applyPreset = (label) => {
-    const preset = PRESETS.find(p => p.label === label);
-    if (!preset) return;
-    const [start, end] = preset.getRange();
+    const p = PRESETS.find(p => p.label === label);
+    if (!p) return;
+    const [start, end] = p.getRange();
     onFromChange(formatDateInput(start));
     onToChange(formatDateInput(end));
   };
@@ -63,8 +66,8 @@ export default function DateRangeFilter({ from, to, onFromChange, onToChange, on
     <div className="date-range-filter" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' }}>
       <select
         className="filter-select"
-        value=""
-        onChange={(e) => { if (e.target.value) applyPreset(e.target.value); }}
+        value={preset}
+        onChange={(e) => { setPreset(e.target.value); if (e.target.value) applyPreset(e.target.value); }}
       >
         <option value="">Quick range...</option>
         {PRESETS.map(p => <option key={p.label} value={p.label}>{p.label}</option>)}
@@ -74,7 +77,7 @@ export default function DateRangeFilter({ from, to, onFromChange, onToChange, on
         className="filter-select"
         style={{ padding: '0.4rem 0.6rem' }}
         value={from}
-        onChange={(e) => onFromChange(e.target.value)}
+        onChange={(e) => { setPreset(''); onFromChange(e.target.value); }}
         title="From date"
       />
       <span style={{ fontSize: '0.78rem', color: 'var(--accent)' }}>to</span>
@@ -83,13 +86,13 @@ export default function DateRangeFilter({ from, to, onFromChange, onToChange, on
         className="filter-select"
         style={{ padding: '0.4rem 0.6rem' }}
         value={to}
-        onChange={(e) => onToChange(e.target.value)}
+        onChange={(e) => { setPreset(''); onToChange(e.target.value); }}
         title="To date"
       />
       {(from || to) && (
         <button
           type="button"
-          onClick={onClear}
+          onClick={() => { setPreset(''); onClear(); }}
           style={{ background: 'rgba(239,68,68,0.1)', color: 'var(--danger)', border: 'none', borderRadius: 6, padding: '0.35rem 0.6rem', fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer' }}
         >
           Clear

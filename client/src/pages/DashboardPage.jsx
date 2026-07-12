@@ -11,13 +11,16 @@ import StatusBadge from '../components/common/StatusBadge';
 import DateRangeFilter from '../components/common/DateRangeFilter';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import { formatCurrency } from '../utils/formatCurrency';
-import { formatDate } from '../utils/formatDate';
+import { formatDate, formatDateInput } from '../utils/formatDate';
+
+const monthStart = () => formatDateInput(new Date(new Date().getFullYear(), new Date().getMonth(), 1));
+const today = () => formatDateInput(new Date());
 
 export default function DashboardPage() {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [dateFrom, setDateFrom] = useState('');
-  const [dateTo, setDateTo] = useState('');
+  const [dateFrom, setDateFrom] = useState(monthStart());
+  const [dateTo, setDateTo] = useState(today());
 
   useEffect(() => {
     setLoading(true);
@@ -35,6 +38,7 @@ export default function DashboardPage() {
         <div className="action-bar-left">
           <DateRangeFilter
             from={dateFrom} to={dateTo}
+            defaultPreset="This Month"
             onFromChange={setDateFrom}
             onToChange={setDateTo}
             onClear={() => { setDateFrom(''); setDateTo(''); }}

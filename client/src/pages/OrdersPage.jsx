@@ -4,6 +4,7 @@ import { Modal } from 'react-bootstrap';
 import toast from 'react-hot-toast';
 import { getOrders, updateOrderStatus, deleteOrder } from '../api/orders';
 import { generateOrderPdf, previewOrderPdf } from '../components/pdf/generateOrderPdf';
+import JobSheetModal from '../components/orders/JobSheetModal';
 import SearchInput from '../components/common/SearchInput';
 import DateRangeFilter from '../components/common/DateRangeFilter';
 import StatusBadge from '../components/common/StatusBadge';
@@ -14,7 +15,7 @@ import LoadingSpinner from '../components/common/LoadingSpinner';
 import { formatDate } from '../utils/formatDate';
 import { ORDER_STATUS_OPTIONS } from '../utils/constants';
 import { BRAND } from '../brand';
-import { ClipboardDocumentListIcon, EyeIcon, ArrowDownTrayIcon } from '@heroicons/react/24/outline';
+import { ClipboardDocumentListIcon, EyeIcon, ArrowDownTrayIcon, DocumentTextIcon } from '@heroicons/react/24/outline';
 
 export default function OrdersPage() {
   const navigate = useNavigate();
@@ -30,6 +31,7 @@ export default function OrdersPage() {
   const [previewUrl, setPreviewUrl] = useState(null);
   const [previewOrder, setPreviewOrder] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
+  const [jobSheetOrder, setJobSheetOrder] = useState(null);
 
   const fetchOrders = useCallback(async () => {
     setLoading(true);
@@ -179,6 +181,9 @@ export default function OrdersPage() {
                   </td>
                   <td onClick={e => e.stopPropagation()}>
                     <div className="d-flex gap-1">
+                      <button style={btnStyle(order.jobSheet?.filled ? 'rgba(34,197,94,0.12)' : 'rgba(245,158,11,0.12)', order.jobSheet?.filled ? 'var(--success)' : 'var(--warning)')} onClick={e => { e.stopPropagation(); setJobSheetOrder(order); }} title="Job Sheet">
+                        <DocumentTextIcon style={{ width: 15, height: 15 }} /> JS
+                      </button>
                       <button style={btnStyle('rgba(177,145,198,0.12)', 'var(--primary)')} onClick={e => handlePreview(e, order)} title="Preview PDF">
                         <EyeIcon style={{ width: 15, height: 15 }} />
                       </button>
@@ -220,6 +225,8 @@ export default function OrdersPage() {
           </button>
         </Modal.Footer>
       </Modal>
+
+      <JobSheetModal order={jobSheetOrder} show={!!jobSheetOrder} onHide={() => setJobSheetOrder(null)} onSaved={fetchOrders} />
 
       <ConfirmModal show={!!deleteTarget} onHide={() => setDeleteTarget(null)} onConfirm={handleDelete} title={`Delete ${BRAND.orderNoun}`} message={`Delete ${BRAND.orderNoun.toLowerCase()} ${deleteTarget?.orderNumber}? This cannot be undone.`} confirmText="Delete" />
     </div>
