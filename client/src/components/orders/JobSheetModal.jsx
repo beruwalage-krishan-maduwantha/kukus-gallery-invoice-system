@@ -32,7 +32,7 @@ export default function JobSheetModal({ order, show, onHide, onSaved }) {
   const isSample = order?.orderType === 'Sample';
   const [sizeOption, setSizeOption] = useState('');
   const [rows, setRows] = useState([{ ...emptyRow }]);
-  const [trims, setTrims] = useState(TRIM_ITEMS.map(item => ({ item, quantity: '' })));
+  const [trims, setTrims] = useState([{ item: '', quantity: '' }]);
   const [notes, setNotes] = useState('');
   const [designFile, setDesignFile] = useState(null);
   const [materialFile, setMaterialFile] = useState(null);
@@ -47,7 +47,7 @@ export default function JobSheetModal({ order, show, onHide, onSaved }) {
     const js = order.jobSheet || {};
     setSizeOption(js.sizeOption || '');
     setRows(js.sizeBreakdown?.length ? js.sizeBreakdown.map(r => ({ color: r.color, s: r.s || '', m: r.m || '', l: r.l || '', xl: r.xl || '', xxl: r.xxl || '' })) : [{ ...emptyRow }]);
-    setTrims(TRIM_ITEMS.map(item => ({ item, quantity: js.trims?.find(t => t.item === item)?.quantity || '' })));
+    setTrims(js.trims?.length ? js.trims.map(t => ({ item: t.item, quantity: t.quantity })) : [{ item: '', quantity: '' }]);
     setNotes(js.notes || '');
     setDesignFile(null); setMaterialFile(null);
     setDesignPreview(null); setMaterialPreview(null);
@@ -188,15 +188,23 @@ export default function JobSheetModal({ order, show, onHide, onSaved }) {
               </Col>
               <Col xs={12}>
                 <Form.Label className="form-label-custom">Trims & Accessories</Form.Label>
-                <Row className="g-2">
-                  {trims.map((t, i) => (
-                    <Col xs={6} md={3} key={t.item}>
-                      <div style={{ fontSize: '0.72rem', color: 'var(--accent)', marginBottom: 2 }}>{t.item}</div>
-                      <Form.Control size="sm" value={t.quantity} placeholder="Qty / details"
-                        onChange={e => { const next = [...trims]; next[i] = { ...next[i], quantity: e.target.value }; setTrims(next); }} />
-                    </Col>
-                  ))}
-                </Row>
+                {trims.map((t, i) => (
+                  <div key={i} className="d-flex gap-2 align-items-center" style={{ marginBottom: '0.5rem' }}>
+                    <Form.Select size="sm" style={{ maxWidth: 200 }} value={t.item}
+                      onChange={e => { const next = [...trims]; next[i] = { ...next[i], item: e.target.value }; setTrims(next); }}>
+                      <option value="">Select item...</option>
+                      {TRIM_ITEMS.map(item => <option key={item} value={item}>{item}</option>)}
+                    </Form.Select>
+                    <Form.Control size="sm" style={{ maxWidth: 240 }} value={t.quantity} placeholder="Qty / details"
+                      onChange={e => { const next = [...trims]; next[i] = { ...next[i], quantity: e.target.value }; setTrims(next); }} />
+                    <button type="button" className="remove-item-btn" onClick={() => trims.length > 1 ? setTrims(trims.filter((_, x) => x !== i)) : setTrims([{ item: '', quantity: '' }])}>
+                      <TrashIcon style={{ width: 16, height: 16 }} />
+                    </button>
+                  </div>
+                ))}
+                <Button variant="link" onClick={() => setTrims([...trims, { item: '', quantity: '' }])} style={{ color: 'var(--primary)', fontWeight: 600, fontSize: '0.8rem', textDecoration: 'none', padding: 0 }}>
+                  <PlusIcon style={{ width: 15, height: 15, marginRight: 4 }} /> Add Trim / Accessory
+                </Button>
               </Col>
             </>
           )}

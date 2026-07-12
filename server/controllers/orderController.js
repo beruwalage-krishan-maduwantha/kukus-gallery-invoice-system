@@ -101,7 +101,7 @@ exports.updateJobSheet = async (req, res) => {
             .map(r => ({ color: r.color || '', s: Number(r.s) || 0, m: Number(r.m) || 0, l: Number(r.l) || 0, xl: Number(r.xl) || 0, xxl: Number(r.xxl) || 0 }))
         : [],
       trims: Array.isArray(jobSheet.trims)
-        ? jobSheet.trims.filter(t => (t.quantity || '').trim()).map(t => ({ item: t.item || '', quantity: t.quantity || '' }))
+        ? jobSheet.trims.filter(t => (t.item || '').trim()).map(t => ({ item: t.item || '', quantity: t.quantity || '' }))
         : [],
       notes: jobSheet.notes || '',
       designImage: current.designImage || { filename: '', mimeType: '' },
