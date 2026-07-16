@@ -4,7 +4,7 @@ import { ALL_CATEGORIES, UNITS, SERVICE_TYPES, CATEGORIES } from '../../utils/co
 
 const emptyForm = { name: '', description: '', category: '', customCategory: '', serviceType: '', defaultPrice: '', unit: 'piece' };
 
-export default function ProductForm({ show, onHide, onSave, product }) {
+export default function ProductForm({ show, onHide, onSave, product, saving = false }) {
   const [form, setForm] = useState(emptyForm);
 
   useEffect(() => {
@@ -27,6 +27,7 @@ export default function ProductForm({ show, onHide, onSave, product }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (saving) return;
     const category = form.category === 'Other' ? form.customCategory : form.category;
     if (!category) return;
     onSave({ ...form, category, defaultPrice: Number(form.defaultPrice) });
@@ -95,8 +96,8 @@ export default function ProductForm({ show, onHide, onSave, product }) {
           </Row>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="outline-secondary" onClick={onHide}>Cancel</Button>
-          <Button type="submit" className="btn-primary-custom">Save Product</Button>
+          <Button variant="outline-secondary" onClick={onHide} disabled={saving}>Cancel</Button>
+          <Button type="submit" className="btn-primary-custom" disabled={saving}>{saving ? 'Saving...' : 'Save Product'}</Button>
         </Modal.Footer>
       </Form>
     </Modal>

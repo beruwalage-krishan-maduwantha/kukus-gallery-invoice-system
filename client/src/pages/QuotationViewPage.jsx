@@ -24,6 +24,7 @@ export default function QuotationViewPage() {
   const [converting, setConverting] = useState(false);
   const [convertData, setConvertData] = useState({ deliveryDate: '', paymentType: 'Cash' });
   const [pdfPreviewUrl, setPdfPreviewUrl] = useState(null);
+  const [statusBusy, setStatusBusy] = useState(false);
 
   useEffect(() => {
     Promise.all([getQuotation(id), getSettings()])
@@ -33,12 +34,15 @@ export default function QuotationViewPage() {
   }, [id]);
 
   const handleStatusChange = async (status) => {
+    if (statusBusy) return;
+    setStatusBusy(true);
     try {
       await updateQuotationStatus(id, status);
       toast.success(`Marked as ${status}`);
       const res = await getQuotation(id);
       setQuotation(res.data);
     } catch (err) { toast.error(err.response?.data?.message || 'Failed'); }
+    finally { setStatusBusy(false); }
   };
 
   const handleConvert = async () => {
@@ -93,12 +97,12 @@ export default function QuotationViewPage() {
             </Link>
           )}
           {quotation.status === 'Draft' && (
-            <Button className="btn-sm-custom" style={{ background: 'rgba(59,130,246,0.1)', color: 'var(--info)', border: 'none', borderRadius: 6, fontWeight: 600 }} onClick={() => handleStatusChange('Sent')}>Mark as Sent</Button>
+            <Button className="btn-sm-custom" style={{ background: 'rgba(59,130,246,0.1)', color: 'var(--info)', border: 'none', borderRadius: 6, fontWeight: 600 }} disabled={statusBusy} onClick={() => handleStatusChange('Sent')}>Mark as Sent</Button>
           )}
           {quotation.status === 'Sent' && (
             <>
-              <Button className="btn-sm-custom" style={{ background: 'rgba(34,197,94,0.1)', color: 'var(--success)', border: 'none', borderRadius: 6, fontWeight: 600 }} onClick={() => handleStatusChange('Accepted')}>Accept</Button>
-              <Button className="btn-sm-custom" style={{ background: 'rgba(239,68,68,0.1)', color: 'var(--danger)', border: 'none', borderRadius: 6, fontWeight: 600 }} onClick={() => handleStatusChange('Rejected')}>Reject</Button>
+              <Button className="btn-sm-custom" style={{ background: 'rgba(34,197,94,0.1)', color: 'var(--success)', border: 'none', borderRadius: 6, fontWeight: 600 }} disabled={statusBusy} onClick={() => handleStatusChange('Accepted')}>Accept</Button>
+              <Button className="btn-sm-custom" style={{ background: 'rgba(239,68,68,0.1)', color: 'var(--danger)', border: 'none', borderRadius: 6, fontWeight: 600 }} disabled={statusBusy} onClick={() => handleStatusChange('Rejected')}>Reject</Button>
             </>
           )}
           {quotation.status === 'Accepted' && (

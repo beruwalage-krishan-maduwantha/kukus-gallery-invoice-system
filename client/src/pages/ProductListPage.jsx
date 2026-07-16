@@ -19,6 +19,7 @@ export default function ProductListPage() {
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
+  const [saving, setSaving] = useState(false);
 
   const fetchProducts = useCallback(async () => {
     setLoading(true);
@@ -32,6 +33,8 @@ export default function ProductListPage() {
   useEffect(() => { fetchProducts(); }, [fetchProducts]);
 
   const handleSave = async (data) => {
+    if (saving) return;
+    setSaving(true);
     try {
       if (editing) {
         await updateProduct(editing._id, data);
@@ -44,6 +47,7 @@ export default function ProductListPage() {
       setEditing(null);
       fetchProducts();
     } catch (err) { toast.error(err.response?.data?.message || 'Save failed'); }
+    finally { setSaving(false); }
   };
 
   const handleDelete = async () => {
@@ -73,7 +77,7 @@ export default function ProductListPage() {
         ))}
       </div>
 
-      {loading ? <LoadingSpinner /> : products.length === 0 ? (
+      {loading && products.length === 0 ? <LoadingSpinner /> : products.length === 0 ? (
         <EmptyState
           icon={CubeIcon}
           title="No products yet"
@@ -112,7 +116,7 @@ export default function ProductListPage() {
         </div>
       )}
 
-      <ProductForm show={showForm} onHide={() => { setShowForm(false); setEditing(null); }} onSave={handleSave} product={editing} />
+      <ProductForm show={showForm} onHide={() => { setShowForm(false); setEditing(null); }} onSave={handleSave} product={editing} saving={saving} />
 
       <ConfirmModal show={!!deleteTarget} onHide={() => setDeleteTarget(null)} onConfirm={handleDelete} title="Delete Product" message={`Remove "${deleteTarget?.name}"?`} confirmText="Delete" />
     </div>

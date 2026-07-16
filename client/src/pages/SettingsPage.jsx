@@ -30,6 +30,7 @@ export default function SettingsPage() {
   const [showRoleForm, setShowRoleForm] = useState(false);
   const [editingRole, setEditingRole] = useState(null);
   const [roleForm, setRoleForm] = useState({ name: '', permissions: [] });
+  const [actionBusy, setActionBusy] = useState(false);
 
   const fetchUsers = () => { if (isAdmin) api.get('/users').then(res => setUsers(res.data)).catch(() => {}); };
   const fetchRoles = () => { if (isAdmin) api.get('/roles').then(res => setRoles(res.data)).catch(() => {}); };
@@ -134,14 +135,17 @@ export default function SettingsPage() {
           </Modal.Body>
           <Modal.Footer>
             <Button variant="outline-secondary" onClick={() => setShowResetPw(null)}>Cancel</Button>
-            <Button className="btn-primary-custom" onClick={async () => {
+            <Button className="btn-primary-custom" disabled={actionBusy} onClick={async () => {
+              if (actionBusy) return;
               if (!newPassword || newPassword.length < 6) return toast.error('Password must be at least 6 characters');
+              setActionBusy(true);
               try {
                 await api.put('/auth/change-password', { newPassword });
                 toast.success('Password changed!');
                 setShowResetPw(null);
               } catch (err) { toast.error(err.response?.data?.message || 'Failed'); }
-            }}>Change Password</Button>
+              finally { setActionBusy(false); }
+            }}>{actionBusy ? 'Please wait...' : 'Change Password'}</Button>
           </Modal.Footer>
         </Modal>
       </div>
@@ -389,12 +393,15 @@ export default function SettingsPage() {
                             background: u.isActive ? 'rgba(239,68,68,0.1)' : 'rgba(34,197,94,0.1)',
                             color: u.isActive ? 'var(--danger)' : 'var(--success)',
                             border: 'none', borderRadius: 6, padding: '0.35rem 0.6rem', fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer'
-                          }} onClick={async () => {
+                          }} disabled={actionBusy} onClick={async () => {
+                            if (actionBusy) return;
+                            setActionBusy(true);
                             try {
                               await api.put(`/users/${u._id}`, { isActive: !u.isActive });
                               toast.success(u.isActive ? 'User deactivated' : 'User activated');
                               fetchUsers();
                             } catch { toast.error('Failed'); }
+                            finally { setActionBusy(false); }
                           }}>{u.isActive ? 'Deactivate' : 'Activate'}</button>
                         )}
                       </div>
@@ -437,10 +444,14 @@ export default function SettingsPage() {
                         <div className="d-flex gap-1">
                           <button className="btn-outline-custom btn-sm-custom" onClick={() => { setEditingRole(r); setRoleForm({ name: r.name, permissions: [...r.permissions] }); setShowRoleForm(true); }}>Edit</button>
                           <button className="btn-sm-custom" style={{ background: 'rgba(239,68,68,0.1)', color: 'var(--danger)', border: 'none', borderRadius: 6, padding: '0.35rem 0.6rem', fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer' }}
+                            disabled={actionBusy}
                             onClick={async () => {
+                              if (actionBusy) return;
                               if (!window.confirm(`Delete role "${r.name}"?`)) return;
+                              setActionBusy(true);
                               try { await api.delete(`/roles/${r._id}`); toast.success('Role deleted'); fetchRoles(); }
                               catch (err) { toast.error(err.response?.data?.message || 'Failed'); }
+                              finally { setActionBusy(false); }
                             }}>Del</button>
                         </div>
                       </td>
@@ -535,21 +546,24 @@ export default function SettingsPage() {
           </Row>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="outline-secondary" onClick={() => setShowUserForm(false)}>Cancel</Button>
-          <Button className="btn-primary-custom" onClick={async () => {
+          <Button variant="outline-secondary" onClick={() => setShowUserForm(false)} disabled={actionBusy}>Cancel</Button>
+          <Button className="btn-primary-custom" disabled={actionBusy} onClick={async () => {
+            if (actionBusy) return;
+            setActionBusy(true);
             try {
               if (editingUser) {
                 await api.put(`/users/${editingUser._id}`, { name: userForm.name, email: userForm.email, role: userForm.role, jobRole: userForm.jobRole || null });
                 toast.success('User updated');
               } else {
-                if (!userForm.name || !userForm.email || !userForm.password) return toast.error('Fill all required fields');
+                if (!userForm.name || !userForm.email || !userForm.password) { setActionBusy(false); return toast.error('Fill all required fields'); }
                 await api.post('/users', userForm);
                 toast.success('User created');
               }
               setShowUserForm(false);
               fetchUsers();
             } catch (err) { toast.error(err.response?.data?.message || 'Failed'); }
-          }}>{editingUser ? 'Update' : 'Create User'}</Button>
+            finally { setActionBusy(false); }
+          }}>{actionBusy ? 'Please wait...' : (editingUser ? 'Update' : 'Create User')}</Button>
         </Modal.Footer>
       </Modal>
 
@@ -587,10 +601,12 @@ export default function SettingsPage() {
           </div>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="outline-secondary" onClick={() => setShowRoleForm(false)}>Cancel</Button>
-          <Button className="btn-primary-custom" onClick={async () => {
+          <Button variant="outline-secondary" onClick={() => setShowRoleForm(false)} disabled={actionBusy}>Cancel</Button>
+          <Button className="btn-primary-custom" disabled={actionBusy} onClick={async () => {
+            if (actionBusy) return;
             if (!roleForm.name.trim()) return toast.error('Enter a role name');
             if (roleForm.permissions.length === 0) return toast.error('Select at least one section');
+            setActionBusy(true);
             try {
               if (editingRole) {
                 await api.put(`/roles/${editingRole._id}`, roleForm);
@@ -603,7 +619,8 @@ export default function SettingsPage() {
               fetchRoles();
               fetchUsers();
             } catch (err) { toast.error(err.response?.data?.message || 'Failed'); }
-          }}>{editingRole ? 'Update Role' : 'Create Role'}</Button>
+            finally { setActionBusy(false); }
+          }}>{actionBusy ? 'Please wait...' : (editingRole ? 'Update Role' : 'Create Role')}</Button>
         </Modal.Footer>
       </Modal>
 
@@ -620,15 +637,18 @@ export default function SettingsPage() {
           </Form.Group>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="outline-secondary" onClick={() => setShowResetPw(null)}>Cancel</Button>
-          <Button className="btn-primary-custom" onClick={async () => {
+          <Button variant="outline-secondary" onClick={() => setShowResetPw(null)} disabled={actionBusy}>Cancel</Button>
+          <Button className="btn-primary-custom" disabled={actionBusy} onClick={async () => {
+            if (actionBusy) return;
             if (!newPassword || newPassword.length < 6) return toast.error('Password must be at least 6 characters');
+            setActionBusy(true);
             try {
               await api.put(`/users/${showResetPw._id}/reset-password`, { newPassword });
               toast.success('Password reset!');
               setShowResetPw(null);
             } catch (err) { toast.error(err.response?.data?.message || 'Failed'); }
-          }}>Reset Password</Button>
+            finally { setActionBusy(false); }
+          }}>{actionBusy ? 'Please wait...' : 'Reset Password'}</Button>
         </Modal.Footer>
       </Modal>
     </div>

@@ -16,13 +16,11 @@ function buildOrdersFromItems({ items, invoiceId, invoiceNumber, customerId, cus
       status: 'Pending'
     };
 
-    if (item.orderType === 'Sample' && item.quantity > 1) {
-      for (let i = 1; i <= item.quantity; i++) {
-        orders.push({ ...base, orderNumber: `${item.orderNumber}-${i}`, quantity: 1 });
-      }
-    } else {
-      orders.push({ ...base, orderNumber: item.orderNumber, quantity: item.quantity });
-    }
+    // Previously, Sample orders with quantity > 1 were split into one order
+    // per unit (SM021-1, SM021-2, ...) because a job sheet could only hold
+    // one design. The job sheet now supports multiple "Design" blocks per
+    // order, so a single order covers the whole quantity.
+    orders.push({ ...base, orderNumber: item.orderNumber, quantity: item.quantity });
   }
   return orders;
 }

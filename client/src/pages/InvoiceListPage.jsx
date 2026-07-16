@@ -32,6 +32,7 @@ export default function InvoiceListPage() {
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [advanceTarget, setAdvanceTarget] = useState(null);
   const [advanceAmount, setAdvanceAmount] = useState('');
+  const [payingAdvance, setPayingAdvance] = useState(false);
 
   const fetchInvoices = useCallback(async () => {
     setLoading(true);
@@ -55,7 +56,9 @@ export default function InvoiceListPage() {
   };
 
   const handleAdvancePay = async () => {
+    if (payingAdvance) return;
     if (!advanceAmount || Number(advanceAmount) <= 0) return toast.error('Enter a valid amount');
+    setPayingAdvance(true);
     try {
       await api.post(`/invoices/${advanceTarget._id}/advance`, { amount: Number(advanceAmount) });
       toast.success('Advance payment recorded');
@@ -63,6 +66,7 @@ export default function InvoiceListPage() {
       setAdvanceAmount('');
       fetchInvoices();
     } catch (err) { toast.error(err.response?.data?.message || 'Failed'); }
+    finally { setPayingAdvance(false); }
   };
 
   const handleDelete = async () => {
@@ -100,7 +104,7 @@ export default function InvoiceListPage() {
         </Link>
       </div>
 
-      {loading ? <LoadingSpinner /> : invoices.length === 0 ? (
+      {loading && invoices.length === 0 ? <LoadingSpinner /> : invoices.length === 0 ? (
         <EmptyState
           icon={DocumentTextIcon}
           title="No invoices yet"
@@ -174,7 +178,9 @@ export default function InvoiceListPage() {
         </Modal.Body>
         <Modal.Footer>
           <Button variant="outline-secondary" onClick={() => setAdvanceTarget(null)}>Cancel</Button>
-          <Button className="btn-primary-custom" onClick={handleAdvancePay}>Record Payment</Button>
+          <Button className="btn-primary-custom" onClick={handleAdvancePay} disabled={payingAdvance}>
+            {payingAdvance ? 'Recording...' : 'Record Payment'}
+          </Button>
         </Modal.Footer>
       </Modal>
 

@@ -32,6 +32,7 @@ export default function ExpensesPage() {
   const [form, setForm] = useState({ ...emptyForm });
   const [saving, setSaving] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState(null);
+  const [deletingAttachment, setDeletingAttachment] = useState(false);
   const [attachFile, setAttachFile] = useState(null);
   const [existingAttachment, setExistingAttachment] = useState(null);
   const [removeAttachment, setRemoveAttachment] = useState(false);
@@ -124,14 +125,16 @@ export default function ExpensesPage() {
   };
 
   const deleteAttachment = async () => {
-    if (!previewExp) return;
+    if (!previewExp || deletingAttachment) return;
     if (!window.confirm(`Delete the attached file "${previewExp.attachment?.filename}"? The expense itself will be kept.`)) return;
+    setDeletingAttachment(true);
     try {
       await updateExpense(previewExp._id, { removeAttachment: true });
       toast.success('Attachment deleted');
       closePreview();
       fetchExpenses();
     } catch (err) { toast.error(err.response?.data?.message || 'Failed to delete attachment'); }
+    finally { setDeletingAttachment(false); }
   };
 
   const handleSave = async () => {
@@ -192,7 +195,7 @@ export default function ExpensesPage() {
         </Button>
       </div>
 
-      {loading ? <LoadingSpinner /> : expenses.length === 0 ? (
+      {loading && expenses.length === 0 ? <LoadingSpinner /> : expenses.length === 0 ? (
         <EmptyState
           icon={BanknotesIcon}
           title="No expenses yet"
@@ -374,7 +377,7 @@ export default function ExpensesPage() {
           )}
         </Modal.Body>
         <Modal.Footer>
-          <button onClick={deleteAttachment} style={{ marginRight: 'auto', background: 'rgba(239,68,68,0.1)', color: 'var(--danger)', border: 'none', borderRadius: 8, padding: '0.55rem 1.2rem', fontSize: '0.82rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', cursor: 'pointer' }}>
+          <button onClick={deleteAttachment} disabled={deletingAttachment} style={{ marginRight: 'auto', background: 'rgba(239,68,68,0.1)', color: 'var(--danger)', border: 'none', borderRadius: 8, padding: '0.55rem 1.2rem', fontSize: '0.82rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', cursor: 'pointer' }}>
             <TrashIcon style={{ width: 15, height: 15, marginRight: 6, verticalAlign: 'text-bottom' }} /> Delete File
           </button>
           <button className="btn-outline-custom" onClick={closePreview}>Close</button>

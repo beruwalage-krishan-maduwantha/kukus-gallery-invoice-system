@@ -11,7 +11,8 @@ router.get('/', getOrders);
 router.patch('/:id/status', updateOrderStatus);
 router.patch('/:id/approve', approveOrder);
 router.put('/:id/jobsheet', updateJobSheet);
-router.get('/:id/jobsheet-image/:kind', getJobSheetImage);
+router.get('/:id/jobsheet-image/:kind/:designIndex/:index', getJobSheetImage);
+router.get('/:id/jobsheet-image/:kind/:designIndex', getJobSheetImage);
 router.delete('/:id', deleteOrder);
 
 module.exports = router;

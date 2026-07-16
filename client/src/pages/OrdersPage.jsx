@@ -117,7 +117,7 @@ export default function OrdersPage() {
         </div>
       </div>
 
-      {loading ? <LoadingSpinner /> : orders.length === 0 ? (
+      {loading && orders.length === 0 ? <LoadingSpinner /> : orders.length === 0 ? (
         <EmptyState
           icon={ClipboardDocumentListIcon}
           title={`No ${BRAND.ordersLabel.toLowerCase()} yet`}

@@ -1,6 +1,7 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import api from '../../api/axios';
+import { SIZE_CHARTS } from '../../utils/sizeCharts';
 
 function fmtDate(date) {
   if (!date) return '';
@@ -48,9 +49,9 @@ function imageWithSize(src, maxWidth, quality) {
   });
 }
 
-async function fetchJobSheetImage(orderId, kind) {
+async function fetchJobSheetImage(orderId, kind, designIndex = 0, index = 0) {
   try {
-    const res = await api.get(`/orders/${orderId}/jobsheet-image/${kind}`, { responseType: 'blob' });
+    const res = await api.get(`/orders/${orderId}/jobsheet-image/${kind}/${designIndex}/${index}`, { responseType: 'blob' });
     const url = URL.createObjectURL(res.data);
     const image = await imageWithSize(url, 700, 0.75);
     URL.revokeObjectURL(url);
@@ -67,6 +68,18 @@ function drawFittedImage(doc, image, x, y, boxWidth, maxHeight) {
   try { doc.addImage(image.dataUrl, 'JPEG', x, y, w, h); } catch { return 0; }
   doc.setDrawColor(200); doc.setLineWidth(0.2); doc.rect(x, y, w, h);
   return h;
+}
+
+// draws an image at a fixed height, width follows its own aspect ratio
+// (capped at maxWidth) - used to pack images tightly instead of leaving
+// blank space around portrait photos in fixed-width grid cells
+function drawImageFixedHeight(doc, image, x, y, targetHeight, maxWidth) {
+  let h = targetHeight;
+  let w = h * (image.w / image.h);
+  if (w > maxWidth) { w = maxWidth; h = w * (image.h / image.w); }
+  try { doc.addImage(image.dataUrl, 'JPEG', x, y, w, h); } catch { return { w: 0, h: 0 }; }
+  doc.setDrawColor(200); doc.setLineWidth(0.2); doc.rect(x, y, w, h);
+  return { w, h };
 }
 
 function drawLine(doc, x, y, width) {
@@ -274,99 +287,149 @@ async function buildOrderPdf(order) {
   doc.setTextColor(0, 0, 0);
 
   const js = order.jobSheet || {};
-  const isSampleSheet = order.orderType === 'Sample';
 
   if (js.filled) {
     // ===== FILLED JOB SHEET =====
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(11);
-    doc.text(`Job Sheet — ${isSampleSheet ? 'Sample' : 'Bulk'}`, margin, y);
+    doc.text('Job Sheet', margin, y);
     y += 6;
 
-    // Images side by side
-    const [designImg, materialImg] = await Promise.all([
-      js.designImage?.filename ? fetchJobSheetImage(order._id, 'design') : null,
-      js.materialImage?.filename ? fetchJobSheetImage(order._id, 'material') : null
-    ]);
-    if (designImg || materialImg) {
-      const colWidth = (contentWidth - 6) / 2;
-      let imgBottom = y;
-      doc.setFontSize(7.5);
-      if (designImg) {
-        doc.setFont('helvetica', 'bold');
-        doc.text('Design / Product', margin, y);
-        const h = drawFittedImage(doc, designImg, margin, y + 2, colWidth, 48);
-        imgBottom = Math.max(imgBottom, y + 2 + h);
-      }
-      if (materialImg) {
-        doc.setFont('helvetica', 'bold');
-        doc.text('Material', margin + colWidth + 6, y);
-        const h = drawFittedImage(doc, materialImg, margin + colWidth + 6, y + 2, colWidth, 48);
-        imgBottom = Math.max(imgBottom, y + 2 + h);
-      }
-      y = imgBottom + 8;
-    }
+    const designs = js.designs?.length ? js.designs : [];
 
-    if (isSampleSheet) {
-      if (js.sizeOption) {
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(8.5);
-        doc.text('Size:', margin, y);
-        doc.setFont('helvetica', 'normal');
-        doc.text(js.sizeOption, margin + 12, y);
-        y += 8;
-      }
-    } else {
-      // Size breakdown table
-      if (js.sizeBreakdown?.length) {
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(9);
-        doc.text('Size Break Down', margin, y);
-        const totals = js.sizeBreakdown.map(r => (r.s || 0) + (r.m || 0) + (r.l || 0) + (r.xl || 0) + (r.xxl || 0));
-        autoTable(doc, {
-          startY: y + 2,
-          head: [['Color / Material', 'S', 'M', 'L', 'XL', '2XL', 'Total']],
-          body: js.sizeBreakdown.map((r, i) => [
-            r.color || '-', r.s || '', r.m || '', r.l || '', r.xl || '', r.xxl || '', totals[i] || ''
-          ]),
-          headStyles: { fillColor: [60, 60, 60], textColor: 255, fontSize: 7, fontStyle: 'bold', cellPadding: 2 },
-          styles: { fontSize: 7.5, cellPadding: 2.5, textColor: [30, 30, 30], lineColor: [0, 0, 0], lineWidth: 0.25 },
-          columnStyles: { 0: { cellWidth: 40, halign: 'left' }, 6: { fontStyle: 'bold' } },
-          margin: { left: margin, right: margin },
-          theme: 'grid', tableLineColor: [0, 0, 0], tableLineWidth: 0.25
-        });
-        y = doc.lastAutoTable.finalY + 8;
-      }
+    for (let d = 0; d < designs.length; d++) {
+      const block = designs[d];
+      if (y > 195) { doc.addPage('a5', 'portrait'); y = 14; }
 
-      // Trims with quantities
-      if (js.trims?.length) {
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(9);
-        doc.text('Trims & Accessories', margin, y);
-        autoTable(doc, {
-          startY: y + 2,
-          head: [['Item', 'Quantity / Details']],
-          body: js.trims.map(t => [t.item, t.quantity]),
-          headStyles: { fillColor: [60, 60, 60], textColor: 255, fontSize: 7, fontStyle: 'bold', cellPadding: 2 },
-          styles: { fontSize: 7.5, cellPadding: 2.5, textColor: [30, 30, 30], lineColor: [0, 0, 0], lineWidth: 0.25 },
-          columnStyles: { 0: { cellWidth: 45, halign: 'left' } },
-          margin: { left: margin, right: margin },
-          theme: 'grid', tableLineColor: [0, 0, 0], tableLineWidth: 0.25
-        });
-        y = doc.lastAutoTable.finalY + 8;
-      }
-    }
-
-    if (js.notes) {
-      if (y > 180) { doc.addPage('a5', 'portrait'); y = 14; }
       doc.setFont('helvetica', 'bold');
-      doc.setFontSize(8.5);
-      doc.text('Notes', margin, y);
-      y += 4;
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(7.5);
-      const noteLines = doc.splitTextToSize(js.notes, contentWidth);
-      doc.text(noteLines, margin, y);
+      doc.setFontSize(9.5);
+      doc.text(`${order.orderNumber}-${d + 1}`, margin, y);
+      y += 5;
+
+      const designImgs = await Promise.all(
+        (block.designImages || []).map(img => fetchJobSheetImage(order._id, 'design', block.designIndex, img.index))
+      );
+      const validDesignImgs = designImgs.filter(Boolean);
+
+      if (validDesignImgs.length) {
+        doc.setFontSize(7.5);
+        let sectionBottom = y;
+
+        if (validDesignImgs.length) {
+          doc.setFont('helvetica', 'bold');
+          doc.text(validDesignImgs.length > 1 ? 'Design / Product Images' : 'Design / Product', margin, y);
+          const gap = 4;
+          const rowHeight = 32;
+          let cursorX = margin;
+          let rowY = y + 2;
+          validDesignImgs.forEach((img) => {
+            const projectedWidth = Math.min(rowHeight * (img.w / img.h), contentWidth);
+            if (cursorX > margin && cursorX + projectedWidth > margin + contentWidth) {
+              cursorX = margin;
+              rowY += rowHeight + 3;
+            }
+            const drawn = drawImageFixedHeight(doc, img, cursorX, rowY, rowHeight, contentWidth);
+            cursorX += drawn.w + gap;
+            sectionBottom = Math.max(sectionBottom, rowY + drawn.h);
+          });
+        }
+
+        y = sectionBottom + 6;
+      }
+
+      const chart = SIZE_CHARTS[block.sizeType === 'kids' ? 'kids' : 'women'];
+      // one row per colour/material; legacy records map to a single row
+      const materials = block.materials?.length
+        ? block.materials
+        : ((block.materialImage?.filename || Object.values(block.sizeBreakdown || {}).some(v => Number(v)))
+            ? [{ index: 0, image: block.materialImage, sizes: block.sizeBreakdown || {} }]
+            : []);
+
+      if (materials.length) {
+        const matImgs = await Promise.all(materials.map(m =>
+          m.image?.filename ? fetchJobSheetImage(order._id, 'material', block.designIndex, m.index ?? 0) : null
+        ));
+
+        const rows = materials.map(m => {
+          const total = chart.reduce((sum, s) => sum + (Number(m.sizes?.[s.key]) || 0), 0);
+          return ['', ...chart.map(s => m.sizes?.[s.key] || ''), total || ''];
+        });
+        if (materials.length > 1) {
+          const colTotals = chart.map(s => materials.reduce((sum, m) => sum + (Number(m.sizes?.[s.key]) || 0), 0));
+          const grand = colTotals.reduce((a, b) => a + b, 0);
+          rows.push(['Total', ...colTotals.map(v => v || ''), grand || '']);
+        }
+
+        autoTable(doc, {
+          startY: y,
+          head: [['Material', ...chart.map(s => s.label), 'Total']],
+          body: rows,
+          headStyles: { fillColor: [60, 60, 60], textColor: 255, fontSize: 5.6, fontStyle: 'bold', cellPadding: 1.2, halign: 'center' },
+          styles: { fontSize: 6.2, cellPadding: 1.6, textColor: [30, 30, 30], lineColor: [0, 0, 0], lineWidth: 0.25, halign: 'center', valign: 'middle' },
+          columnStyles: {
+            0: { cellWidth: 18 },
+            [chart.length + 1]: { fontStyle: 'bold' }
+          },
+          didParseCell: (data) => {
+            if (data.section !== 'body') return;
+            const isTotalRow = materials.length > 1 && data.row.index === materials.length;
+            data.cell.styles.minCellHeight = isTotalRow ? 6 : 13;
+            if (isTotalRow) {
+              data.cell.styles.fontStyle = 'bold';
+              data.cell.styles.fillColor = [235, 235, 235];
+            }
+          },
+          didDrawCell: (data) => {
+            if (data.section !== 'body' || data.column.index !== 0) return;
+            const img = matImgs[data.row.index];
+            if (!img) return;
+            const pad = 1;
+            const availW = data.cell.width - pad * 2;
+            const availH = data.cell.height - pad * 2;
+            const ratio = img.w / img.h;
+            let h = availH;
+            let w = h * ratio;
+            if (w > availW) { w = availW; h = w / ratio; }
+            try {
+              doc.addImage(img.dataUrl, 'JPEG', data.cell.x + (data.cell.width - w) / 2, data.cell.y + (data.cell.height - h) / 2, w, h);
+            } catch {}
+          },
+          margin: { left: margin, right: margin },
+          theme: 'grid', tableLineColor: [0, 0, 0], tableLineWidth: 0.25
+        });
+        y = doc.lastAutoTable.finalY + 6;
+      }
+
+      if (block.notes) {
+        if (y > 190) { doc.addPage('a5', 'portrait'); y = 14; }
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(7.5);
+        doc.text('Notes:', margin, y);
+        doc.setFont('helvetica', 'normal');
+        const noteLines = doc.splitTextToSize(block.notes, contentWidth - 16);
+        doc.text(noteLines, margin + 16, y);
+        y += noteLines.length * 3.6 + 4;
+      } else {
+        y += 2;
+      }
+    }
+
+    // Trims with quantities
+    if (js.trims?.length) {
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(9);
+      doc.text('Trims & Accessories', margin, y);
+      autoTable(doc, {
+        startY: y + 2,
+        head: [['Item', 'Quantity / Details']],
+        body: js.trims.map(t => [t.item, t.quantity]),
+        headStyles: { fillColor: [60, 60, 60], textColor: 255, fontSize: 7, fontStyle: 'bold', cellPadding: 2 },
+        styles: { fontSize: 7.5, cellPadding: 2.5, textColor: [30, 30, 30], lineColor: [0, 0, 0], lineWidth: 0.25 },
+        columnStyles: { 0: { cellWidth: 45, halign: 'left' } },
+        margin: { left: margin, right: margin },
+        theme: 'grid', tableLineColor: [0, 0, 0], tableLineWidth: 0.25
+      });
+      y = doc.lastAutoTable.finalY + 8;
     }
 
     return doc;

@@ -95,7 +95,7 @@ export default function CustomerListPage() {
         </Button>
       </div>
 
-      {loading ? <LoadingSpinner /> : customers.length === 0 ? (
+      {loading && customers.length === 0 ? <LoadingSpinner /> : customers.length === 0 ? (
         <EmptyState
           icon={UserGroupIcon}
           title="No customers yet"

@@ -20,6 +20,7 @@ export default function InvoiceViewPage() {
   const [loading, setLoading] = useState(true);
   const [showDelete, setShowDelete] = useState(false);
   const [pdfPreviewUrl, setPdfPreviewUrl] = useState(null);
+  const [statusBusy, setStatusBusy] = useState(false);
 
   useEffect(() => {
     Promise.all([getInvoice(id), getSettings()])
@@ -32,12 +33,15 @@ export default function InvoiceViewPage() {
   }, [id]);
 
   const handleStatusChange = async (status) => {
+    if (statusBusy) return;
+    setStatusBusy(true);
     try {
       await updateInvoiceStatus(id, status);
       toast.success(`Marked as ${status}`);
       const res = await getInvoice(id);
       setInvoice(res.data);
     } catch (err) { toast.error(err.response?.data?.message || 'Failed'); }
+    finally { setStatusBusy(false); }
   };
 
   const handleDelete = async () => {
@@ -77,11 +81,11 @@ export default function InvoiceViewPage() {
               <Link to={`/invoices/${id}/edit`}>
                 <Button className="btn-outline-custom btn-sm-custom"><PencilIcon style={{ width: 14, height: 14, marginRight: 4 }} /> Edit</Button>
               </Link>
-              <Button className="btn-sm-custom" style={{ background: 'rgba(59,130,246,0.1)', color: 'var(--info)', border: 'none', borderRadius: 6, fontWeight: 600, cursor: 'pointer' }} onClick={() => handleStatusChange('Sent')}>Mark as Sent</Button>
+              <Button className="btn-sm-custom" style={{ background: 'rgba(59,130,246,0.1)', color: 'var(--info)', border: 'none', borderRadius: 6, fontWeight: 600, cursor: 'pointer' }} disabled={statusBusy} onClick={() => handleStatusChange('Sent')}>Mark as Sent</Button>
             </>
           )}
           {invoice.status === 'Sent' && (
-            <Button className="btn-sm-custom" style={{ background: 'rgba(34,197,94,0.1)', color: 'var(--success)', border: 'none', borderRadius: 6, fontWeight: 600, cursor: 'pointer' }} onClick={() => handleStatusChange('Paid')}>Mark as Paid</Button>
+            <Button className="btn-sm-custom" style={{ background: 'rgba(34,197,94,0.1)', color: 'var(--success)', border: 'none', borderRadius: 6, fontWeight: 600, cursor: 'pointer' }} disabled={statusBusy} onClick={() => handleStatusChange('Paid')}>Mark as Paid</Button>
           )}
           <Button className="btn-outline-custom btn-sm-custom" onClick={handlePreviewPdf}>
             <EyeIcon style={{ width: 14, height: 14, marginRight: 4 }} /> Preview PDF

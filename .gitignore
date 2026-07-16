@@ -8,3 +8,4 @@ server/uploads/*.pdf
 .claude/
 backups/
 invoice_system_vertex_digital_solutions/
+server/_*backup*.json

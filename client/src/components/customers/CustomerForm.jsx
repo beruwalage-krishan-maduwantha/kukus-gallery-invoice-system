@@ -10,9 +10,16 @@ export default function CustomerForm({ show, onHide, onSave, customer }) {
     setForm(customer ? { title: customer.title || '', name: customer.name || '', email: customer.email || '', phone: customer.phone || '', address: customer.address || '', company: customer.company || '', notes: customer.notes || '' } : emptyForm);
   }, [customer, show]);
 
+  const [error, setError] = useState('');
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSave(form);
+    if (!form.name.trim() && !form.company.trim()) {
+      setError('Enter either a Name or a Company.');
+      return;
+    }
+    setError('');
+    onSave(form.name.trim() ? form : { ...form, name: form.company.trim() });
   };
 
   return (
@@ -22,6 +29,7 @@ export default function CustomerForm({ show, onHide, onSave, customer }) {
       </Modal.Header>
       <Form onSubmit={handleSubmit}>
         <Modal.Body>
+          {error && <p style={{ color: 'var(--danger, #dc3545)', fontSize: '0.85rem', marginBottom: '0.75rem' }}>{error}</p>}
           <Row className="g-3">
             <Col md={2}>
               <Form.Group>
@@ -37,8 +45,8 @@ export default function CustomerForm({ show, onHide, onSave, customer }) {
             </Col>
             <Col md={4}>
               <Form.Group>
-                <Form.Label className="form-label-custom">Name *</Form.Label>
-                <Form.Control className="form-input" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} required />
+                <Form.Label className="form-label-custom">Name</Form.Label>
+                <Form.Control className="form-input" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
               </Form.Group>
             </Col>
             <Col md={6}>

@@ -32,6 +32,7 @@ export default function QuotationListPage() {
   const [convertTarget, setConvertTarget] = useState(null);
   const [converting, setConverting] = useState(false);
   const [convertData, setConvertData] = useState({ deliveryDate: '', paymentType: 'Cash' });
+  const [statusBusy, setStatusBusy] = useState(false);
 
   const fetchQuotations = useCallback(async () => {
     setLoading(true);
@@ -47,11 +48,14 @@ export default function QuotationListPage() {
   useEffect(() => { fetchQuotations(); }, [fetchQuotations]);
 
   const handleStatusChange = async (id, status) => {
+    if (statusBusy) return;
+    setStatusBusy(true);
     try {
       await updateQuotationStatus(id, status);
       toast.success(`Quotation marked as ${status}`);
       fetchQuotations();
     } catch (err) { toast.error(err.response?.data?.message || 'Failed'); }
+    finally { setStatusBusy(false); }
   };
 
   const handleConvert = async () => {
@@ -104,7 +108,7 @@ export default function QuotationListPage() {
         </Link>
       </div>
 
-      {loading ? <LoadingSpinner /> : quotations.length === 0 ? (
+      {loading && quotations.length === 0 ? <LoadingSpinner /> : quotations.length === 0 ? (
         <EmptyState
           icon={DocumentDuplicateIcon}
           title="No quotations yet"
@@ -144,12 +148,12 @@ export default function QuotationListPage() {
                         <button className="btn-sm-custom" style={btnStyle('rgba(177,145,198,0.1)', 'var(--primary)')} onClick={() => navigate(`/quotations/${q._id}/edit`)}>Edit</button>
                       )}
                       {q.status === 'Draft' && (
-                        <button className="btn-sm-custom" style={btnStyle('rgba(59,130,246,0.1)', 'var(--info)')} onClick={() => handleStatusChange(q._id, 'Sent')}>Send</button>
+                        <button className="btn-sm-custom" style={btnStyle('rgba(59,130,246,0.1)', 'var(--info)')} disabled={statusBusy} onClick={() => handleStatusChange(q._id, 'Sent')}>Send</button>
                       )}
                       {q.status === 'Sent' && (
                         <>
-                          <button className="btn-sm-custom" style={btnStyle('rgba(34,197,94,0.1)', 'var(--success)')} onClick={() => handleStatusChange(q._id, 'Accepted')}>Accept</button>
-                          <button className="btn-sm-custom" style={btnStyle('rgba(239,68,68,0.1)', 'var(--danger)')} onClick={() => handleStatusChange(q._id, 'Rejected')}>Reject</button>
+                          <button className="btn-sm-custom" style={btnStyle('rgba(34,197,94,0.1)', 'var(--success)')} disabled={statusBusy} onClick={() => handleStatusChange(q._id, 'Accepted')}>Accept</button>
+                          <button className="btn-sm-custom" style={btnStyle('rgba(239,68,68,0.1)', 'var(--danger)')} disabled={statusBusy} onClick={() => handleStatusChange(q._id, 'Rejected')}>Reject</button>
                         </>
                       )}
                       {q.status === 'Accepted' && (

@@ -79,7 +79,7 @@ export default function CreditNotesPage() {
         </div>
       </div>
 
-      {loading ? <LoadingSpinner /> : customerCredits.length === 0 ? (
+      {loading && customerCredits.length === 0 ? <LoadingSpinner /> : customerCredits.length === 0 ? (
         <EmptyState
           icon={ReceiptRefundIcon}
           title="No credit notes yet"
